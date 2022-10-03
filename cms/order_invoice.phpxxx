@@ -1,0 +1,60 @@
+<?php
+/**
+ * @author Carin Pretorius - CEIT Development
+ * Created on 2016-11_02
+ */
+
+session_start();
+require_once ("../application/classes/General.class.php");
+$vGeneral = new General();
+require_once ("application/classes/CmsParts.class.php");
+$vCmsParts = new CmsParts();
+require_once ("../application/classes/MysqlQuery.class.php");
+$vQuery = new MysqlQuery();
+require_once ("../application/classes/RequestUtils.class.php");
+$vRequest = new RequestUtils();
+require_once ("../application/classes/StringUtils.class.php");
+$vString = new StringUtils();
+
+include "../application/config/session_config.php";
+include "../include/connect/Connect.php";
+
+
+// Require composer autoload
+require_once __DIR__ . '/mpdf/vendor/autoload.php';
+
+
+include("../mpdf.php");
+$mpdf = new mPDF();
+$mpdf->WriteHTML($body);
+$content = $mpdf->Output('', 'S');
+
+$content = chunk_split(base64_encode($content));
+$mailto = '';
+$from_name = '';
+$from_mail = '';
+$replyto = '';
+$uid = md5(uniqid(time()));
+$subject = '';
+$message = '';
+$filename = "test.pdf";
+
+// $header = "From: ".$from_name." <".$from_mail.">rn";
+// $header .= "Reply-To: ".$replyto."rn";
+// $header .= "MIME-Version: 1.0rn";
+// $header .= "Content-Type: multipart/mixed; boundary="".$uid.""rnrn";
+// $header .= "This is a multi-part message in MIME format.rn";
+// $header .= "--".$uid."rn";
+// $header .= "Content-type:text/html; charset=iso-8859-1rn";
+// $header .= "Content-Transfer-Encoding: 7bitrnrn";
+// $header .= $message."rnrn";
+// $header .= "--".$uid."rn";
+// $header .= "Content-Type: application/pdf; name="".$filename.""rn";
+// $header .= "Content-Transfer-Encoding: base64rn";
+// $header .= "Content-Disposition: attachment; filename="".$filename.""rnrn";
+// $header .= $content."rnrn";
+// $header .= "--".$uid."--";
+// $is_sent = @mail($mailto, $subject, "", $header);
+// ?>
+
+include "../include/connect/CloseConnect.php";

@@ -1,0 +1,175 @@
+<?php
+if($vType == "k"){//keyword
+		$vOrder = " ORDER BY CASE ";
+		$vKeyword = StringUtils::filterTextForSearch(trim(strtolower(strip_tags(stripslashes($pSearchData['cat'])))));
+
+		$vWhere .= "WHERE (LOWER(bs.name) = ? OR ";
+		$vBindLetters .= "s";
+		$vKeyword1 = $vKeyword;
+		$vBindParams[] = & $vKeyword1;
+		$vOrder .= "WHEN LOWER(bs.name) = '".$vKeyword1."' THEN 1 ";
+
+		$vWhere .= " LOWER(bs.name) LIKE ? OR ";
+		$vBindLetters .= "s";
+		($pSearchData['autocomplete'] && $pSearchData['autocomplete']  == 1 ? $vKeyword1 = $vKeyword : $vKeyword1 = "%{$vKeyword}%");
+		$vBindParams[] = & $vKeyword1;
+		$vOrder .= "WHEN LOWER(bs.name) LIKE '".$vKeyword1."' THEN 3 ";
+
+		$vWhere .= "LOWER(bs.description) = ? OR ";
+		$vBindLetters .= "s";
+		$vCleanKeyword = str_replace(", ", ",", $vKeyword);
+		$vBindParams[] = & $vCleanKeyword;
+		$vOrder .= "WHEN LOWER(bs.name) = '".$vCleanKeyword."' THEN 2 ";
+
+		$vWhere .= "LOWER(bs.name) LIKE ? OR ";
+		$vBindLetters .= "s";
+		$vCleanKeyword = str_replace(", ", ",", $vKeyword);
+		($pSearchData['autocomplete'] && $pSearchData['autocomplete']  == 1 ? $vKeyword1 = $vCleanKeyword : $vKeyword1 = "%{$vCleanKeyword}%");
+		$vBindParams[] = & $vKeyword1;
+		$vOrder .= "WHEN LOWER(bs.name) LIKE '".$vKeyword1."' THEN 4 ";
+
+		$vWhere .= "bs.sku LIKE ?)";
+		$vBindLetters .= "s";
+		($pSearchData['autocomplete'] && $pSearchData['autocomplete']  == 1 ? $vKeyword1 = $vKeyword : $vKeyword1 = "%{$vKeyword}%");
+		$vBindParams[] = & $vKeyword1;
+		$vOrder .= "WHEN bs.sku LIKE '".$vKeyword1."' THEN 5 ELSE 6 END";
+
+		$vWindowValues = General::echoWalkingWindowTopSearch($pConn, $per_page, $vPageNo, $vUrl, "bs.id", "books_search bs", $vWhere, $vBindLetters, $vBindParams);
+		$vResults = MysqlQuery::getBooksFull($pConn, $vWhere, $vOrder, $vBindLetters,  $vBindParams, $vWindowValues[4]);
+}
+else if($vType == "ks"){//keyword with sort
+		$vOrder = " ORDER BY ".urldecode($pSearchData['sort']);
+		$vKeyword = StringUtils::filterTextForSearch(trim(strtolower(strip_tags(stripslashes($pSearchData['cat'])))));
+
+		$vWhere .= "WHERE (LOWER(bs.title) = ? OR ";
+		$vBindLetters .= "s";
+		$vKeyword1 = $vKeyword;
+		$vBindParams[] = & $vKeyword1;
+
+		$vWhere .= " LOWER(bs.title) LIKE ? OR ";
+		$vBindLetters .= "s";
+		($pSearchData['autocomplete'] && $pSearchData['autocomplete']  == 1 ? $vKeyword1 = $vKeyword : $vKeyword1 = "%{$vKeyword}%");
+		$vBindParams[] = & $vKeyword1;
+
+		$vWhere .= "LOWER(bs.author) = ? OR ";
+		$vBindLetters .= "s";
+		$vKeyword1 = $vKeyword;
+		$vBindParams[] = & $vKeyword1;
+
+		$vWhere .= "LOWER(bs.author) LIKE ? OR ";
+		$vBindLetters .= "s";
+		($pSearchData['autocomplete'] && $pSearchData['autocomplete']  == 1 ? $vKeyword1 = $vKeyword : $vKeyword1 = "%{$vKeyword}%");
+		$vBindParams[] = & $vKeyword1;
+
+		$vWhere .= "bs.isbn LIKE ?)";
+		$vBindLetters .= "s";
+		($pSearchData['autocomplete'] && $pSearchData['autocomplete']  == 1 ? $vKeyword1 = $vKeyword : $vKeyword1 = "%{$vKeyword}%");
+		$vBindParams[] = & $vKeyword1;
+
+		$vWindowValues = General::echoWalkingWindowTopSearch($pConn, $per_page, $vPageNo, $vUrl, "bs.id", "books_search bs", $vWhere, $vBindLetters, $vBindParams);
+		$vResults = MysqlQuery::getBooksFull($pConn, $vWhere, $vOrder, $vBindLetters,  $vBindParams, $vWindowValues[4]);
+}
+else if($vType == "a"){// author
+// 		$vOutPrintValue = 0;
+// 		$vBindLetters .= "i";
+// 		$vBindParams[] = & $vOutPrintValue;
+// 		$vWhere = "WHERE  b.out_of_print = ? and ";
+
+		$vOrder = " ORDER BY ".urldecode($pSearchData['sort']);
+		$vAuthor = trim(strtolower(strip_tags(stripslashes($pSearchData['cat']))));
+
+		$vWhere .= " WHERE (LOWER(b.author) LIKE ? OR ";
+		$vBindLetters .= "s";
+		$vKeyword1 = "%{$vAuthor}%";
+		$vBindParams[] = & $vKeyword1;
+
+		$vWhere .= "LOWER(b.illustrator) LIKE ? OR ";
+		$vBindLetters .= "s";
+		$vKeyword1 = "%{$vAuthor}%";
+		$vBindParams[] = & $vKeyword1;
+
+		$vWhere .= "LOWER(b.translator) LIKE ?)";
+		$vBindLetters .= "s";
+		$vKeyword1 = "%{$vAuthor}%";
+		$vBindParams[] = & $vKeyword1;
+
+// 		$vWhere .= " b.language = ?";
+// 		$vBindLetters .= "s";
+// 		$vBindParams[] = & $_SESSION['SessionGrafLanguage'];
+
+		$vWindowValues = General::echoWalkingWindowTopSearch($pConn, $per_page, $vPageNo, $vUrl, "b.id", "books_search b", $vWhere, $vBindLetters, $vBindParams);
+		$vResults = MysqlQuery::getBooks($pConn, $vWhere, $vOrder, $vBindLetters,  $vBindParams, $vWindowValues[4]);
+}
+else if($vType == "m"){//menu
+		$vOutPrintValue = 0;
+		$vBindLetters .= "i";
+		$vBindParams[] = & $vOutPrintValue;
+		$vWhere = "WHERE  s.id > ? and ";
+
+		$vWhere .= " s.sub_category = ?";
+		$vOrder = " ORDER BY ".urldecode($pSearchData['sort']);
+		$vValue = $pSearchData['subcat_id'];
+		$vBindLetters .= "i";
+		$vBindParams[] = & $vValue;
+
+		$vWindowValues = General::echoWalkingWindowTopSearch($pConn, $per_page, $vPageNo, $vUrl, "s.id", "stationary s", $vWhere, $vBindLetters, $vBindParams);
+		$vResults = MysqlQuery::getStationary($pConn, $vWhere, $vOrder, $vBindLetters,  $vBindParams, $vWindowValues[4]);
+}
+else if($vType == "c"){//category
+		$vOutPrintValue = 0;
+		$vBindLetters .= "i";
+		$vBindParams[] = & $vOutPrintValue;
+		$vWhere = "WHERE  b.out_of_print = ? and ";
+
+		$vWhere .= " b.category = ?";
+		$vOrder = " ORDER BY ".urldecode($pSearchData['sort']);
+		$vValue = $pSearchData['cat_id'];
+		$vBindLetters .= "i";
+		$vBindParams[] = & $vValue;
+
+		$vWindowValues = General::echoWalkingWindowTopSearch($pConn, $per_page, $vPageNo, $vUrl, "id", "books b", $vWhere, $vBindLetters, $vBindParams);
+		$vResults = MysqlQuery::getBooks($pConn, $vWhere, $vOrder, $vBindLetters,  $vBindParams, $vWindowValues[4]);
+}
+else if($vType == "b"){
+		$vWhere = "WHERE b.id = ?";
+		$vOrder = "";
+		$vValue = $pSearchData['id'];
+		$vBindParams[] = & $vValue;
+		$vBindLetters .= "i";
+
+		$vWindowValues = General::echoWalkingWindowTopSearch($pConn, $per_page, $vPageNo, $vUrl, "id", "books b", $vWhere, $vBindLetters, $vBindParams);
+		$vResults = MysqlQuery::getBooks($pConn, $vWhere, $vOrder, $vBindLetters,  $vBindParams, $vWindowValues[4]);
+}
+else if ($vType == "Moleskine"){
+		$vWhere = "WHERE b.id in (select id from books where author = ?) AND b.out_of_print = ?";
+		$vOrder = " ORDER BY ".urldecode($pSearchData['sort']);
+		$vValue = "Moleskine";
+		$vBindParams[] = & $vValue;
+		$vBindLetters .= "s";
+		$vOutPrintValue = 0;
+		$vBindLetters .= "i";
+		$vBindParams[] = & $vOutPrintValue;
+
+		$vWindowValues = General::echoWalkingWindowTopSearch($pConn, $per_page, $vPageNo, $vUrl, "id", "books b", $vWhere, $vBindLetters, $vBindParams);
+		$vResults = MysqlQuery::getBooks($pConn, $vWhere, $vOrder, $vBindLetters,  $vBindParams, $vWindowValues[4]);
+}
+else if ($vType == "Skryfbehoeftes" || $vType == "Stationery"){
+		$vWhere = "WHERE b.sub_category = ?";
+		$vOrder = "ORDER BY b.title ASC";
+		$vValue = 164;//Pens
+		$vBindParams[] = & $vValue;
+		$vBindLetters .= "i";
+
+		$vWindowValues = General::echoWalkingWindowTopSearch($pConn, $per_page, $vPageNo, $vUrl, "id", "books b", $vWhere, $vBindLetters, $vBindParams);
+		$vResults = MysqlQuery::getBooks($pConn, $vWhere, $vOrder, $vBindLetters,  $vBindParams, $vWindowValues[4]);
+}
+else if ($vType == "book-id"){
+		$vWhere = "WHERE b.id = ?";
+		$vOrder = "";
+		$vValue = $pSearchData['id'];
+		$vBindParams[] = & $vValue;
+		$vBindLetters .= "i";
+
+		$vWindowValues = General::echoWalkingWindowTopSearch($pConn, $per_page, $vPageNo, $vUrl, "id", "books b", $vWhere, $vBindLetters, $vBindParams);
+		$vResults = MysqlQuery::getBooks($pConn, $vWhere, $vOrder, $vBindLetters,  $vBindParams, $vWindowValues[4]);
+}

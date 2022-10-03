@@ -1,0 +1,20 @@
+User-agent: Ahrefsbot
+Disallow: /
+
+User-agent: Baiduspider
+Disallow: /
+
+User-agent: Googlebot-image
+Disallow: /application/config
+Crawl-delay: 1
+
+User-agent: *
+Disallow: /application/config
+Disallow: /cms
+Disallow: /logs
+Disallow: /mail
+Disallow: /tcpdf
+Disallow: /include/connect
+Crawl-delay: 1
+
+Sitemap: https://www.graffitibooks.co.za/sitemap.xml

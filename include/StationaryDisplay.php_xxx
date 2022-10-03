@@ -1,0 +1,181 @@
+<?php
+
+	$vPage = MysqlQuery::getText($pConn, 14);/*Soek*/
+	$vString = "";
+	if(count($vResults['id']) > 0){
+		$vString .= "<form class=\"form-horizontal\" name=\"booksForm\" id=\"booksForm\">";
+		$vString .= "<input type=\"hidden\" id=\"current-url\" name=\"current-url\" value=\"".$vCurrentUrl."\">";
+		$vString .= "<div id=\"form-border\">";
+			$vString .= "<div id=\"center\">";
+
+// 			if($pSearchData['type'] != "b"){
+// 				$vString .= "<div class=\"form-header\">";
+// 					$vString .="<div class=\"row\">";
+// 						$vString .= "<div class=\"col-xs-6 col-md-7\">";
+// 							$vString .= "<h1 class=\"red\">".$vHeading."</h1>";
+// 								if(!empty($pSort)){
+// 									$vString .= "<span class=\"text-small green no-space\">Results ".$vWindowValues[6]." of ".$vWindowValues[5]."</span><br>";
+// 									if(isset($vResults['id']) && count($vResults['id']) > 1){
+// 										$vString .= "<span class=\"text-small-normal green no-space\">".MysqlQuery::getText($pConn, 333)/*Gesorteer volgens*/.": ".General::returnSortOrderDescription($pConn, $pSort)."</span>";
+// 									}
+// 								}
+// 						$vString .= "</div>";
+// 						$vString .= "<div class=\"col-xs-5 col-md-4\">";
+// 						if($pSearchData['type'] != "tv" && $pSearchData['type'] != "rr"){
+// 							$vString .= "<span class=\"pull-right\">";
+// 							if(isset($vResults['id']) && count($vResults['id']) > 1 && !empty($pSort)){
+// 								$vString .= General::echoSortOrderSelect($pConn, $pSort, $vUrlData, $vType);
+// 							}
+// 							$vString .= "</span>";
+// 						}
+// 						$vString .= "</div>";
+// 						$vString .= "<div class=\"col-xs-1\"></div>";
+// 					$vString .= "</div>";
+// 				$vString .= "</div>";//Header
+// 			}
+
+				$vString .= "<div class=\"form-body\">";
+				if(isset($vResults['id'])){
+					for($x = 0; $x < count($vResults['id']); $x++){
+
+// 					$vResult['id'][] = $id;0
+// 				    $vResult['sku'][] = $sku;1
+// 				    $vResult['category'][] = $category;
+// 				    $vResult['sub_category'][] = $sub_category;
+// 				    $vResult['code'][] = $code;
+// 				    $vResult['name'][] = $name;4
+// 				    $vResult['brand'][] = $brand;21
+// 				    $vResult['description'][] = $description;
+// 				    $vResult['cost_price'][] = $cost_price;
+// 				    $vResult['retail_price'][] = $retail_price;8
+// 				    $vResult['special_price'][] = $special_price;7
+// 				    $vResult['supplier_id'][] = $supplier_id;
+// 				    $vResult['in_stock'][] = $in_stock;16
+// 				    $vResult['blob_path'][] = $blob_path;6
+// 				    $vResult['comments'][] = $comments;
+// 				    $vResult['date_loaded'][] = $date_loaded;
+// 				    $vResult['search_idx'][] = $search_idx;
+// 				    $vResult['edit_by'][] = $edit_by;
+// 				    $vResult['category_string'][] = $category_string;19
+// 				    $vResult['sub_category_string'][] = $sub_category_string;20
+
+						$vString .="<div class=\"row\">";
+						$vString .="<div itemscope itemtype=\"http://schema.org/Product\" class=\"form-group\">";
+
+							$vString .= "<div class=\"col-xs-2 col-md-2 row-grid col-center thumb-book-image\" id=\"".$vClass."_".$vResults['id'][$x]."\" data-id=\"".$vResults['id'][$x]."\">";
+								if(!empty($vResults['blob_path'][$x])){
+									$vString .= "<a href=\"images/books/".$vResults['blob_path'][$x]."\" data-lightbox=\"img_".$vResults['blob_path'][$x]."\" data-title=\"".$vResults['name'][$x]."\" title=\"".$vResults['name'][$x]."\">";
+										$vString .= "<img itemprop=\"image\" id=\"".$vResults['id'][$x]."\" src=\"images/books/".$vResults['blob_path'][$x]."\" class=\"img-responsive thumb\" alt=\"".MysqlQuery::getText($pConn, 311)/*Klik om te vergroot*/."\" title=\"".MysqlQuery::getText($pConn, 311)/*Klik om te vergroot*/."\">";
+									$vString .= "</a>";
+									$vString .= "<div class=\"text-xsmall\">".MysqlQuery::getText($pConn, 311)/*Klik om te vergroot*/."</div>";
+								}
+								else {
+									$vString .= "<a href=\"images/no_image.png\" data-lightbox=\"img_logo.png\" data-title=\"".MysqlQuery::getText($pConn, 475)/*Geen foto*/."\" title=\"".MysqlQuery::getText($pConn, 475)/*Geen foto*/."\">";
+										$vString .= "<img id=\"".$vResults['id'][$x]."\" src=\"images/no_image.png\" class=\"img-responsive cart-thumb thumb\" alt=\"".MysqlQuery::getText($pConn, 475)/*Geen foto*/."\" title=\"".MysqlQuery::getText($pConn, 475)/*Geen foto*/."\">";
+									$vString .= "</a>";
+								}
+								$vString .= "<div class=\"white\">".$vResults['sku'][$x]."</div>";
+
+							$vString .= "</div>";//col
+							$vString .= "<div class=\"col-xs-10 col-md-10\">";
+								$vString .= "<div><h1 class=\"green\"><a href=\"".$_SESSION['SessionGrafFullServerUrl'].$_SESSION['SessionGrafLanguage']."/".$vResults['id'][$x]."/".MysqlQuery::getText($pConn, 157)/*Boeke*/."\" itemprop=\"name\" title=\"".$vResults['name'][$x]."\">".General::str_highlight($vResults['name'][$x], $pSearchData['cat'])."</a></h1></div>";//title
+								$vString .= "<h2 class=\"no-display\">".$vSubHead.$vResults['sub_category_string'][$x]."</h2>";
+								if(!empty($vResults['brand'][$x])){
+									$vBrandName = MysqlQuery::getFieldValue($pConn, 'lk_st_suppliers', 'name', 'id = '.$vResults['brand'][$x]);
+									$vString .= "<div class=\"text-small-normal blue no-space\">";
+										$vString .= "<a class=\"red-menu\"href=\"".$_SESSION['SessionGrafLanguage']."/a/".$vPage."/0/date_publish DESC/".str_replace(".", "~", $vAuthorResult[$a])."\" title=\"".$vAuthorResult[$a]."\" title=\"".$vAuthorResult[$a]."\">".$vBrandName."</a>";
+									$vString .= "</div>";
+								}
+
+								//Cat & sub-cat
+								$vString .= "<div class=\"text-small-normal blue no-space\">".$vResults['category_string'][$x]."&nbsp;&nbsp;-&nbsp;&nbsp;".$vResults['sub_category_string'][$x]."</div>";
+
+			                    //Price start
+								(!empty($vResults['special_price'][$x]) && $vResults['special_price'][$x] > 0  ? $vFinalPrice = $vResults['special_price'][$x] : $vFinalPrice = $vResults['retail_price'][$x]);
+								$vNormalPrice = $vResults['retail_price'][$x];
+
+								if($vFinalPrice < $vResults['retail_price'][$x]){
+									$vString .= "<span  itemprop=\"offers\" itemscope itemtype=\"http://schema.org/Offer\"><div class=\"thumb-book-discount discount\">R ".round($vResults['retail_price'][$x])."</div>";
+									$vString .= "<div class=\"thumb-book-price price\">R <span itemprop=\"price\">".$vFinalPrice."</span>";
+									$vString .= "<span class=\"green text-small-normal\"><i class=\"fa fa-check fa-lg icon-spacing\" aria-hidden=\"true\"></i>".MysqlQuery::getText($pConn, 32)/*Jy spaar*/." R ".round($vResults['retail_price'][$x]-$vFinalPrice)."</span></div><meta itemprop=\"priceCurrency\" content=\"ZAR\"></span>";
+								}
+								else {
+									$vString .= "<div class=\"thumb-book-price price\">R <span itemprop=\"price\">".$vFinalPrice."</span></div><meta itemprop=\"priceCurrency\" content=\"ZAR\"></span>";
+								}
+
+								$vString .= "<div class=\"dgreen\" itemprop=\"description\">".$vResults[5][$x]."</div>";//Summary
+
+			                    $vString .= "<div class=\"thumb-book-shop\">";
+				                    if(isset($_SESSION['SessionGrafUserId']) && $_SESSION['SessionGrafUserId'] != ''){//Logged in
+			                    		if($vResults['in_stock'][$x] > 0){
+			                    			$vString .= "<a class=\"btn btn-primary my-cart-btn-s-stationary\" role=\"button\" data-id=\"".$vResults['id'][$x]."\" data-image=\"images/books/".$vResults['blob_path'][$x]."\" title=\"".MysqlQuery::getText($pConn, 24)/*Laai in mandjie*/."\">".MysqlQuery::getText($pConn, 24)/*Laai in mandjie*/."<i class=\"fa fa-shopping-basket top-margin\"></i></a>";
+			                    			$vString .= "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a id=\"add-to-wishlist-stationary".$vResults['id'][$x]."\" class=\"btn btn-primary\" role=\"button\" data-book=\"".$vResults['id'][$x]."\" title=\"".MysqlQuery::getText($pConn, 312)/*Laai in Wenslys*/."\">".MysqlQuery::getText($pConn, 312)/*Laai in Wenslys*/."</a>";
+			                    		}
+		                    			if($vResults['in_stock'][$x] == 0){//in_stock = 0 && out_of_print = No
+			                    			$vString .= "<div class=\"text-small-normal red\">".MysqlQuery::getText($pConn, 293)/*Nie in voorraad - sal versending vertraag*/."</div>";
+			                    		}
+			                    		else {
+			                    			$vString .= "<div class=\"text-small-normal green\">".MysqlQuery::getText($pConn, 431)/*In voorraad - versending binne 48 uur*/."</div>";
+			                    		}
+				                    }
+				                    else {//Not logged in
+				                    	$vString .= "<a class=\"btn btn-primary\" href=\"#login\" role=\"button\" data-toggle=\"modal\" title=\"".MysqlQuery::getText($pConn, 266)/*Teken aan om te koop*/."\">".MysqlQuery::getText($pConn, 266)/*Teken aan om te koop*/."<i class=\"fa fa-shopping-basket top-margin\"></i></a>";
+				                    }
+			                    $vString .= "</div>";
+							$vString .= "</div>";//col
+							$vString .= "</div>";//form-group
+						$vString .="</div>";//row
+
+						$vString .="<div class=\"row\">";
+							$vString .= "<div class=\"col-xs-2 col-md-2\"></div>";
+							$vString .= "<div class=\"col-xs-10 col-md-10\">";
+								$vString .="<div id=\"wishlist_double".$vResults['id'][$x]."\" class=\"error\" style=\"display:none;\">".MysqlQuery::getText($pConn, 313)/*Die boek is reeds in jou Wenslys gelaai*/."</div>";
+								$vString .="<div id=\"wishlist_success".$vResults['id'][$x]."\" class=\"success\" style=\"display:none;\">".MysqlQuery::getText($pConn, 314)/*Die boek is in jou Wenslys gelaai*/."</div>";
+							$vString .="</div>";
+						$vString .="</div>";//row
+						$vString .="<div class=\"row info-detail\"><div class=\"col-xs-12\"></div></div>";
+					}
+				}
+				$vString .= "</div>";//Body
+
+				if($per_page < $vWindowValues[5]){
+					$vString .= "<div class=\"form-footer\">";
+						$vString .="<div class=\"row\">";
+		                    $vString .="<div class=\"col-xs-12\">";
+		                    	$vString .= General::echoWalkingWindowPages($vWindowValues[5], $per_page, $vPageNo, $vWindowValues[2], $vUrl);
+							$vString .="</div>";//col
+						$vString .="</div>";//row
+					$vString .="</div>";//footer
+				}
+
+			$vString .= "</div>";//center
+		$vString .= "</div>";//form-border
+		$vString .= "</form>";
+	}
+	else {
+		$vString .= "<form class=\"form-horizontal\" name=\"booksForm\" id=\"booksForm\">";
+		$vString .= "<input type=\"hidden\" id=\"current-url\" name=\"current-url\" value=\"".$vCurrentUrl."\">";
+		$vString .= "<div id=\"form-border\">";
+			$vString .= "<div id=\"center\">";
+
+				$vString .= "<div class=\"form-header\">";
+					$vString .="<div class=\"row\">";
+						$vString .= "<div class=\"col-xs-12 col-md-12\">";
+							$vString .= "<h1 class=\"red\">".$vHeading."</h1>";
+						$vString .= "</div>";
+					$vString .= "</div>";
+				$vString .= "</div>";//Header
+
+				$vString .= "<div class=\"form-body\">";
+						$vString .="<div class=\"row\">";
+						$vString .="<div class=\"form-group\">";
+							$vString .= "<div class=\"col-xs-12 col-md-12 row-grid\">";
+								$vString .= MysqlQuery::getText($pConn, 21);/*Jammer, geen resultate is gevind nie!*/
+							$vString .= "</div>";//col
+							$vString .= "</div>";//form-group
+						$vString .="</div>";//row
+				$vString .= "</div>";//Body
+			$vString .= "</div>";//center
+		$vString .= "</div>";//form-border
+		$vString .= "</form>";
+	}

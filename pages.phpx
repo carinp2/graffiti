@@ -1,0 +1,68 @@
+<?php
+/**
+ * @author Carin Pretorius - CEIT Development
+ * Created on 2016-11_02
+ */
+
+session_start();
+
+require_once ("application/classes/General.class.php");
+$vGeneral = new General();
+
+include "application/config/session_config.php";
+include "include/connect/Connect.php";
+
+require_once ("application/classes/RequestUtils.class.php");
+$vRequest = new RequestUtils();
+require_once ("application/classes/StringUtils.class.php");
+$vString = new StringUtils();
+require_once ("application/classes/MysqlQuery.class.php");
+$vQuery = new MysqlQuery();
+require_once ("application/classes/Parts.class.php");
+$vParts = new Parts();
+require_once ("application/classes/Pages.class.php");
+$vPages = new Pages();
+
+$vType = $vRequest->getParameter('type');
+(empty($vType) ? $vType = "error" : $vType = $vType);
+$vPage = $vRequest->getParameter('page');
+(empty($vPage) ? $vPage = "Home" : $vPage = $vPage);
+//TODO Write error page
+
+$vHtmlBegin = $vParts->getHtmlBegin($conn, $vBookId);
+echo $vHtmlBegin;
+
+$vHeader = $vParts->getHeader($conn);
+echo $vHeader;
+
+$vTopMenu = $vParts->getTopMenu($conn, $vPage);
+echo $vTopMenu;
+
+$vPagesTop = $vParts->getPagesPageTop();
+echo $vPagesTop;
+
+
+	if($vType == "Register" || $vType == "Registreer"){
+		$vId = $vRequest->getParameter('id');
+		if($vId == 0){
+			$vRegister = $vPages->getRegisterForm($conn, $vId);
+			echo $vRegister;
+		}
+		else if($vId > 0){
+			include "include/RegistrationQueries.php";
+		}
+	}
+
+$vPagesPageBottom = $vParts->getPagesPageBottom();
+echo $vPagesPageBottom;
+
+$vFooter = $vParts->getFooter($conn, $vPage);
+echo $vFooter;
+
+$vPageBottom = $vParts->getPageBottom($conn);
+echo $vPageBottom;
+
+include "include/connect/CloseConnect.php";
+
+$vHtmlEnd = $vParts->getHtmlEnd();
+echo $vHtmlEnd;
