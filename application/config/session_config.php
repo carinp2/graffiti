@@ -16,11 +16,14 @@ $_SESSION['now_month_year'] = date("m/Y");
 $_SESSION['SessionGrafStyle'] = "css/style1.12.css";
 $_SESSION['SessionGrafScript'] = "js/general1.26.js";
 
+//Login changes - Login not required to add to cart - 13-10-2022
+$_SESSION['SessionGrafUserSessionId'] = session_id();
+
 unset($_SESSION['SessionGrafServerPrefix']);
-if(strpos($vPageUrl, 'graffiti2') !== false){
+if(strpos($vPageUrl, 'graffiti') !== false){
 	$_SESSION['SessionGrafServerPrefix'] = "/";
-	$_SESSION['SessionGrafFullServerUrl'] = "http://graffiti2/";
-	$_SESSION['SessionGrafServerUrl'] = "graffiti2";
+	$_SESSION['SessionGrafFullServerUrl'] = "http://graffiti/";
+	$_SESSION['SessionGrafServerUrl'] = "graffiti";
 }
 else if(strpos($vPageUrl, 'graffitibooks') !== false){
 	$_SESSION['SessionGrafServerPrefix'] = "/";

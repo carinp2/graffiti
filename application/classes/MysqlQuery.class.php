@@ -1300,15 +1300,15 @@ class MysqlQuery {
 	}
 
 	public static function getClients($pConn, $pWhere, $pOrder, $pBindLetters,  $pBindParams, $pLimit){
-		$vSqlString = "select id, firstname, surname, email, validated, phone, postal_address1, postal_address2, postal_city, postal_province, postal_country, postal_code, physical_address1, physical_address2, physical_city, physical_province, physical_country, physical_code, newsletter, language, special_discount from clients ".$pWhere." ".$pOrder." ".$pLimit;
+		$vSqlString = "select id, firstname, surname, email, validated, phone, postal_address1, postal_address2, postal_city, postal_province, postal_country, postal_code, physical_address1, physical_address2, physical_city, physical_province, physical_country, physical_code, newsletter, language, special_discount, physical_country_id from clients ".$pWhere." ".$pOrder." ".$pLimit;
 		//error_log($vSqlString."//".$pBindParams[0]."//".$pBindParams[1]."//".$pBindParams[2]);
 		$stmt = $pConn->prepare($vSqlString);
 		array_unshift($pBindParams, $pBindLetters);
 		call_user_func_array(array($stmt, 'bind_param'), $pBindParams);
         $id=0;
-        $firstname=$surname=$email=$validated=$phone=$postal_address1=$postal_address2=$postal_city=$postal_province=$postal_country=$postal_code=$physical_address1=$physical_address2=$physical_city=$physical_province=$physical_country=$physical_code=$newsletter=$language=$special_discount = '';
+        $firstname=$surname=$email=$validated=$phone=$postal_address1=$postal_address2=$postal_city=$postal_province=$postal_country=$postal_code=$physical_address1=$physical_address2=$physical_city=$physical_province=$physical_country=$physical_code=$newsletter=$language=$special_discount=$physical_country_id = '';
 		if($stmt->execute() == true) {
-			$stmt->bind_result($id, $firstname, $surname, $email, $validated, $phone, $postal_address1, $postal_address2, $postal_city, $postal_province, $postal_country, $postal_code, $physical_address1, $physical_address2, $physical_city, $physical_province, $physical_country, $physical_code, $newsletter, $language, $special_discount);
+			$stmt->bind_result($id, $firstname, $surname, $email, $validated, $phone, $postal_address1, $postal_address2, $postal_city, $postal_province, $postal_country, $postal_code, $physical_address1, $physical_address2, $physical_city, $physical_province, $physical_country, $physical_code, $newsletter, $language, $special_discount, $physical_country_id);
 			while ($stmt->fetch()) {
 				if($id && $id > 0) {
 					$vId[] = $id;
@@ -1332,11 +1332,12 @@ class MysqlQuery {
 					$vNewsletter[] = $newsletter;
 					$vLanguage[] = $language;
 					$vSpecial_discount[] = $special_discount;
+                    $vPhysical_country_id[] = $physical_country_id;
 				}
 			}
 		}
 		$stmt->close();
-		return array($vId, $vFirstname, $vSurname, $vEmail, $vValidated, $vPhone, $vPostal_address1, $vPostal_address2, $vPostal_city, $vPostal_province, $vPostal_code, $vPostal_country, $vPhysical_address1, $vPhysical_address2, $vPhysical_city, $vPhysical_province, $vPhysical_country, $vPhysical_code, $vNewsletter, $vLanguage, $vSpecial_discount);
+		return array($vId, $vFirstname, $vSurname, $vEmail, $vValidated, $vPhone, $vPostal_address1, $vPostal_address2, $vPostal_city, $vPostal_province, $vPostal_code, $vPostal_country, $vPhysical_address1, $vPhysical_address2, $vPhysical_city, $vPhysical_province, $vPhysical_country, $vPhysical_code, $vNewsletter, $vLanguage, $vSpecial_discount,$vPhysical_country_id);
 	}
 
 	public static function getOrderClient($pConn, $pId){

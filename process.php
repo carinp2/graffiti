@@ -24,7 +24,7 @@ require_once ("application/classes/Pages.class.php");
 $vPages = new Pages();
 require_once ("application/resources/PasswordHashClass.php");
 
-$vType =  $_REQUEST['type'];
+$vType = ($_POST['type'] ?? $_GET['type']);
 
 if($vType == "register"){
 	$vGraf = 0;
@@ -53,14 +53,14 @@ if($vType == "register"){
 		$vData['email'] = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
 		$vData['phone'] = filter_var($_POST['phone'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 		$vData['password'] = $hash;
-		$vData['validated'] = 0;
+		$vData['validated'] = 1;
 		$vData['salt'] = $salt;
-		$vData['postal_address1'] = filter_var($_POST['postal_address1'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-		$vData['postal_address2'] = filter_var($_POST['postal_address2'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-		$vData['postal_city'] = filter_var($_POST['postal_city'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-		$vData['postal_province'] = filter_var($_POST['postal_province'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-		$vData['postal_code'] = filter_var($_POST['postal_code'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-		$vData['postal_country'] = filter_var($_POST['postal_country'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+//		$vData['postal_address1'] = filter_var($_POST['postal_address1'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+//		$vData['postal_address2'] = filter_var($_POST['postal_address2'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+//		$vData['postal_city'] = filter_var($_POST['postal_city'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+//		$vData['postal_province'] = filter_var($_POST['postal_province'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+//		$vData['postal_code'] = filter_var($_POST['postal_code'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+//		$vData['postal_country'] = filter_var($_POST['postal_country'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 		$vData['physical_address1'] = filter_var($_POST['physical_address1'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 		$vData['physical_address2'] = filter_var($_POST['physical_address2'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 		$vData['physical_city'] = filter_var($_POST['physical_city'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
@@ -68,36 +68,17 @@ if($vType == "register"){
 		$vData['physical_country'] = filter_var($_POST['physical_country'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 		$vData['physical_code'] = filter_var($_POST['physical_code'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 		$vData['temp_token'] = $temp_token;
-		($_POST['newsletter'] == "" ?   : $vData['newsletter'] = $_POST['newsletter']);
+		$vData['newsletter'] = (isset($_POST['newsletter']) ? filter_var($_POST['newsletter'], FILTER_SANITIZE_FULL_SPECIAL_CHARS) : 0);
 		$vData['language'] = filter_var($_POST['client_language'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 		$_SESSION['SessionGrafLanguage'] = $vData['language'];
+		$vData['special_discount'] = 0.00;
 
-		$vData['special_discount'] = 0;
-
-		$pos = strpos($vData['postal_country'], "file");
 		$pos2 = strpos($vData['firstname'], "http");
-		$pos3 = strpos($vData['postal_city'], "file");
 		$pos4 = strpos($vData['surname'], "FR");
-		if($pos === false && $pos2 === false && $pos3 === false && $pos4 === false){
+		if($pos2 === false && $pos4 === false){
 			$vQueryResult = MysqlQuery::doInsert($conn, 'clients', $vData);
 			if($vQueryResult > 5000) {
 				$vNewId = $vQueryResult;
-
-				//Graffiti email
-			    $subject = "Website - Client registration";
-			    $to = "carin@ceit.cc";
-
-			    $headers  = "MIME-Version: 1.0" . "\r\n";
-			    $headers .= "Content-type: text/html; charset=UTF-8" . "\r\n";
-			    $headers .= "From: ".$_POST['firstname']." ".$_POST['surname']."<".$_POST['email'].">". "\r\n";
-			    //$headers .= "CC: dirk@smc-synergy.co.za\r\n";
-			    $message  = "'n Nuwe registrasie via die webwerf: <br><br>";
-
-			    $message .= "Naam: " . $_POST['firstname'] . " ". $_POST['surname'] ."<br>";
-			    $message .= "Kontaknommer: " . $_POST['phone'] . "<br>";
-			    $message .= "Epos: " . $_POST['email'] . "<br>";
-			    //TODO Change for Live
-			    $message .= "<br>Gebruik die  <a href=\"https://www.graffitiboeke.co.za/cms\" target=\"_blank\" title=\"CMS\">CMS</a> vir meer detail<br>";
 
 			    //Client Email
 			    $subjectClient = MysqlQuery::getText($conn, 252)/*Graffiti - Webwerf registrasie*/;
@@ -105,32 +86,26 @@ if($vType == "register"){
 
 			    $headersClient  = "MIME-Version: 1.0" . "\r\n";
 			    $headersClient .= "Content-type: text/html; charset=UTF-8" . "\r\n";
-			    $headersClient .= "From: Graffiti". "\r\n";
+			    $headersClient .= "From: carin@ceit.cc". "\r\n";
 
 			    $messageClient  = $_POST['firstname']." ".$_POST['surname'].",<br><br>";
-			    $messageClient  .= MysqlQuery::getText($conn, 253)/*Dankie vir jou registrasie op Graffiti.*/."<br><br>";
+                $messageClient  .= MysqlQuery::getText($conn, 253)/*Dankie vir jou registrasie op Graffiti. Jou intekenbesonderhede is as volg:*/."<br><br>";
+                $messageClient  .= MysqlQuery::getText($conn, 239)/*Gebruikersnaam / E-pos*/.": ".$vData['email']."<br>";
+                $messageClient  .= MysqlQuery::getText($conn, 99)/*Wagwoord*/.": ".$_POST['password']."<br>";
 			    //TODO Change for Live
-			    $messageClient .= "<a href=\"https://www.graffitiboeke.co.za/".$_SESSION['SessionGrafLanguage']."/".$vNewId."/".MysqlQuery::getText($conn, 260)/*Verifieer*/."/".$temp_token."/".$random_token."\" title=\"".MysqlQuery::getText($conn, 259)/*Maak asseblief die skakel oop om jou registrasie te verifieer.*/."\">".MysqlQuery::getText($conn, 259)/*Maak asseblief die skakel oop om jou registrasie te verifieer.*/."</a>";
-
+//			    $messageClient .= "<a href=\"https://www.graffitiboeke.co.za/".$_SESSION['SessionGrafLanguage']."/".$vNewId."/".MysqlQuery::getText($conn, 260)/*Verifieer*/."/".$temp_token."/".$random_token."\" title=\"".MysqlQuery::getText($conn, 259)/*Maak asseblief die skakel oop om jou registrasie te verifieer.*/."\">".MysqlQuery::getText($conn, 259)/*Maak asseblief die skakel oop om jou registrasie te verifieer.*/."</a>";
 			    $messageClient  .= "<br><br>Graffiti<br>www.graffitiboeke.co.za<br><br>";
 			     //TODO Change for Live
 			    $messageClient  .= "<img src=\"https://www.graffitiboeke.co.za/images/logo.png\" height=\"120\" width=\"245\" alt=\"Graffiti\">";
 			}
 
-	// 		if (@mail($to, $subject, $message, $headers)){
-	// 			$vGraf = 1;
-	// 		}
-	// 		else {
-	// 			$vGraf = 2;
-	// 		}
-			if (@mail($toClient, $subjectClient, $messageClient, $headersClient)){
+			if (mail($toClient, $subjectClient, $messageClient, $headersClient,)){
 				$vClient = 1;
 			}
 			else {
 				$vClient = 2;
 			}
 
-	//		if ($vClient == 2 || $vGraf == 2 || $vQueryResult == 0){
 			if ($vClient == 2 || $vQueryResult == 0){
 				echo 'error';
 			}
@@ -151,12 +126,12 @@ else if($vType == "profile-edit"){
 	$vDataC['surname'] = filter_var($_POST['surname'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 	$vDataC['email'] = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
 	$vDataC['phone'] = filter_var($_POST['phone'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-	$vDataC['postal_address1'] = filter_var($_POST['postal_address1'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-	$vDataC['postal_address2'] = filter_var($_POST['postal_address2'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-	$vDataC['postal_city'] = filter_var($_POST['postal_city'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-	$vDataC['postal_province'] = filter_var($_POST['postal_province'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-	$vDataC['postal_code'] = filter_var($_POST['postal_code'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-	$vDataC['postal_country'] = filter_var($_POST['postal_country'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+//	$vDataC['postal_address1'] = filter_var($_POST['postal_address1'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+//	$vDataC['postal_address2'] = filter_var($_POST['postal_address2'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+//	$vDataC['postal_city'] = filter_var($_POST['postal_city'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+//	$vDataC['postal_province'] = filter_var($_POST['postal_province'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+//	$vDataC['postal_code'] = filter_var($_POST['postal_code'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+//	$vDataC['postal_country'] = filter_var($_POST['postal_country'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 	$vDataC['physical_address1'] = filter_var($_POST['physical_address1'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 	$vDataC['physical_address2'] = filter_var($_POST['physical_address2'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 	$vDataC['physical_city'] = filter_var($_POST['physical_city'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);

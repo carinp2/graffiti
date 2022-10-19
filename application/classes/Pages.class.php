@@ -222,17 +222,18 @@ class Pages {
 													include "include/BookPriceDisplay.php";
 
 								                    $vString .= "<div class=\"thumb-book-shop\">";
-									                    if(isset($_SESSION['SessionGrafUserId']) && $_SESSION['SessionGrafUserId'] != ''){
+//                                                    Login changes - Remove ln226 * ln233 - 236 - Login not required to add to cart - 13-10-2022
+//									                    if(isset($_SESSION['SessionGrafUserId']) && $_SESSION['SessionGrafUserId'] != ''){
 //									                    	if(strtotime($_SESSION['now_date']) >= strtotime($vResults[25][$x])){//Not published yet
 									                    		$vString .= "<a class=\"btn btn-primary my-cart-btn\" role=\"button\" data-id=\"".$vResults[0][$x]."\" data-image=\"images/books/".$vResults[6][$x]."\" title=\"".MysqlQuery::getText($pConn, 24)/*Laai in mandjie*/."\">".MysqlQuery::getText($pConn, 24)/*Laai in mandjie*/."<i class=\"fa fa-shopping-basket top-margin\"></i></a>";
 // 									                    	}
 // 									                    	else {
 // 									                    		$vString .= "<a id=\"add-to-wishlist".$vResults[0][$x]."\" class=\"btn btn-primary\" role=\"button\" data-book=\"".$vResults[0][$x]."\">".MysqlQuery::getText($pConn, 312)/*Laai in Wenslys*/."</a>";
 // 									                    	}
-									                    }
-									                    else {
-									                    	$vString .= "<a class=\"btn btn-primary\" href=\"#login\" role=\"button\" data-toggle=\"modal\" title=\"".MysqlQuery::getText($pConn, 266)/*Teken aan om te koop*/."\">".MysqlQuery::getText($pConn, 266)/*Teken aan om te koop*/."<i class=\"fa fa-shopping-basket top-margin\"></i></a>";
-									                    }
+//									                    }
+//									                    else {
+//									                    	$vString .= "<a class=\"btn btn-primary\" href=\"#login\" role=\"button\" data-toggle=\"modal\" title=\"".MysqlQuery::getText($pConn, 266)/*Teken aan om te koop*/."\">".MysqlQuery::getText($pConn, 266)/*Teken aan om te koop*/."<i class=\"fa fa-shopping-basket top-margin\"></i></a>";
+//									                    }
 
 														$vString .="<div id=\"wishlist_double".$vResults[0][$x]."\" class=\"home-error\" style=\"display:none;\">".MysqlQuery::getText($pConn, 313)/*Die boek is reeds in jou Wenslys gelaai*/."</div>";
 														$vString .="<div id=\"wishlist_success".$vResults[0][$x]."\" class=\"home-success\" style=\"display:none;\">".MysqlQuery::getText($pConn, 314)/*Die boek is in jou Wenslys gelaai*/."</div>";
@@ -1943,14 +1944,16 @@ class Pages {
 
     public static function returnCompetitions($pConn){
         $vOrder = "ORDER BY date_end desc";
-        $vValue = $_SESSION['date_min_one_month'];
+//        $vValue = $_SESSION['date_min_one_month'];
         $vValue2 = 1;
         $vBindParams = array();
-        $vBindLetters = "si";
-        $vBindParams[] =& $vValue;
+//        $vBindLetters = "si";
+        $vBindLetters = "i";
+//        $vBindParams[] =& $vValue;
         $vBindParams[] =& $vValue2;
-        $vLimit = "";
-        $vWhere = " WHERE date_end > ? AND valid = ?";
+        $vLimit = " LIMIT 10";
+//        $vWhere = " WHERE date_end > ? AND valid = ?";
+        $vWhere = " WHERE valid = ?";
         $vResults = MysqlQuery::getCompetitions($pConn, $vWhere, $vOrder, $vBindLetters, $vBindParams, $vLimit);
         $vString = "";
 //		$vString = "<form class='form-horizontal' name='compForm' id='compForm' role='form'>";

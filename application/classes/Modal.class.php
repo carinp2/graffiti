@@ -28,7 +28,7 @@ class Modal {
 								$vString .= "<div class=\"col-xs-12\">";
 									$vString .= "<label for=\"password\" class=\"modal-label\">".MysqlQuery::getText($pConn, 99)/*Wagwoord*/.":</label>";
 									$vString .= "<input type=\"password\" class=\"modal-input\" name=\"login_password\" id=\"login_password\" value=\"\" placeholder=\"".MysqlQuery::getText($pConn, 99)/*Wagwoord*/."\" required autocomplete=\"off\">";
-									$vString .= "<span toggle=\"#login_password\" class=\"fa fa-fw fa-eye field-icon toggle-password\"></span>";
+									$vString .= "&nbsp;<span toggle=\"#login_password\" class=\"fa fa-fw fa-eye field-icon toggle-password\"></span>";
 								$vString .= "</div>";
 							$vString .= "</div>";
 							$vString .="<div class=\"row\">";
@@ -80,13 +80,13 @@ class Modal {
 			$vString .= "</div>";
 
 			$vString .= "<Script>
-                $(\".toggle-password\").click(function() {
-                  $(this).toggleClass(\"fa-eye fa-eye-slash\");
-                  var input = $($(this).attr(\"toggle\"));
-                  if (input.attr(\"type\") == \"password\") {
-                    input.attr(\"type\", \"text\");
+                $('.toggle-password').click(function() {
+                  $(this).toggleClass('fa-eye fa-eye-slash');
+                  var input = $($(this).attr('toggle'));
+                  if (input.attr('type') == 'password') {
+                    input.attr('type', 'text');
                   } else {
-                    input.attr(\"type\", \"password\");
+                    input.attr('type', 'password');
                   }
                 });
                 </Script>
@@ -568,7 +568,7 @@ class Modal {
 
 	public static function loadModals($pConn){
 		$vString = "";
-			if(!isset($_SESSION['SessionGrafUserId']) || $_SESSION['SessionGrafUserId'] == ''){
+			if(!isset($_SESSION['SessionGrafUserId']) || $_SESSION['SessionGrafUserId'] == '' || !is_int($_SESSION['SessionGrafUserId'])){
 				$vLoginForm = Modal::getLoginForm($pConn);
 				$vString .= $vLoginForm;
 			}

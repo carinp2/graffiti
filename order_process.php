@@ -26,8 +26,8 @@ $vPages = new Pages();
 $vType =  $vRequest->getParameter('type');
 
 if($vType == "update-cart" || $vType == "update-cart-on-checkout"){
-	($_SESSION['SessionGrafUserId'] == $_COOKIE['cookie_graf_ui'] ? $vData['client_id'] = $_SESSION['SessionGrafUserId'] : $vData['client_id'] = 0);
-	if($vData['client_id'] > 0){
+	$vData['client_id'] = ($_SESSION['SessionGrafUserId'] == $_COOKIE['cookie_graf_ui'] ? $_SESSION['SessionGrafUserId'] : 0);
+	if($vData['client_id'] > 0 || ($vData['client_id'] == 0 && isset($_SESSION['SessionGrafUserSessionId'])){
 			$vData['book_id'] = $_POST['book_id'];
 			$vData['add_date'] = $_SESSION['now_date'];
 			$vData['temp_salt'] = General::createSalt(15);
@@ -36,7 +36,7 @@ if($vType == "update-cart" || $vType == "update-cart-on-checkout"){
 				($vType == "update-cart-on-checkout" ? $vNumber = $_POST['book_number'] : $vNumber = $vExistsNumber+1);
 				$vOrder = "";
 				$vBindParams = array();
-				$vBindLetters .= "ii";
+				$vBindLetters = "ii";
 				$vBindParams[] =& $vData['client_id'];
 				$vBindParams[] =& $_POST['book_id'];
 				$vLimit = "";

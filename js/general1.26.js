@@ -38,7 +38,7 @@ $( window ).on( "load", function() {
         
       //################################# Registration submit start
         $('#registerSubmit').click(function(e){
-	       	 $('#register_complete').fadeOut(500);      	
+	       	 $('#register_complete').fadeOut(500);
 	    	 $('#register_password').fadeOut(500); 
 	    	 $('#register_error').fadeOut(500);     
 	    	 $('#register_double').fadeOut(500); 
@@ -49,16 +49,17 @@ $( window ).on( "load", function() {
             var firstname = $('#registerForm #firstname').val();
             var surname = $('#registerForm #surname').val();
             var email = $('#registerForm #email').val();
-            var postal_address1 = $('#registerForm #postal_address1').val();
-            var postal_city = $('#registerForm #postal_city').val();
-            var postal_province = $('#registerForm #postal_province').val();
-            var postal_code = $('#registerForm #postal_code').val();
+            var physical_address1 = $('#registerForm #physical_address1').val();
+            var physical_city = $('#registerForm #physical_city').val();
+            var physical_province = $('#registerForm #physical_province').val();
+			var physical_country = $('#registerForm #physical_country').val();
+            var physical_code = $('#registerForm #physical_code').val();
             var phone = $('#registerForm #phone').val();
+
             if(type == "register"){
 	            var password = $('#registerForm #password').val();
 	            var password2 = $('#registerForm #password2').val();
             }
-            
             if(firstname.length == 0){
                 var error = true;
                 $('#registerForm #firstname').addClass("validation");
@@ -77,36 +78,42 @@ $( window ).on( "load", function() {
             }else{
                 $('#registerForm #email').removeClass("validation");
             }  
-            if(postal_address1.length == 0){
+            if(physical_address1.length == 0){
                 var error = true;
-                $('#registerForm #postal_address1').addClass("validation");
+                $('#registerForm #physical_address1').addClass("validation");
             }else{
-                $('#registerForm #postal_address1').removeClass("validation");
+                $('#registerForm #physical_address1').removeClass("validation");
             }
-            if(postal_city.length == 0){
+            if(physical_city.length == 0){
                 var error = true;
-                $('#registerForm #postal_city').addClass("validation");
+                $('#registerForm #physical_city').addClass("validation");
             }else{
-                $('#registerForm #postal_city').removeClass("validation");
+                $('#registerForm #physical_city').removeClass("validation");
             }
-            if(postal_province.length == 0){
+            if(physical_province.length == 0){
                 var error = true;
-                $('#registerForm #postal_province').addClass("validation");
+                $('#registerForm #physical_province').addClass("validation");
             }else{
-                $('#registerForm #postal_province').removeClass("validation");
+                $('#registerForm #physical_province').removeClass("validation");
             }
-            if(postal_code.length == 0){
+			if(physical_country == 0){
                 var error = true;
-                $('#registerForm #postal_code').addClass("validation");
+                $('#registerForm #physical_country').addClass("validation");
+            }else {
+				$('#registerForm #physical_country').removeClass("validation");
+			}
+            if(physical_code.length == 0){
+                var error = true;
+                $('#registerForm #physical_code').addClass("validation");
             }else{
-                $('#registerForm #postal_code').removeClass("validation");
+                $('#registerForm #physical_code').removeClass("validation");
             }
             if(phone.length == 0){
                 var error = true;
                 $('#registerForm #phone').addClass("validation");
             }else{
                 $('#registerForm #phone').removeClass("validation");
-            }            
+            }
             if(type == "register"){
 	            if(password.length == 0){
 	                var error = true;
@@ -114,7 +121,13 @@ $( window ).on( "load", function() {
 	            }else{
 	                $('#registerForm #password').removeClass("validation");
 	            }
-	            if(password2 != password){
+				if(password2.length == 0){
+	                var error = true;
+	                $('#registerForm #password2').addClass("validation");
+	            }else{
+	                $('#registerForm #password2').removeClass("validation");
+	            }
+	            if(password2 !== password){
 	                var error = true;
 	                $('#registerForm #password2').addClass("validation");
 	                $('#registerForm #password').val();

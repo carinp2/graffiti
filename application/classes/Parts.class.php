@@ -385,14 +385,15 @@ class Parts {
 		      				$vString .= "\" data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"".$vEnTitle."\">".MysqlQuery::getText($pConn, 45)/*Engels*/."</a></li>";
 		      			$vString .= "</ul>";
 		      			$vString .= "<ul class=\"pull-right welcome-menu no-display\" id=\"admin-menu\">";
-		      				if(!isset($_SESSION['SessionGrafUserId']) || $_SESSION['SessionGrafUserId'] == ""){
+//                          Login changes - Add new sessionid checker for not logged-in users 17-10-2022 & remove cart section from if
+                            $vOrderNumber = MysqlQuery::getCartSum($pConn, " WHERE client_id = ? and order_date is NULL and order_reference is NULL and order_id is NULL and temp_salt is not NULL", $vBindLetters, $vBindParams);
+                            $vString .= "<li id=\"cart-anchor\"><a  href=\"".$_SESSION['SessionGrafLanguage']."/".$_SESSION['SessionGrafUserId']."/".MysqlQuery::getText($pConn, 285)/*BestelNou*/."\" class=\"red-menu\" title=\"".MysqlQuery::getText($pConn, 17)/*Bestel nou*/."\"><i class=\"fa fa-shopping-basket icon-shopping-cart glyphicon-shopping-cart my-cart-icon\" title=\"".MysqlQuery::getText($pConn, 17)/*Bestel nou*/."\"></i><span class=\"badge badge-notify\" id=\"cart-num\">".$vOrderNumber."</span></a></li>";
+		      				if((!isset($_SESSION['SessionGrafUserId']) || $_SESSION['SessionGrafUserId'] == "") && isset($_SESSION['SessionGrafUserSessionId'])){
 		      					$vString .= " <i class=\"my-cart-icon my-cart-invisible\" aria-hidden=\"true\"></i>";
 		      					$vString .= " <li><a href=\"".$_SESSION['SessionGrafLanguage']."/0/".MysqlQuery::getText($pConn, 96)/*Registreer*/."\" class=\"text-small red\" title=\"".MysqlQuery::getText($pConn, 96)/*Registreer*/."\">".MysqlQuery::getText($pConn, 96)/*Registreer*/."</a></li>";
 		      					$vString .= " <li><a data-target=\"#login\" role=\"button\" data-toggle=\"modal\" class=\"text-small red-menu\" title=\"".MysqlQuery::getText($pConn, 237)/*Teken aan*/."\">".MysqlQuery::getText($pConn, 237)/*Teken aan*/."</a></li>";
 		      				}
 		      				else {
-		      					$vOrderNumber = MysqlQuery::getCartSum($pConn, " WHERE client_id = ? and order_date is NULL and order_reference is NULL and order_id is NULL and temp_salt is not NULL", $vBindLetters, $vBindParams);
-		      					$vString .= "<li id=\"cart-anchor\"><a  href=\"".$_SESSION['SessionGrafLanguage']."/".$_SESSION['SessionGrafUserId']."/".MysqlQuery::getText($pConn, 285)/*BestelNou*/."\" class=\"red-menu\" title=\"".MysqlQuery::getText($pConn, 17)/*Bestel nou*/."\"><i class=\"fa fa-shopping-basket icon-shopping-cart glyphicon-shopping-cart my-cart-icon\" title=\"".MysqlQuery::getText($pConn, 17)/*Bestel nou*/."\"></i><span class=\"badge badge-notify\" id=\"cart-num\">".$vOrderNumber."</span></a></li>";
 		      					$vString .= "<li><a href=\"".$_SESSION['SessionGrafLanguage']."/Logout\" id=\"logoff\" class=\"text-small red-menu\" title=\"".MysqlQuery::getText($pConn, 270)/*Teken af*/."\"> ".MysqlQuery::getText($pConn, 270)/*Teken af*/."</a></li>";
 		      					$vString .= "<li><a href=\"".$_SESSION['SessionGrafLanguage']."/".$_SESSION['SessionGrafUserId']."/".MysqlQuery::getText($pConn, 319)/*Profiel*/."/0\"id=\"profile\" class=\"text-small red-menu\" data-html=\"true\" data-toggle=\"tooltip\" data-placement=\"bottom\"  title=\"".MysqlQuery::getText($pConn, 216)/*Verander jou profiel*/."\"> ".$_SESSION['SessionGrafUserFirstname']."&nbsp;".$_SESSION['SessionGrafUserSurname']."</a></li>";
 		      				}
