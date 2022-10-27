@@ -2,23 +2,23 @@
 if($vPriceDisplayType == "query"){
 	//New or Topseller
 	if($new == 1 || $top_seller == 1 && ( $vNewTopDiscountPrice < $vSpecialDiscountPrice) && $vNewTopDiscountPrice < $vClientDiscountPrice){
-		$vFinalPrice[] = $vNewTopDiscountPrice;
+		$vFinalPrice = $vNewTopDiscountPrice;
 	}
 	//on special and special price smaller than price and special price bigger than 0
 	else if($special == 1 && ($vSpecialDiscountPrice < $price && $vSpecialDiscountPrice < $vClientDiscountPrice)){
-		$vFinalPrice[] = $vSpecialDiscountPrice;
+		$vFinalPrice = $vSpecialDiscountPrice;
 	}
 	//Soon & soon discount and soon discount smaller than price and soon discount smaller than client discount
 	//else if(($soon_discount == 1 && ($vSoonDiscountPrice < $price && $vSoonDiscountPrice < $vClientDiscountPrice)) || ($language == 'en' && $category != 7 && ($vSoonDiscountPrice < $price && $vSoonDiscountPrice < $vClientDiscountPrice)) || ($language == 'af' && $category != 6 && ($vSoonDiscountPrice < $price && $vSoonDiscountPrice < $vClientDiscountPrice))){
 	else if(($soon_discount == 1 && ($vSoonDiscountPrice < $price && $vSoonDiscountPrice < $vClientDiscountPrice)) || ($language == 'en' && ($vSoonDiscountPrice < $price && $vSoonDiscountPrice < $vClientDiscountPrice)) || ($language == 'af' && ($vSoonDiscountPrice < $price && $vSoonDiscountPrice < $vClientDiscountPrice))){
-		$vFinalPrice[] = $vSoonDiscountPrice;
+		$vFinalPrice = $vSoonDiscountPrice;
 	}
 	//Price bigger client discount price and special price bigger client special price
 	else if($vClientDiscountPrice < $price && $vClientDiscountPrice <  $vSpecialDiscountPrice){
-		$vFinalPrice[] = $vClientDiscountPrice;
+		$vFinalPrice = $vClientDiscountPrice;
 	}
 	else {
-		$vFinalPrice[] = $vNormalPrice;
+		$vFinalPrice = $vNormalPrice;
 	}
 	//Price end
 }

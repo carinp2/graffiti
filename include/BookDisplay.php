@@ -208,17 +208,14 @@
 								}
 
 			                    $vString .= "<div class=\"thumb-book-shop\">";
-				                    if(isset($_SESSION['SessionGrafUserId']) && $_SESSION['SessionGrafUserId'] != ''){//Logged in
+				                    if((isset($_SESSION['SessionGrafUserId']) && $_SESSION['SessionGrafUserId'] != '') || (isset($_SESSION['SessionGrafUserSessionId']) && $_SESSION['SessionGrafUserSessionId'] != '')){//Logged in
                                         if($vResults[41][$x] != 3) {
                                             if (strtotime($_SESSION['now_date']) >= strtotime($vResults[25][$x])) {//Published
                                                 if ($vResults[15][$x] == 0) {//out_print = No
                                                     $vString .= "<a class=\"btn btn-primary my-cart-btn-s\" role=\"button\" data-id=\"" . $vResults[0][$x] . "\" data-image=\"images/books/" . $vResults[6][$x] . "\" title=\"" . MysqlQuery::getText($pConn, 24)/*Laai in mandjie*/ . "\">" . MysqlQuery::getText($pConn, 24)/*Laai in mandjie*/ . "<i class=\"fa fa-shopping-basket top-margin\"></i></a>";
-                                                    $vString .= "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a id=\"add-to-wishlist" . $vResults[0][$x] . "\" class=\"btn btn-primary\" role=\"button\" data-book=\"" . $vResults[0][$x] . "\" title=\"" . MysqlQuery::getText($pConn, 312)/*Laai in Wenslys*/ . "\">" . MysqlQuery::getText($pConn, 312)/*Laai in Wenslys*/ . "</a>";
-                                                    //E-book start
-                                                    if (isset($vResults[42][$x]) && !empty($vResults[42][$x])) {
-                                                        $vString .= "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class=\"btn btn-primary my-cart-btn-s\" href=\"" . $vResults[43][$x] . "?acc=24611a00cd5703876097b06abc12643b\" target=\"_blank\" data-placement=\"top\" data-toggle=\"tooltip\" data-html=\"true\" title=\"" . MysqlQuery::getText($pConn, 480)/*Beskikbaar as e-Boek<br>e-Boeke word direk by LAPA*/ . "\">" . MysqlQuery::getText($pConn, 481)/*Bestel e-Boek*/ . "</a>";
+                                                    if(isset($_SESSION['SessionGrafUserId']) && $_SESSION['SessionGrafUserId'] != '') {
+                                                        $vString .= "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a id=\"add-to-wishlist" . $vResults[0][$x] . "\" class=\"btn btn-primary\" role=\"button\" data-book=\"" . $vResults[0][$x] . "\" title=\"" . MysqlQuery::getText($pConn, 312)/*Laai in Wenslys*/ . "\">" . MysqlQuery::getText($pConn, 312)/*Laai in Wenslys*/ . "</a>";
                                                     }
-                                                    //E-book end
                                                 }
                                                 if ($vResults[16][$x] == 0 && $vResults[15][$x] == 0) {//in_stock = 0 && out_of_print = No
                                                     $vString .= "<div class=\"text-small-normal red\">" . MysqlQuery::getText($pConn, 293)/*Nie in voorraad - sal versending vertraag*/ . "</div>";
@@ -229,7 +226,9 @@
                                                 }
                                             } else {//Not published yet
                                                 $vString .= "<a class=\"btn btn-primary my-cart-btn-s\" role=\"button\" data-id=\"" . $vResults[0][$x] . "\" data-image=\"images/books/" . $vResults[6][$x] . "\" title=\'" . MysqlQuery::getText($pConn, 24)/*Laai in mandjie*/ . "\">" . MysqlQuery::getText($pConn, 24)/*Laai in mandjie*/ . "<i class=\"fa fa-shopping-basket top-margin\"></i></a>";
-                                                $vString .= "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a id=\"add-to-wishlist" . $vResults[0][$x] . "\" class=\"btn btn-primary\" role=\"button\" data-book=\"" . $vResults[0][$x] . "\" title=\'" . MysqlQuery::getText($pConn, 312)/*Laai in Wenslys*/ . "\">" . MysqlQuery::getText($pConn, 312)/*Laai in Wenslys*/ . "</a>";
+                                                if(isset($_SESSION['SessionGrafUserId']) && $_SESSION['SessionGrafUserId'] != '') {
+                                                    $vString .= "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a id=\"add-to-wishlist" . $vResults[0][$x] . "\" class=\"btn btn-primary\" role=\"button\" data-book=\"" . $vResults[0][$x] . "\" title=\'" . MysqlQuery::getText($pConn, 312)/*Laai in Wenslys*/ . "\">" . MysqlQuery::getText($pConn, 312)/*Laai in Wenslys*/ . "</a>";
+                                                }
                                                 $vString .= "<div class=\"text-small-normal red\">" . MysqlQuery::getText($pConn, 412)/*Let asseblief op die publikasie datum - versending sodra boek gepubliseer is*/ . "</div>";
                                                 //$vString .= "<a id=\"add-to-wishlist".$vResults[0][$x]."\" class=\"btn btn-primary\" role=\"button\" data-book=\"".$vResults[0][$x]."\">".MysqlQuery::getText($pConn, 312)/*Laai in Wenslys*/."</a>";
                                             }
@@ -240,11 +239,7 @@
 				                    }
 				                    //else if(strtotime($_SESSION['now_date']) < strtotime($vResults[25][$x])){//Not logged in
 				                    else {//Not logged in
-				                    	$vString .= "<a class=\"btn btn-primary\" href=\"#login\" role=\"button\" data-toggle=\"modal\" title=\"".MysqlQuery::getText($pConn, 266)/*Teken aan om te koop*/."\">".MysqlQuery::getText($pConn, 266)/*Teken aan om te koop*/."<i class=\"fa fa-shopping-basket top-margin\"></i></a>";
-					                    //E-book start
-										if(isset($vResults[42][$x]) && !empty($vResults[42][$x])){
-											$vString .= "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class=\"btn btn-primary my-cart-btn-s\" href=\"".$vResults[43][$x]."?acc=24611a00cd5703876097b06abc12643b\" target=\"_blank\" data-placement=\"top\" data-toggle=\"tooltip\" data-html=\"true\" title=\"".MysqlQuery::getText($pConn, 480)/*Beskikbaar as e-Boek<br>e-Boeke word direk by LAPA*/."\">".MysqlQuery::getText($pConn, 481)/*Bestel e-Boek*/."</a>";
-										}
+				                    	//$vString .= "<a class=\"btn btn-primary\" href=\"#login\" role=\"button\" data-toggle=\"modal\" title=\"".MysqlQuery::getText($pConn, 266)/*Teken aan om te koop*/."\">".MysqlQuery::getText($pConn, 266)/*Teken aan om te koop*/."<i class=\"fa fa-shopping-basket top-margin\"></i></a>";
 				                    }
 			                    $vString .= "</div>";
 							$vString .= "</div>";//col

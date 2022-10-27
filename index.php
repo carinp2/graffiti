@@ -29,9 +29,8 @@ require_once ("application/classes/Client.class.php");
 $vClient= new Client();
 require_once ("application/resources/PasswordHashClass.php");
 
-echo "SessionGrafUserId = ".$_SESSION['SessionGrafUserId']."/////";
-echo "<br>/////SessionId: ".$_SESSION['SessionGrafUserSessionId']."////";
-echo "<br>/////Cookie: ".$_COOKIE['cookie_graf_ui']."////";
+echo "SessionGrafUserId = ".(isset($_SESSION['SessionGrafUserId']) ?? 0)."/////";
+echo "<br>/////SessionGrafUserSessionId: ".($_SESSION['SessionGrafUserSessionId'] ?? 0)."////";
 
 $vString = "";
 //$vPage = $vRequest->getParameter('page');

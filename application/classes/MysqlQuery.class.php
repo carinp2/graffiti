@@ -1429,6 +1429,9 @@ class MysqlQuery {
 	}
 
 	public static function getCart($pConn, $pWhere, $pOrder, $pBindLetters,  $pBindParams, $pLimit){
+        include_once "BookPrice.php";
+        $vBookPrice = new BookPrice();
+
 		//$vAutoDiscount = MysqlQuery::getAutoDiscount($pConn);
 		$vSqlString = "select w.id, w.book_id, w.client_id, w.number, w.add_date, w.temp_salt, w.order_date, w.order_reference, w.order_id, b.title, b.price, b.new, b.top_seller, b.special, b.special_price, b.blob_path, ";
 		$vSqlString .= "b.in_stock, b.default_discount, b.date_publish, b.soon_discount, b.language, b.category, b.sub_category, w.address1, w.address2, w.city, w.province, w.country, w.code, w.receiver_name, ";
@@ -1440,7 +1443,7 @@ class MysqlQuery {
 		array_unshift($pBindParams, $pBindLetters);
 		call_user_func_array(array($stmt, 'bind_param'), $pBindParams);
         $id=0;
-        $book_id=$client_id=$number=$add_date=$temp_salt=$order_date=$order_reference=$order_id=$title=$price=$new=$top_seller=$special=$special_price=$blob_path=$in_stock=$default_discount=$date_publish=$soon_discount=$language=$category=$sub_category=$address1=$address2=$city=$province=$country=$code=$receiver_name=$receiver_phone=$courier_type=$courier_detail=$courier_cost=$order_price=$total_price=$message=$delivery_address_type = '';
+        $book_id=$client_id=$number=$add_date=$temp_salt=$order_date=$order_reference=$order_id=$title=$vFinalPrice=$price=$new=$top_seller=$special=$special_price=$blob_path=$in_stock=$default_discount=$date_publish=$soon_discount=$language=$category=$sub_category=$address1=$address2=$city=$province=$country=$code=$receiver_name=$receiver_phone=$courier_type=$courier_detail=$courier_cost=$order_price=$total_price=$message=$delivery_address_type = '';
 		if($stmt->execute() == true) {
 			$stmt->bind_result($id, $book_id, $client_id, $number, $add_date, $temp_salt, $order_date, $order_reference, $order_id, $title, $price, $new, $top_seller, $special, $special_price, $blob_path, $in_stock, $default_discount, $date_publish, $soon_discount, $language, $category, $sub_category, $address1, $address2, $city, $province, $country, $code, $receiver_name, $receiver_phone, $courier_type, $courier_detail, $courier_cost, $order_price, $total_price, $message, $delivery_address_type);
 			while ($stmt->fetch()) {
@@ -1460,14 +1463,17 @@ class MysqlQuery {
 					$vDatePublish[] = $date_publish;
 					$vSoonDiscount[] = $soon_discount;
 
-                    //Price start
-					$vNewTopDiscountPrice =  round($price-($price*$default_discount));
-					(!empty($special) && $special > 0  ? $vSpecialDiscountPrice = $special_price : $vSpecialDiscountPrice = $price);
-					$vClientDiscountPrice = round($price-($price*$_SESSION['SessionGrafSpecialDiscount']));
-					$vSoonDiscountPrice = round($price-($price*$default_discount));
-					$vNormalPrice = $price;
-					$vPriceDisplayType = "query";
-					include "include/BookPriceDisplay.php";
+//                    //Price start
+//					$vNewTopDiscountPrice =  round($price-($price*$default_discount));
+//					$vSpecialDiscountPrice = (!empty($special) && $special > 0  ? $special_price : $price);
+//					$vClientDiscountPrice = round($price-($price*$_SESSION['SessionGrafSpecialDiscount']));
+//					$vSoonDiscountPrice = round($price-($price*$default_discount));
+//					$vNormalPrice = $price;
+//					$vPriceDisplayType = "query";
+//                    //$vPriceDisplayType, $new, $top_seller, $vNewTopDiscountPrice, $vSpecialDiscountPrice, $vClientDiscountPrice, $special, $price, $soon_discount, $vSoonDiscountPrice, $vNormalPrice, $language
+//
+////                    include "include/BookPriceDisplay.php";
+
 
 					$vAddress1[] = $address1;
 					$vAddress2[] = $address2;
@@ -1484,11 +1490,24 @@ class MysqlQuery {
 					$vTotalPrice[] = $total_price;
 					$vMessage[] = $message;
 					$vDeliveryAddressType[] = $delivery_address_type;
+
+                    $vPrice[] = $price;
+                    $vDefaultDiscount[] = $default_discount;
+                    $vSpecial[] = $special;
+                    $vSpecialPrice = $special_price;
+                    $vNew[] = $new;
+                    $vTopSeller[] = $top_seller;
+                    $vLanguage[] = $language;
 				}
 			}
 		}
 		$stmt->close();
-		return array($vId, $vBookId, $vClientId, $vNumber, $vAddDate, $vTempSalt, $vOrderDate, $vOrderReference, $vOrderId, $vTitle, $vFinalPrice, $vBlobPath, $vInStock, $vDatePublish, $vAddress1, $vAddress2, $vCity, $vProvince, $vCountry, $vCode, $vReceiverName, $vReceiverPhone, $vCourierType, $vCourierDetail, $vCourierCost, $vOrderPrice, $vTotalPrice, $vMessage, $vDeliveryAddressType);
+		if(isset($vId)){
+            return array($vId, $vBookId, $vClientId, $vNumber, $vAddDate, $vTempSalt, $vOrderDate, $vOrderReference, $vOrderId, $vTitle, $vFinalPrice, $vBlobPath, $vInStock, $vDatePublish, $vAddress1, $vAddress2, $vCity, $vProvince, $vCountry, $vCode, $vReceiverName, $vReceiverPhone, $vCourierType, $vCourierDetail, $vCourierCost, $vOrderPrice, $vTotalPrice, $vMessage, $vDeliveryAddressType, $vPrice, $vDefaultDiscount, $vSpecial, $vSpecialPrice, $vNew, $vTopSeller, $vSoonDiscount, $vLanguage);
+        }
+        else {
+            return array();
+        }
 	}
 
 	public static function cleanCart($pConn){

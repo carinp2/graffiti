@@ -13,7 +13,7 @@ $_SESSION['SessionGrafSpecialDiscount'] = 0;
 
 $_SESSION['now_date'] = date("Y-m-d");
 $_SESSION['now_month_year'] = date("m/Y");
-$_SESSION['SessionGrafStyle'] = "css/style1.12.css";
+$_SESSION['SessionGrafStyle'] = "css/style1.13.css";
 $_SESSION['SessionGrafScript'] = "js/general1.26.js";
 
 //Login changes - Login not required to add to cart - 13-10-2022
@@ -57,7 +57,7 @@ if(!isset($_COOKIE['cookie_graf_remun']) || $_COOKIE['cookie_graf_remun'] == '' 
 $_SESSION['SessionGrafHost'] = "127.0.0.1";
 $_SESSION['SessionGrafDbName'] = "graffiti";
 $_SESSION['SessionGrafUName'] = "root";
-$_SESSION['SessionGrafPass'] = "";
+$_SESSION['SessionGrafPass'] = "mysql";
 
 /* DEV Server */
 //  $_SESSION['SessionGrafHost'] = "dedi51.cpt4.host-h.net";

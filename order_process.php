@@ -5,7 +5,7 @@
  */
 
 session_start();
-session_cache_limiter( 'nocache' );
+//session_cache_limiter( 'nocache' );
 require_once ("application/classes/General.class.php");
 $vGeneral = new General();
 
@@ -26,32 +26,33 @@ $vPages = new Pages();
 $vType =  $vRequest->getParameter('type');
 
 if($vType == "update-cart" || $vType == "update-cart-on-checkout"){
-	$vData['client_id'] = ($_SESSION['SessionGrafUserId'] == $_COOKIE['cookie_graf_ui'] ? $_SESSION['SessionGrafUserId'] : 0);
-	if($vData['client_id'] > 0 || ($vData['client_id'] == 0 && isset($_SESSION['SessionGrafUserSessionId'])){
-			$vData['book_id'] = $_POST['book_id'];
-			$vData['add_date'] = $_SESSION['now_date'];
-			$vData['temp_salt'] = General::createSalt(15);
-			$vExistsNumber = $vQuery->checkBookExistsCart($conn, "client_id = ".$_SESSION['SessionGrafUserId']." and book_id = ".$_POST['book_id']." and order_date is NULL and order_reference is NULL and order_id is NULL");
-			if($vExistsNumber > 0){
-				($vType == "update-cart-on-checkout" ? $vNumber = $_POST['book_number'] : $vNumber = $vExistsNumber+1);
-				$vOrder = "";
-				$vBindParams = array();
-				$vBindLetters = "ii";
-				$vBindParams[] =& $vData['client_id'];
-				$vBindParams[] =& $_POST['book_id'];
-				$vLimit = "";
-				$vWhere = "WHERE client_id = ? and book_id = ? and order_date is NULL and order_reference is NULL and order_id is NULL";
-				if($vNumber > 0){
-					$vQueryResult = $vQuery->updateCart($conn, $vWhere, $vBindLetters,  $vBindParams, $vNumber);//1 = Success | 0 = Error
-				}
-				else {
-					$vQueryResult = $vQuery->doDelete($conn,  'cart', "client_id = ".$vData['client_id']." and book_id = ".$_POST['book_id']." and order_date is NULL and order_reference is NULL and order_id is NULL");//1 = Success | 0 = Error
-				}
-			}
-			else {
-				$vData['number'] = 1;
-				$vQueryResult = $vQuery->doInsert($conn, 'cart', $vData);//>1 = Success | 0 = Error
-			}
+	if((isset($_SESSION['SessionGrafUserId']) && $_SESSION['SessionGrafUserId'] > 0) || (!isset($_SESSION['SessionGrafUserId']) && isset($_SESSION['SessionGrafUserSessionId']))){
+        $vTempClientId = (isset($_SESSION['SessionGrafUserId']) ? $_SESSION['SessionGrafUserId'] : $_SESSION['SessionGrafUserSessionId']);
+        $vData['client_id'] = $vTempClientId;
+        $vData['book_id'] = $_POST['book_id'];
+        $vData['add_date'] = $_SESSION['now_date'];
+        $vData['temp_salt'] = General::createSalt(15);
+        $vExistsNumber = $vQuery->checkBookExistsCart($conn, "client_id = '".$vTempClientId."' and book_id = ".$_POST['book_id']." and order_date is NULL and order_reference is NULL and order_id is NULL");
+        if($vExistsNumber > 0){
+            ($vType == "update-cart-on-checkout" ? $vNumber = $_POST['book_number'] : $vNumber = $vExistsNumber+1);
+            $vOrder = "";
+            $vBindParams = array();
+            $vBindLetters = "ii";
+            $vBindParams[] =& $vData['client_id'];
+            $vBindParams[] =& $_POST['book_id'];
+            $vLimit = "";
+            $vWhere = "WHERE client_id = ? and book_id = ? and order_date is NULL and order_reference is NULL and order_id is NULL";
+            if($vNumber > 0){
+                $vQueryResult = $vQuery->updateCart($conn, $vWhere, $vBindLetters,  $vBindParams, $vNumber);//1 = Success | 0 = Error
+            }
+            else {
+                $vQueryResult = $vQuery->doDelete($conn,  'cart', "client_id = ".$vData['client_id']." and book_id = ".$_POST['book_id']." and order_date is NULL and order_reference is NULL and order_id is NULL");//1 = Success | 0 = Error
+            }
+        }
+        else {
+            $vData['number'] = 1;
+            $vQueryResult = $vQuery->doInsert($conn, 'cart', $vData);//>1 = Success | 0 = Error
+        }
 		if ($vQueryResult > 0){
 			$vResult =  1;
 		}

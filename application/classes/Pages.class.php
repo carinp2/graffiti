@@ -260,10 +260,10 @@ class Pages {
 	}
 
 	public static function returnCheckoutForm($pConn, $pClientId){
-		if($pClientId == $_SESSION['SessionGrafUserId']){
+		if((isset($_SESSION['SessionGrafUserId']) && $pClientId == $_SESSION['SessionGrafUserId']) || (isset($_SESSION['SessionGrafUserSessionId']) && $pClientId == $_SESSION['SessionGrafUserSessionId'])){
 			$vOrder = " ORDER BY b.title ";
 			$vBindParams = array();
-			$vBindLetters .= "i";
+			$vBindLetters = (is_int($pClientId) ? "i" : "s");
 			$vBindParams[] = & $pClientId;
 			$vLimit = "";
 			$vWhere = " WHERE client_id = ? and order_date is NULL and order_reference is NULL and order_id is NULL and temp_salt is not NULL";
@@ -271,7 +271,7 @@ class Pages {
 
 			$vUrl = General::curPageURL();
 
-			$vString .= "<form class=\"form-horizontal\" name=\"orderForm\" id=\"orderForm\" role=\"form\" method=\"post\" action=\"".$_SESSION['SessionGrafLanguage']."/".$pClientId."/".MysqlQuery::getText($pConn, 283)/*BestelNouKoerier*/."\">";
+			$vString = "<form class=\"form-horizontal\" name=\"orderForm\" id=\"orderForm\" role=\"form\" method=\"post\" action=\"".$_SESSION['SessionGrafLanguage']."/".$pClientId."/".MysqlQuery::getText($pConn, 283)/*BestelNouKoerier*/."\">";
 			$vString .= "<div id=\"form-border\">";
 			$vString .= "<div id=\"center\">";
 					$vString .= "<div class=\"form-header\">";
@@ -295,10 +295,40 @@ class Pages {
 									$vString .= "<hr class=\"light-gray\">";
 								$vString .="</div>";
 							$vString .="</div>";
-					if(count($vResults[0]) > 0){
+					if(!empty($vResults) && count($vResults[0]) > 0){
 				//			$vBooksString = MysqlQuery::getText($pConn, 157)/*Boeke*/.":&nbsp;&nbsp;";
 							for($x = 0; $x < count($vResults[0]); $x++){
-								$vTotalBookPrice = $vResults[3][$x] * $vResults[10][$x];
+
+                                //Final Price start
+                                $vNewTopDiscountPrice =  round($vResults[29][$x]-($vResults[29][$x]*$vResults[30][$x]));
+                                $vSpecialDiscountPrice = (!empty($vResults[31][$x]) && $vResults[31][$x] > 0  ? $vResults[32][$x] : $vResults[29][$x]);
+                                $vClientDiscountPrice = round($vResults[29][$x]-($vResults[29][$x]*$_SESSION['SessionGrafSpecialDiscount']));
+                                $vSoonDiscountPrice = round($vResults[29][$x]-($vResults[29][$x]*$vResults[30][$x]));
+                                $vNormalPrice = $vResults[29][$x];
+                                $vPriceDisplayType = "query";
+                                include "include/BookPriceDisplay.php";
+//                                if($vResults[33][$x] == 1 || $vResults[34][$x] == 1 && ( $vNewTopDiscountPrice < $vSpecialDiscountPrice) && $vNewTopDiscountPrice < $vClientDiscountPrice){
+//                                    $vFinalPrice = $vNewTopDiscountPrice;
+//                                }
+//                                //on special and special price smaller than price and special price bigger than 0
+//                                else if($vResults[31][$x] == 1 && ($vSpecialDiscountPrice < $vResults[29][$x] && $vSpecialDiscountPrice < $vClientDiscountPrice)){
+//                                    $vFinalPrice = $vSpecialDiscountPrice;
+//                                }
+//                                //Soon & soon discount and soon discount smaller than price and soon discount smaller than client discount
+//                                else if(($vResults[35][$x] == 1 && ($vSoonDiscountPrice < $vResults[29][$x] && $vSoonDiscountPrice < $vClientDiscountPrice)) || ($vResults[36][$x] == 'en' && ($vSoonDiscountPrice < $vResults[29][$x] && $vSoonDiscountPrice < $vClientDiscountPrice)) || ($vResults[36][$x] == 'af' && ($vSoonDiscountPrice < $vResults[29][$x] && $vSoonDiscountPrice < $vClientDiscountPrice))){
+//                                    $vFinalPrice = $vSoonDiscountPrice;
+//                                }
+//                                //Price bigger client discount price and special price bigger client special price
+//                                else if($vClientDiscountPrice < $vResults[29][$x] && $vClientDiscountPrice <  $vSpecialDiscountPrice){
+//                                    $vFinalPrice = $vClientDiscountPrice;
+//                                }
+//                                else {
+//                                    $vFinalPrice = $vNormalPrice;
+//                                }
+//                                //Final Price end
+                                include "include/BookPriceDisplay.php";
+
+								$vTotalBookPrice = $vResults[3][$x] * $vFinalPrice;
 								($vResults[3][$x] <= 2 ? $vNoDisplay = "no-display" : $vNoDisplay = "");
 								//Books
 								$vString .= "<div class=\"row row-grid line\">";
@@ -315,7 +345,7 @@ class Pages {
 
 										$vString .= "<div id=\"big-order-message\" class=\"text-xsmall red ".$vNoDisplay."\">".MysqlQuery::getText($pConn, 445)/*Let asseblief daarop dat Graffiti soms beperkte voorraad van.....*/."</div></div>";
 										$vString .= "<div class=\"col-xs-2 col-md-1 row-grid col-right\"><input type=\"number\" name=\"number\" id=\"cart-number-".$vResults[0][$x]."\" class=\"input-number\" data-src=\"".$vResults[0][$x]."\" data-book=\"".$vResults[1][$x]."\" value=\"".$vResults[3][$x]."\" required size=\"50\"></div>";
-										$vString .= "<div class=\"col-xs-2 col-md-2 row-grid col-right\" id=\"cart-total-price-".$vResults[0][$x]."\" data-src=\"".$vResults[10][$x]."\">R ".$vTotalBookPrice."</div>";
+										$vString .= "<div class=\"col-xs-2 col-md-2 row-grid col-right\" id=\"cart-total-price-".$vResults[0][$x]."\" data-src=\"".$vFinalPrice."\">R ".$vTotalBookPrice."</div>";
 										$vString .= "<div class=\"col-xs-2 col-md-1 row-grid\">";
 												//$vString .= "<span id=\"remove-book-".$vResults[0][$x]."\" class=\"btn btn-xs btn-danger\" data-src=\"".$vResults[0][$x]."\">X</span>";
 												$vString .= "<a id=\"remove-book-".$vResults[0][$x]."\" class=\"btn btn-primary btn-xsmall\" role=\"button\" data-src=\"".$vResults[0][$x]."\" title=\"".MysqlQuery::getText($pConn, 287)/*Verwyder boek*/."\">";
@@ -396,7 +426,7 @@ class Pages {
 			$vString .="</Script>";
 		}
 		else {
-			$vString .= "An error occurred with the order";//TODO ERROR
+			$vString = "An error occurred with the order";//TODO ERROR
 		}
 		return General::prepareStringForDisplay($vString);
 	}
@@ -405,22 +435,24 @@ class Pages {
 		$vPargo = Modal::openPargo($pConn);
 		$vString = $vPargo;
 
-		if($pClientId == $_SESSION['SessionGrafUserId']){
+		if((isset($_SESSION['SessionGrafUserId']) && $pClientId == $_SESSION['SessionGrafUserId']) || (isset($_SESSION['SessionGrafUserSessionId']) && $pClientId == $_SESSION['SessionGrafUserSessionId'])){
 			$vOrder = " ORDER BY b.title ";
 			$vBindParams = array();
-			$vBindLetters = "i";
+			$vBindLetters = (is_int($pClientId) ? "i" : "s");
 			$vBindParams[] = & $pClientId;
 			$vLimit = "";
 			$vWhere = " WHERE client_id = ? and order_date is NULL and order_reference is NULL and order_id is NULL and temp_salt is not NULL";
 			$vResults = MysqlQuery::getCart($pConn, $vWhere, $vOrder, $vBindLetters, $vBindParams, $vLimit);
 
-			$vCOrder = "";
-			$vCBindParams = array();
-			$vCBindLetters = "i";
-			$vCBindParams[] = & $pClientId;
-			$vCLimit = "";
-			$vCWhere = " WHERE id = ?";
-			$vClientResults = MysqlQuery::getClients($pConn, $vCWhere, $vCOrder, $vCBindLetters, $vCBindParams, $vCLimit);
+            if(isset($_SESSION['SessionGrafUserId']) && $pClientId == $_SESSION['SessionGrafUserId']) {
+                $vCOrder = "";
+                $vCBindParams = array();
+                $vCBindLetters = (is_int($pClientId) ? "i" : "s");
+                $vCBindParams[] = &$pClientId;
+                $vCLimit = "";
+                $vCWhere = " WHERE id = ?";
+                $vClientResults = MysqlQuery::getClients($pConn, $vCWhere, $vCOrder, $vCBindLetters, $vCBindParams, $vCLimit);
+            }
 
 			//$vCourierResults = MysqlQuery::getLookup($pConn, "courier");//id, text, sort
 			$vCourierResults = MysqlQuery::getCourierSelection($pConn, 9999);//$vId, $vCourier_type
@@ -456,14 +488,25 @@ class Pages {
 										$vString .= "<h5 class=\"gray\"><i class=\"fa fa-angle-double-right fa-lg\" aria-hidden=\"true\"></i>&nbsp;&nbsp;".MysqlQuery::getText($pConn, 281)/*Jou boeke*/."</h5>";
 									$vString .="</div>";
 								$vString .="</div>";//row
-						if(count($vResults[0]) > 0){
+						    if(isset($vResults) && count($vResults[0]) > 0){
 								for($x = 0; $x < count($vResults[0]); $x++){
-									$vTotalBookPrice = $vResults[3][$x] * $vResults[10][$x];
+
+                                    //Final Price start
+                                    $vNewTopDiscountPrice =  round($vResults[29][$x]-($vResults[29][$x]*$vResults[30][$x]));
+                                    $vSpecialDiscountPrice = (!empty($vResults[31][$x]) && $vResults[31][$x] > 0  ? $vResults[32][$x] : $vResults[29][$x]);
+                                    $vClientDiscountPrice = round($vResults[29][$x]-($vResults[29][$x]*$_SESSION['SessionGrafSpecialDiscount']));
+                                    $vSoonDiscountPrice = round($vResults[29][$x]-($vResults[29][$x]*$vResults[30][$x]));
+                                    $vNormalPrice = $vResults[29][$x];
+                                    $vPriceDisplayType = "query";
+                                    include "include/BookPriceDisplay.php";
+                                    //Final Price end
+
+									$vTotalBookPrice = $vResults[3][$x] * $vFinalPrice;
 										($vResults[12][$x] == 0 && $vResults[13][$x] <= $_SESSION['now_date'] ? $vInStockMesssage = "<span class=\"text-small-normal red\">&nbsp;&nbsp;(".MysqlQuery::getText($pConn, 293)/*Nie in voorraad - sal versending vertraag*/.")</span>" : $vInStockMesssage = "");
 										($vResults[13][$x] > $_SESSION['now_date'] ? $vPublicationMesssage = "<span class=\"text-small-normal red\">&nbsp;&nbsp;(".MysqlQuery::getText($pConn, 412)/*Let asseblief op die publikasie datum. Versending sodra boek gepubliseer is.*/." - ".$vResults[13][$x].")</span>" : $vPublicationMesssage = "");
 									//Books
 									$vString .= "<div class=\"row row-grid\">";
-											$vString .= "<div class=\"col-xs-6 col-md-6 row-grid\">".$vResults[9][$x].$vInStockMesssage."".$vPublicationMesssage."</div>";
+											$vString .= "<div class=\"col-xs-6 col-md-6 row-grid\">".$vResults[9][$x].$vInStockMesssage." ".$vPublicationMesssage."</div>";
 											$vString .= "<div class=\"col-xs-3 col-md-3 row-grid col-right\">".$vResults[3][$x]."</div>";
 											$vString .= "<div class=\"col-xs-3 col-md-2 row-grid col-right\" id=\"cart-total-price-".$vResults[0][$x]."\">R ".$vTotalBookPrice."</div>";
 											$vString .= "<div class=\"col-md-1 row-grid col-right\"></div>";
@@ -475,32 +518,6 @@ class Pages {
 										$vString .= "<div class=\"col-xs-6 col-md-5 row-grid col-right gray\" id=\"cart-total-all-books-price\"></div>";
 										$vString .= "<div class=\"col-md-1 row-grid col-right\"></div>";
 								$vString .="</div>";//row
-
-// 								//Country select
-// 								$vString .="<div class=\"row\">";
-// 									//$vString .="<hr class=\"light-gray\">";
-// 									$vString .= "<div class=\"col-xs-12\">";
-// 										$vString .= "<h5 class=\"red\"><i class=\"fa fa-angle-double-right fa-lg\" aria-hidden=\"true\"></i>&nbsp;&nbsp;".MysqlQuery::getText($pConn, 195)/*Kies die land waarheen die bestelling versend moet word*/."";
-// 										$vString .= "</h5>";
-// 									$vString .= "</div>";
-// 								$vString .="</div>";//row
-
-// 								$vString .= "<div class=\"row row-grid\">";
-// 										$vString .= "<div class=\"col-xs-12 col-md-12 row-grid green checkbox-inline\">";
-// 											$vString .= "<select name=\"pre-country-select\" id=\"pre-country-select\">";
-// 												$vString .= "<option value=\"0\">".MysqlQuery::getText($pConn, 110)/*Kies jou land*/."</option>";
-// 						            			if(count($vCountryResults[0]) > 0){
-// 						            				for($cc = 0; $cc < count($vCountryResults[0]); $cc++){
-// 						            					$vString .= "<option value=\"".$vCountryResults[2][$cc]."\" data=\"".$vCountryResults[0][$cc]."\"";
-// 						            						if($vResults[23][0] == $vCountryResults[0][$cc]){
-// 						            							$vString .= " selected";
-// 						            						}
-// 						            					$vString .= ">".$vCountryResults[1][$cc]."</option>";
-// 						            				}
-// 						            			}
-// 						            		$vString .= "</select>";
-// 										$vString .= "</div>";
-// 								$vString .="</div><br>";//row
 
 								//Courier option
 								$vString .="<div class=\"row\">";
@@ -532,23 +549,6 @@ class Pages {
 						            		$vString .= "</select>";
 										$vString .= "</div>";
 								$vString .="</div>";//row
-
-//								$vString .= "<div class=\"row row-grid\">";
-//                                    $vString .= "<div class=\"col-xs-12 col-md-12 row-grid green checkbox-inline\">";
-//                                        if(count($vCourierResults[0]) > 0) {
-//                                            for ($c = 0; $c < count($vCourierResults[0]); $c++) {
-//                                                $vString .= "<input type='radio' id='courier-type".$vCourierResults[0][$c]."' name='courier-type' value='" . $vCourierResults[0][$c] . "'";
-//                                                if ($vResults[22][0] == $vCourierResults[0][$c]) {
-//                                                    $vString .= " checked";
-//                                                } else if ($vCourierResults[0][$c] == 7) {
-//                                                    $vString .= " checked";
-//                                                }
-//                                                $vString .= ">";
-//                                                $vString .= "<label class='space-left' for='" . $vCourierResults[1][$c] . "'>" . $vCourierResults[1][$c] . "</label><br>";
-//                                            }
-//                                        }
-//                                    $vString .= "</div>";
-//								$vString .="</div>";//row
 
 								//Country selection
 								$vCountryResults = MysqlQuery::getCountryCourierCost($pConn, array_sum($vResults[3]));//$vId, $vCountry, $vCost
@@ -617,25 +617,23 @@ class Pages {
 									$vString .="</div>";
 								$vString .="</div>";//row
 
-								//Delivery address
-								$vString .="<div class=\"row\">";
-									$vString .= "<div class=\"col-xs-12\">";
-										$vString .= "<h5 class=\"red\"><i class=\"fa fa-angle-double-right fa-lg\" aria-hidden=\"true\"></i>&nbsp;&nbsp;".MysqlQuery::getText($pConn, 289)/*Kies 'n afleweringsadres*/."</h5>";
-									$vString .="</div>";
-								$vString .="</div>";//row
+                                //Reciever name & no
+                                $vString .= "<div class=\"row space-bottom\">";
+                                    $vString .= "<div class=\"col-xs-12\">";
+                                        $vString .= "<h5 class=\"red\"><i class=\"fa fa-angle-double-right fa-lg\" aria-hidden=\"true\"></i>&nbsp;&nbsp;" . MysqlQuery::getText($pConn, 454)/*Ontvanger naam en kontaknommer*/ . '</h5>';
+                                        $vString .= "<div class=\"green space-left\"><input type=\"text\" name=\"new_name\" id=\"new_name\" value=\"" . $vNName . "\" placeholder=\"" . MysqlQuery::getText($pConn, 383)/*Ontvanger naam*/ . "\" size=\"50\" maxlength=\"50\" class=\"text-small-normal space-top-small\"></div>";
+                                        $vString .= "<div class=\"green space-left\"><input type=\"text\" name=\"new_phone\" id=\"new_phone\" value=\"" . $vNPhone . "\" placeholder=\"" . MysqlQuery::getText($pConn, 384)/*Ontvanger kontaknommer*/ . "\" size=\"25\" maxlength=\"25\" class=\"text-small-normal space-top-small\"></div>";
+                                    $vString .= '</div>';
+                                $vString .= '</div>';//row
+
+                                //Delivery address
+                                $vString .= "<div class=\"row\">";
+                                    $vString .= "<div class=\"col-xs-12\">";
+                                        $vString .= "<h5 class=\"red\"><i class=\"fa fa-angle-double-right fa-lg\" aria-hidden=\"true\"></i>&nbsp;&nbsp;" . MysqlQuery::getText($pConn, 289)/*Kies 'n afleweringsadres*/ . '</h5>';
+                                    $vString .= '</div>';
+                                $vString .= '</div>';//row
 
 								$vString .= "<div class=\"row row-grid\">";
-									($vResults[28][0] == 1 ? $vPostalChecked = " checked" : $vPostalChecked = "");
-									($vResults[28][0] == 1 ? $vPostalDiv = " selected-div" : $vPostalDiv = "");
-										$vString .= "<div class=\"col-xs-2 col-md-1 col-right checkbox-inline\"><input type=\"checkbox\" id=\"delivery-postal\" data-src=\"postal\" name=\"delivery\" value=\"postal\" ".$vPostalChecked."></div>";
-										$vString .= "<div class=\"col-xs-10 col-md-2 line text-small-normal".$vPostalDiv."\" id=\"postal-check\" data-address1=\"".$vClientResults[6][0]."\"  data-address2=\"".$vClientResults[7][0]."\" data-city=\"".$vClientResults[8][0]."\" data-province=\"".$vClientResults[9][0]."\" data-code=\"".$vClientResults[10][0]."\" data-country=\"".$vClientResults[11][0]."\">";
-											(!empty($vClientResults[6][0]) ? $vString .= $vClientResults[6][0]."<br>" : $vString .= "");
-											(!empty($vClientResults[7][0]) ? $vString .= $vClientResults[7][0]."<br>" : $vString .= "");
-											(!empty($vClientResults[8][0]) ? $vString .= $vClientResults[8][0]."<br>" : $vString .= "");
-											(!empty($vClientResults[9][0]) ? $vString .= $vClientResults[9][0]."<br>" : $vString .= "");
-											(!empty($vClientResults[10][0]) ? $vString .= $vClientResults[10][0]."<br>" : $vString .= "");
-											(!empty($vClientResults[11][0]) ? $vString .= $vClientResults[11][0] : $vString .= "");
-										$vString .= "</div>";
 										if(!empty($vClientResults[12][0]) || !empty($vClientResults[13][0])){
 											($vResults[28][0] == 2 ? $vPhysicalChecked = " checked" : $vPhysicalChecked = "");
 											($vResults[28][0] == 2 ? $vPhysicalDiv = " selected-div" : $vPhysicalDiv = "");
@@ -648,10 +646,6 @@ class Pages {
 												(!empty($vClientResults[16][0]) ? $vString .= $vClientResults[16][0]."<br>" : $vString .= "");
 												(!empty($vClientResults[17][0]) ? $vString .= $vClientResults[17][0] : $vString .= "");
 											$vString .= "</div>";
-										}
-										else {
-											$vString .= "<div class=\"col-xs-2 col-md-1 col-right checkbox-inline\"></div>";
-											$vString .= "<div class=\"col-xs-10 col-md-2 line text-small-normal\" id=\"physical-check\"></div>";
 										}
 										if($vResults[28][0] == 3){
 											$vNewChecked = " checked";
@@ -671,23 +665,14 @@ class Pages {
 
 										$vString .= "<div class=\"col-xs-2 col-md-1 col-right checkbox-inline\"><input type=\"checkbox\" id=\"delivery-new\" data-src=\"new\" name=\"delivery\" value=\"new\"".$vNewChecked."></div>";
 										$vString .= "<div class=\"col-xs-10 col-md-2 line text-small-normal".$vNewDiv."\"  id=\"new-check\">";
-											$vString .= "<div><input type=\"text\" name=\"new_1\" id=\"new_1\" value=\"".$vN1."\" placeholder=\"".MysqlQuery::getText($pConn, 181)/*Adres*/."\" size=\"25\" maxlength=\"45\" class=\"text-small-normal\" disabled=\"true\"></div>";
-											$vString .= "<div><input type=\"text\" name=\"new_2\" id=\"new_2\" value=\"".$vN2."\" placeholder=\"\" size=\"25\" maxlength=\"50\" class=\"text-small-normal\" disabled=\"true\"></div>";
-											$vString .= "<div><input type=\"text\" name=\"new_city\" id=\"new_city\" value=\"".$vNCity."\" placeholder=\"".MysqlQuery::getText($pConn, 98)/*Stad / Dorp*/."\" size=\"25\" maxlength=\"45\" class=\"text-small-normal\" disabled=\"true\"></div>";
-											$vString .= "<div><input type=\"text\" name=\"new_province\" id=\"new_province\" value=\"".$vNProvince."\" placeholder=\"".MysqlQuery::getText($pConn, 248)/*Provinsie*/."\" size=\"25\" maxlength=\"45\" class=\"text-small-normal\" disabled=\"true\"></div>";
-											$vString .= "<div><input type=\"text\" name=\"new_country\" id=\"new_country\" value=\"".$vNCountry."\" placeholder=\"".MysqlQuery::getText($pConn, 229)/*Land*/."\" size=\"25\" maxlength=\"45\" class=\"text-small-normal\" disabled=\"true\"></div>";
-											$vString .= "<div><input type=\"text\" name=\"new_code\" id=\"new_code\" value=\"".$vNCode."\" placeholder=\"".MysqlQuery::getText($pConn, 71)/*Poskode*/."\" size=\"10\" maxlength=\"6\" class=\"text-small-normal\" disabled=\"true\"></div>";
+											$vString .= "<div><input type=\"text\" name=\"new_1\" id=\"new_1\" value=\"".$vN1."\" placeholder=\"".MysqlQuery::getText($pConn, 181)/*Adres*/."\" size=\"25\" maxlength=\"45\" class=\"text-small-normal space-top-small\" disabled=\"true\"></div>";
+											$vString .= "<div><input type=\"text\" name=\"new_2\" id=\"new_2\" value=\"".$vN2."\" placeholder=\"\" size=\"25\" maxlength=\"50\" class=\"text-small-normal space-top-small\" disabled=\"true\"></div>";
+											$vString .= "<div><input type=\"text\" name=\"new_city\" id=\"new_city\" value=\"".$vNCity."\" placeholder=\"".MysqlQuery::getText($pConn, 98)/*Stad / Dorp*/."\" size=\"25\" maxlength=\"45\" class=\"text-small-normal space-top-small\" disabled=\"true\"></div>";
+											$vString .= "<div><input type=\"text\" name=\"new_province\" id=\"new_province\" value=\"".$vNProvince."\" placeholder=\"".MysqlQuery::getText($pConn, 248)/*Provinsie*/."\" size=\"25\" maxlength=\"45\" class=\"text-small-normal space-top-small\" disabled=\"true\"></div>";
+											$vString .= "<div><input type=\"text\" name=\"new_country\" id=\"new_country\" value=\"".$vNCountry."\" placeholder=\"".MysqlQuery::getText($pConn, 229)/*Land*/."\" size=\"25\" maxlength=\"45\" class=\"text-small-normal space-top-small\" disabled=\"true\"></div>";
+											$vString .= "<div><input type=\"text\" name=\"new_code\" id=\"new_code\" value=\"".$vNCode."\" placeholder=\"".MysqlQuery::getText($pConn, 71)/*Poskode*/."\" size=\"10\" maxlength=\"6\" class=\"text-small-normal space-top-small\" disabled=\"true\"></div>";
 											$vString .= "<input type=\"hidden\" name=\"pargo_point_code\" id=\"pargo_point_code\" value=\"".$vPargoPoint."\">";
-											$vString .= "<div class=\"text-small red\"><i class=\"fa fa-question fa-lg\" aria-hidden=\"true\" data-html=\"true\" data-toggle=\"tooltip\" data-placement=\"top\"  title=\"".MysqlQuery::getText($pConn, 290)/*Tik 'n posadres vir hierdie...*/."  ".MysqlQuery::getText($pConn, 360)/*Hierdie tydelike adres sal nie jou gestoorde profiel adres vervang nie.*/."\"></i></div>";
-										$vString .= "</div>";
-								$vString .="</div>";//row
-
-								//Reciever name & no
-								$vString .="<div class=\"row space-bottom\">";
-									$vString .= "<div class=\"col-xs-12\">";
-										$vString .= "<h5 class=\"red\"><i class=\"fa fa-angle-double-right fa-lg\" aria-hidden=\"true\"></i>&nbsp;&nbsp;".MysqlQuery::getText($pConn, 454)/*Ontvanger naam en kontaknommer*/."</h5>";
-											$vString .= "<div class=\"green\"><input type=\"text\" name=\"new_name\" id=\"new_name\" value=\"".$vNName."\" placeholder=\"".MysqlQuery::getText($pConn, 383)/*Ontvanger naam*/."\" size=\"25\" maxlength=\"50\" class=\"text-small-normal space-left\"></div>";
-											$vString .= "<div class=\"green\"><input type=\"text\" name=\"new_phone\" id=\"new_phone\" value=\"".$vNPhone."\" placeholder=\"".MysqlQuery::getText($pConn, 384)/*Ontvanger kontaknommer*/."\" size=\"25\" maxlength=\"25\" class=\"text-small-normal space-left\"></div>";
+											$vString .= "<div class=\"text-small red space-top-small\"><i class=\"fa fa-question fa-lg\" aria-hidden=\"true\" data-html=\"true\" data-toggle=\"tooltip\" data-placement=\"top\"  title=\"".MysqlQuery::getText($pConn, 290)/*Tik 'n posadres vir hierdie...*/."  ".MysqlQuery::getText($pConn, 360)/*Hierdie tydelike adres sal nie jou gestoorde profiel adres vervang nie.*/."\"></i></div>";
 										$vString .= "</div>";
 								$vString .="</div>";//row
 
@@ -718,20 +703,20 @@ class Pages {
 							$vString .= "<div class=\"form-footer\">";
 								$vString .="<div class=\"row\">";
 				                    $vString .="<div class=\"col-xs-12\">";
-										$vString .= "<a href=\"".$_SESSION['SessionGrafLanguage']."/".$_SESSION['SessionGrafUserId']."/".MysqlQuery::getText($pConn, 285)/*BestelNou*/."\" title=\"".MysqlQuery::getText($pConn, 56)/*Terug*/."\"><button type=\"button\" id=\"backCButton\" class=\"btn btn-primary\">".MysqlQuery::getText($pConn, 56)/*Terug*/."</button></a>";
+										$vString .= "<a href=\"".$_SESSION['SessionGrafLanguage']."/".(isset($_SESSION['SessionGrafUserId']) ? $_SESSION['SessionGrafUserId'] : $_SESSION['SessionGrafUserSessionId'])."/".MysqlQuery::getText($pConn, 285)/*BestelNou*/."\" title=\"".MysqlQuery::getText($pConn, 56)/*Terug*/."\"><button type=\"button\" id=\"backCButton\" class=\"btn btn-primary\">".MysqlQuery::getText($pConn, 56)/*Terug*/."</button></a>";
 										$vString .= "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button type=\"submit\" id=\"cartSubmitStep2\" class=\"btn btn-primary no-display\" title=\"".MysqlQuery::getText($pConn, 122)/*Gaan voort*/."\">".MysqlQuery::getText($pConn, 122)/*Gaan voort*/."</button>";
 									$vString .="</div>";
 								$vString .="</div>";
 							$vString .="</div>";//footer
-					}
-					else {
+                        }
+                        else {
 							$vString .="<div class=\"row\">";
 								$vString .= "<div class=\"col-xs-12\">";
 									$vString .= "<h5 class=\"gray\">".MysqlQuery::getText($pConn, 123)/*Jou mandjie is leeg*/."</h5>";
 									$vString .= "<hr class=\"light-gray\">";
 								$vString .="</div>";
 							$vString .="</div>";
-					}
+					    }
 					$vString .= "</div>";//center
 				$vString .= "</div>";//form-border
 				$vString .= "<input type=\"hidden\" name=\"deliver_name\" id=\"deliver_name\" value=\"".$vResults[20][0]."\">";
@@ -810,9 +795,10 @@ class Pages {
 					}
 				}
 			</Script>
-<?php
+        <?php
 		}
 		else {
+            echo "Error";
 				//$vErrorResult = $vPages->returnErrorResult($pConn, 279);//*Jou bestelling is nie gelaai nie. Probeer asseblief weer. Kontak Graffititi indien die fout herhaaldelik voorkom.
 				//echo $vErrorResult;
 		}

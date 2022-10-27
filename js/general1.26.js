@@ -477,6 +477,7 @@ $( window ).on( "load", function() {
     $.fn.calculateTotalBookCost = function() {
 		var sum = 0;
 		$('[id^=cart-total-price-]').each(function(){
+			// var theValue = $(this).text().substring(2);
 			var theValue = $(this).text().substring(2);
 		    sum += parseFloat(theValue);
 		   $('#cart-total-all-books-price').html('R '+sum+''); 
@@ -550,14 +551,14 @@ $( window ).on( "load", function() {
     	if ($(this).is(':checked')) {
     		$('#delivery_address_error').fadeOut(500);   
     		$('#cartSubmitStep2').fadeIn(500);   
-    		if(type == "postal"){
-    			$( "#delivery-physical").prop('checked', false);
-    			$("#physical-check").removeClass( "selected-div" );
-    			$( "#delivery-new").prop('checked', false);
-    			$("#new-check").removeClass( "selected-div" );		
-    			$("#postal-check").addClass( "selected-div" );
-    		}
-    		else if(type == "physical"){
+    		// if(type == "postal"){
+    		// 	$( "#delivery-physical").prop('checked', false);
+    		// 	$("#physical-check").removeClass( "selected-div" );
+    		// 	$( "#delivery-new").prop('checked', false);
+    		// 	$("#new-check").removeClass( "selected-div" );
+    		// 	$("#postal-check").addClass( "selected-div" );
+    		// }
+    		if(type == "physical"){
     			$( "#delivery-postal").prop('checked', false);
     			$("#postal-check").removeClass( "selected-div" );	
     			$( "#delivery-new").prop('checked', false);

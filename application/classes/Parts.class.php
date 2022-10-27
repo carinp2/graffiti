@@ -358,9 +358,10 @@ class Parts {
 			$vEnUrl = "en/Home";
 		}
 
+        $vTempClientId = (isset($_SESSION['SessionGrafUserId']) ? $_SESSION['SessionGrafUserId'] : $_SESSION['SessionGrafUserSessionId']);
 		$vBindParams = array();
 		$vBindLetters = "i";
-		$vBindParams[] = & $_SESSION['SessionGrafUserId'];
+		$vBindParams[] = & $vTempClientId;
         $vString = "";
 		$vString .= "\n<div id=\"header\">";
 			$vString .= "<div class=\"container\" id=\"static-header\">";
@@ -387,7 +388,7 @@ class Parts {
 		      			$vString .= "<ul class=\"pull-right welcome-menu no-display\" id=\"admin-menu\">";
 //                          Login changes - Add new sessionid checker for not logged-in users 17-10-2022 & remove cart section from if
                             $vOrderNumber = MysqlQuery::getCartSum($pConn, " WHERE client_id = ? and order_date is NULL and order_reference is NULL and order_id is NULL and temp_salt is not NULL", $vBindLetters, $vBindParams);
-                            $vString .= "<li id=\"cart-anchor\"><a  href=\"".$_SESSION['SessionGrafLanguage']."/".$_SESSION['SessionGrafUserId']."/".MysqlQuery::getText($pConn, 285)/*BestelNou*/."\" class=\"red-menu\" title=\"".MysqlQuery::getText($pConn, 17)/*Bestel nou*/."\"><i class=\"fa fa-shopping-basket icon-shopping-cart glyphicon-shopping-cart my-cart-icon\" title=\"".MysqlQuery::getText($pConn, 17)/*Bestel nou*/."\"></i><span class=\"badge badge-notify\" id=\"cart-num\">".$vOrderNumber."</span></a></li>";
+                            $vString .= "<li id=\"cart-anchor\"><a  href=\"".$_SESSION['SessionGrafLanguage']."/".$vTempClientId."/".MysqlQuery::getText($pConn, 285)/*BestelNou*/."\" class=\"red-menu\" title=\"".MysqlQuery::getText($pConn, 17)/*Bestel nou*/."\"><i class=\"fa fa-shopping-basket icon-shopping-cart glyphicon-shopping-cart my-cart-icon\" title=\"".MysqlQuery::getText($pConn, 17)/*Bestel nou*/."\"></i><span class=\"badge badge-notify\" id=\"cart-num\">".$vOrderNumber."</span></a></li>";
 		      				if((!isset($_SESSION['SessionGrafUserId']) || $_SESSION['SessionGrafUserId'] == "") && isset($_SESSION['SessionGrafUserSessionId'])){
 		      					$vString .= " <i class=\"my-cart-icon my-cart-invisible\" aria-hidden=\"true\"></i>";
 		      					$vString .= " <li><a href=\"".$_SESSION['SessionGrafLanguage']."/0/".MysqlQuery::getText($pConn, 96)/*Registreer*/."\" class=\"text-small red\" title=\"".MysqlQuery::getText($pConn, 96)/*Registreer*/."\">".MysqlQuery::getText($pConn, 96)/*Registreer*/."</a></li>";
