@@ -514,7 +514,7 @@ class Pages {
 								}
 								//Total book cost
 								$vString .= "<div class=\"row row-grid space-bottom\">";
-										$vString .= "<div class=\"col-xs-6 col-md-6 row-grid gray\">".MysqlQuery::getText($pConn, 107)/*Totaal*/."</div>";
+										$vString .= "<div class=\"col-xs-6 col-md-6 row-grid gray\">".MysqlQuery::getText($pConn, 107)/*Sub Totaal*/."</div>";
 										$vString .= "<div class=\"col-xs-6 col-md-5 row-grid col-right gray\" id=\"cart-total-all-books-price\"></div>";
 										$vString .= "<div class=\"col-md-1 row-grid col-right\"></div>";
 								$vString .="</div>";//row
@@ -530,8 +530,8 @@ class Pages {
 								$vString .="</div>";//row
 
 								$vString .= "<div class=\"row row-grid\">";
-										$vString .= "<div class=\"col-xs-12 col-md-12 row-grid green checkbox-inline\">";
-											$vString .= "<select name=\"courier-type\" id=\"courier-type\" size='4'>";
+										$vString .= "<div class=\"col-xs-12 col-md-8 row-grid green checkbox-inline\">";
+											$vString .= "<select name=\"courier-type\" id=\"courier-type\" size='4' class='form-control'>";
 												//$vString .= "<option value=\"\">".MysqlQuery::getText($pConn, 291)/*Kies 'n opsie*/."</option>";
 						            			if(count($vCourierResults[0]) > 0){
 						            				for($c = 0; $c < count($vCourierResults[0]); $c++){
@@ -553,8 +553,8 @@ class Pages {
 								//Country selection
 								$vCountryResults = MysqlQuery::getCountryCourierCost($pConn, array_sum($vResults[3]));//$vId, $vCountry, $vCost
 								$vString .= "<div class=\"row row-grid space-bottom no-display\" id=\"country-cart-courier-select\">";
-										$vString .= "<div class=\"col-xs-12 col-md-12 row-grid green checkbox-inline\">";
-											$vString .= "<select name=\"country-select\" id=\"country-select\">";
+										$vString .= "<div class=\"col-xs-12 col-md-6 row-grid green checkbox-inline\">";
+											$vString .= "<select name=\"country-select\" id=\"country-select\" class='form-control'>";
 												$vString .= "<option value=\"0\">".MysqlQuery::getText($pConn, 110)/*Kies jou land*/."</option>";
 						            			if(count($vCountryResults[0]) > 0){
 						            				for($cc = 0; $cc < count($vCountryResults[0]); $cc++){
@@ -602,9 +602,9 @@ class Pages {
 								$vString .="</div>";//row
 
 								//Total order cost
-								$vString .= "<div class=\"row row-grid total-line no-display\" id=\"total-cart-cost\">";
+								$vString .= "<div class=\"row row-grid total-line no-display space-left\" id=\"total-cart-cost\">";
 									$vString .= "<div class=\"form-group\">";
-										$vString .= "<div class=\"col-xs-6 col-md-6 row-grid green\">".MysqlQuery::getText($pConn, 292)/*Totale bestelling koste*/."</div>";
+										$vString .= "<div class=\"col-xs-6 col-md-6 row-grid green\">".strtoupper(MysqlQuery::getText($pConn, 292))/*Totaal*/."</div>";
 										$vString .= "<div class=\"col-xs-6 col-md-5 row-grid col-right green\" id=\"cart-total-order-cost\"></div>";
 										$vString .= "<div class=\"col-md-1 row-grid col-right\"></div>";
 									$vString .="</div>";
@@ -617,122 +617,125 @@ class Pages {
 									$vString .="</div>";
 								$vString .="</div>";//row
 
-                                //Reciever name & no
-                                $vString .= "<div class=\"row space-bottom\">";
-                                    $vString .= "<div class=\"col-xs-12\">";
-                                        $vString .= "<h5 class=\"red\"><i class=\"fa fa-angle-double-right fa-lg\" aria-hidden=\"true\"></i>&nbsp;&nbsp;" . MysqlQuery::getText($pConn, 454)/*Ontvanger naam en kontaknommer*/ . '</h5>';
-                                        $vString .= "<div class=\"green space-left\"><input type=\"text\" name=\"new_name\" id=\"new_name\" value=\"" . $vNName . "\" placeholder=\"" . MysqlQuery::getText($pConn, 383)/*Ontvanger naam*/ . "\" size=\"50\" maxlength=\"50\" class=\"text-small-normal space-top-small\"></div>";
-                                        $vString .= "<div class=\"green space-left\"><input type=\"text\" name=\"new_phone\" id=\"new_phone\" value=\"" . $vNPhone . "\" placeholder=\"" . MysqlQuery::getText($pConn, 384)/*Ontvanger kontaknommer*/ . "\" size=\"25\" maxlength=\"25\" class=\"text-small-normal space-top-small\"></div>";
-                                    $vString .= '</div>';
-                                $vString .= '</div>';//row
-
                                 //Delivery address
                                 $vString .= "<div class=\"row\">";
                                     $vString .= "<div class=\"col-xs-12\">";
-                                        $vString .= "<h5 class=\"red\"><i class=\"fa fa-angle-double-right fa-lg\" aria-hidden=\"true\"></i>&nbsp;&nbsp;" . MysqlQuery::getText($pConn, 289)/*Kies 'n afleweringsadres*/ . '</h5>';
+                                        $vString .= "<h5 class=\"red\"><i class=\"fa fa-angle-double-right fa-lg\" aria-hidden=\"true\"></i>&nbsp;&nbsp;" . MysqlQuery::getText($pConn, 289)/* Afleweringsadres & Ontvanger naam en kontaknommer */ . '</h5>';
                                     $vString .= '</div>';
                                 $vString .= '</div>';//row
 
 								$vString .= "<div class=\"row row-grid\">";
-										if(!empty($vClientResults[12][0]) || !empty($vClientResults[13][0])){
-											($vResults[28][0] == 2 ? $vPhysicalChecked = " checked" : $vPhysicalChecked = "");
-											($vResults[28][0] == 2 ? $vPhysicalDiv = " selected-div" : $vPhysicalDiv = "");
-											$vString .= "<div class=\"col-xs-2 col-md-1 col-right checkbox-inline\"><input type=\"checkbox\" id=\"delivery-physical\" data-src=\"physical\" name=\"delivery\" value=\"physical\" ".$vPhysicalChecked."></div>";
-											$vString .= "<div class=\"col-xs-10 col-md-2 line text-small-normal".$vPhysicalDiv."\" id=\"physical-check\" data-address1=\"".$vClientResults[12][0]."\"  data-address2=\"".$vClientResults[13][0]."\" data-city=\"".$vClientResults[14][0]."\" data-province=\"".$vClientResults[15][0]."\" data-code=\"".$vClientResults[17][0]."\" data-country=\"".$vClientResults[16][0]."\">";
-												(!empty($vClientResults[12][0]) ? $vString .= $vClientResults[12][0]."<br>" : $vString .= "");
-												(!empty($vClientResults[13][0]) ? $vString .= $vClientResults[13][0]."<br>" : $vString .= "");
-												(!empty($vClientResults[14][0]) ? $vString .= $vClientResults[14][0]."<br>" : $vString .= "");
-												(!empty($vClientResults[15][0]) ? $vString .= $vClientResults[15][0]."<br>" : $vString .= "");
-												(!empty($vClientResults[16][0]) ? $vString .= $vClientResults[16][0]."<br>" : $vString .= "");
-												(!empty($vClientResults[17][0]) ? $vString .= $vClientResults[17][0] : $vString .= "");
-											$vString .= "</div>";
-										}
-										if($vResults[28][0] == 3){
-											$vNewChecked = " checked";
-											$vNewDiv = " selected-div";
-											//$vNName = $vResults[20][0];
-											$vN1 = $vResults[14][0];
-											$vN2 = $vResults[15][0];
-											$vNCity = $vResults[16][0];
-											$vNProvince = $vResults[17][0];
-											$vNCountry = $vResults[18][0];
-											$vNCode = $vResults[19][0];
-											$vNPhone = $vResults[21][0];
-											$vPargoPoint = $vResults[23][0];
-										}
-										(empty($vResults[20][0]) ? $vNName = $vClientResults[1][0]." ".$vClientResults[2][0] : $vNName = $vResults[20][0]);
-										(empty($vResults[21][0]) ? $vNPhone = $vClientResults[5][0] : $vNPhone = $vResults[21][0]);
-
-										$vString .= "<div class=\"col-xs-2 col-md-1 col-right checkbox-inline\"><input type=\"checkbox\" id=\"delivery-new\" data-src=\"new\" name=\"delivery\" value=\"new\"".$vNewChecked."></div>";
-										$vString .= "<div class=\"col-xs-10 col-md-2 line text-small-normal".$vNewDiv."\"  id=\"new-check\">";
-											$vString .= "<div><input type=\"text\" name=\"new_1\" id=\"new_1\" value=\"".$vN1."\" placeholder=\"".MysqlQuery::getText($pConn, 181)/*Adres*/."\" size=\"25\" maxlength=\"45\" class=\"text-small-normal space-top-small\" disabled=\"true\"></div>";
-											$vString .= "<div><input type=\"text\" name=\"new_2\" id=\"new_2\" value=\"".$vN2."\" placeholder=\"\" size=\"25\" maxlength=\"50\" class=\"text-small-normal space-top-small\" disabled=\"true\"></div>";
-											$vString .= "<div><input type=\"text\" name=\"new_city\" id=\"new_city\" value=\"".$vNCity."\" placeholder=\"".MysqlQuery::getText($pConn, 98)/*Stad / Dorp*/."\" size=\"25\" maxlength=\"45\" class=\"text-small-normal space-top-small\" disabled=\"true\"></div>";
-											$vString .= "<div><input type=\"text\" name=\"new_province\" id=\"new_province\" value=\"".$vNProvince."\" placeholder=\"".MysqlQuery::getText($pConn, 248)/*Provinsie*/."\" size=\"25\" maxlength=\"45\" class=\"text-small-normal space-top-small\" disabled=\"true\"></div>";
-											$vString .= "<div><input type=\"text\" name=\"new_country\" id=\"new_country\" value=\"".$vNCountry."\" placeholder=\"".MysqlQuery::getText($pConn, 229)/*Land*/."\" size=\"25\" maxlength=\"45\" class=\"text-small-normal space-top-small\" disabled=\"true\"></div>";
-											$vString .= "<div><input type=\"text\" name=\"new_code\" id=\"new_code\" value=\"".$vNCode."\" placeholder=\"".MysqlQuery::getText($pConn, 71)/*Poskode*/."\" size=\"10\" maxlength=\"6\" class=\"text-small-normal space-top-small\" disabled=\"true\"></div>";
-											$vString .= "<input type=\"hidden\" name=\"pargo_point_code\" id=\"pargo_point_code\" value=\"".$vPargoPoint."\">";
-											$vString .= "<div class=\"text-small red space-top-small\"><i class=\"fa fa-question fa-lg\" aria-hidden=\"true\" data-html=\"true\" data-toggle=\"tooltip\" data-placement=\"top\"  title=\"".MysqlQuery::getText($pConn, 290)/*Tik 'n posadres vir hierdie...*/."  ".MysqlQuery::getText($pConn, 360)/*Hierdie tydelike adres sal nie jou gestoorde profiel adres vervang nie.*/."\"></i></div>";
-										$vString .= "</div>";
-								$vString .="</div>";//row
-
-								//Special message
-								$vString .="<div class=\"row\">";
-									$vString .= "<div class=\"col-xs-12\">";
-										$vString .= "<h5 class=\"red\"><i class=\"fa fa-angle-double-right fa-lg\" aria-hidden=\"true\"></i>&nbsp;&nbsp;".MysqlQuery::getText($pConn, 153)/*Aflewerings boodskap*/."</h5>";
-									$vString .="</div>";
-								$vString .="</div>";//row
-
-								$vString .= "<div class=\"row row-grid\">";
-										$vString .= "<div class=\"col-xs-12 col-md-12 row-grid green checkbox-inline\">";
-											$vString .= "<textarea name=\"message\" id=\"message\" wrap=\"soft\" cols=\"120\" rows=\"2\" maxlength=\"255\">".$vResults[27][0]."</textarea>";
-										$vString .= "</div>";
-								$vString .="</div>";//row
+                                    //Set values when courier & delivery info have been captured
+                                    if(isset($vResults[28][0]) && !empty($vResults[28][0])){
+                                        $vDeliver_name = $vResults[20][0];
+                                        $vDeliver_address1 = $vResults[14][0];
+                                        $vDeliver_address2 = $vResults[15][0];
+                                        $vDeliver_city = $vResults[16][0];
+                                        $vDeliver_province = $vResults[17][0];
+                                        $vDeliver_country = $vResults[18][0];
+                                        $vDeliver_code = $vResults[19][0];
+                                        $vDeliver_phone = $vResults[21][0];
+                                        $vCourier_type = $vResults[22][0];
+                                        $vCourier_detail = $vResults[23][0];
+                                        $vCourier_cost = $vResults[24][0];
+                                        $vPrice = $vResults[25][0];
+                                        $vTotal_price = $vResults[26][0];
+                                        $vDelivery_address_type = $vResults[28][0];
+                                        $vDelivery_message = $vResults[27][0];
+                                    }
+                                    //Else use client saved physical address
+                                    else if(isset($vClientResults) && count($vClientResults) > 0){
+                                        $vDeliver_name = $vClientResults[1][0]." ".$vClientResults[2][0];
+                                        $vDeliver_address1 = $vClientResults[12][0];
+                                        $vDeliver_address2 = $vClientResults[13][0];
+                                        $vDeliver_city = $vClientResults[14][0];
+                                        $vDeliver_province = $vClientResults[15][0];
+                                        $vDeliver_country = $vClientResults[16][0];
+                                        $vDeliver_code = $vClientResults[17][0];
+                                        $vDeliver_phone = $vClientResults[5][0];
+                                        $vCourier_type = '';
+                                        $vCourier_detail = '';
+                                        $vCourier_cost = $vResults[24][0];
+                                        $vPrice = $vResults[25][0];
+                                        $vTotal_price = $vResults[26][0];
+                                        $vDelivery_address_type = 2;
+                                        $vDelivery_message = $vResults[27][0];
+                                    }
+                                    $vString .= "<div class='col-xs-12 col-md-6 space-left'>";
+                                        $vString .= "<div>
+                                            <label for='deliver_name' class='green'>".MysqlQuery::getText($pConn, 383)/*Ontvanger naam*/.": </label>
+                                            <input type='text' name='deliver_name' id='deliver_name' value='" . ($vDeliver_name ?? '') . "' maxlength='50' class='form-control'>
+                                        </div>
+                                        <div>
+                                            <label for='deliver_phone' class='green space-top-small'>".MysqlQuery::getText($pConn, 384)/*Ontvanger kontaknommer*/.": </label>
+                                            <input type='text' name='deliver_phone' id='deliver_phone' value='" . ($vDeliver_phone ?? '') . "' maxlength='25' class='form-control'>
+                                        </div>
+                                        <div>
+                                            <label for='deliver_address1' class='green space-top-small'>".MysqlQuery::getText($pConn, 181)/*Adres*/.": </label>
+                                            <input type='text' name='deliver_address1' id='deliver_address1' value='".($vDeliver_address1 ?? '')."' maxlength='45' class='form-control'>
+                                            <input type='text' name='deliver_address2' id='deliver_address2' value='".($vDeliver_address2 ?? '')."' maxlength='50' class='form-control'>
+                                        </div>
+                                        <div>
+                                            <label for='deliver_city' class='green space-top-small'>".MysqlQuery::getText($pConn, 98)/*Stad / Dorp*/.": </label>
+                                            <input type='text' name='deliver_city' id='deliver_city' value='".($vDeliver_city ?? '')."' maxlength='45' class='form-control'>
+                                        </div>
+                                        <div>
+                                            <label for='deliver_province' class='green space-top-small'>".MysqlQuery::getText($pConn, 248)/*Provinsie*/.": </label>
+                                            <input type='text' name='deliver_province' id='deliver_province' value='".($vDeliver_province ?? '')."' maxlength='45' class='form-control'>
+                                        </div>
+                                        <div>
+                                            <label for='deliver_country' class='green space-top-small'>".MysqlQuery::getText($pConn, 229)/*Land*/.": </label>
+                                            <input type='text' name='deliver_country' id='deliver_country' value='".($vDeliver_country ?? '')."' maxlength='45' class='form-control'>
+                                        </div>
+                                        <div>
+                                            <label for='deliver_code' class='green space-top-small'>".MysqlQuery::getText($pConn, 71)/*Poskode*/.": </label>
+                                            <input type='text' name='deliver_code' id='deliver_code' value='".($vDeliver_code ?? '')."' maxlength='6' class='form-control'>
+                                        </div>
+                                        <div>
+                                            <label for='message' class='green space-top-small'>".MysqlQuery::getText($pConn, 153)/*Aflewerings boodskap*/.": </label>
+                                            <textarea name='message' id='message' wrap='soft' cols='70' rows='3' maxlength='255' class='form-control'>".$vDelivery_message."</textarea>
+                                        </div>                                        
+                                        <input type='hidden' name='pargo_point_code' id='pargo_point_code' value='".$vCourier_detail."'>
+                                        <input type='hidden' name='courier_type' id='courier_type' value='".$vCourier_type."'>
+                                        <input type='hidden' name='courier_detail' id='courier_detail' value='".$vCourier_detail."'>
+                                        <input type='hidden' name='courier_cost' id='courier_cost' value='".$vCourier_cost."'>
+                                        <input type='hidden' name='price' id='price' value='".$vPrice."'>
+                                        <input type='hidden' name='total_price' id='total_price' value='".$vTotal_price."'>
+                                        <input type='hidden' name='delivery_address_type' id='delivery_address_type' value='".$vDelivery_address_type."'>
+                                    </div>
+								</div>";//row
 
 								//Form error
-								$vString .="<div class=\"row space-bottom\">";
-									$vString .= "<div class=\"col-xs-12\">";
-										$vString .="<div id=\"delivery_courier_error\" class=\"error\" style=\"display:none;\">".MysqlQuery::getText($pConn, 282)/*Kies 'n versendingsopsie*/."</div>";
-										$vString .="<div id=\"delivery_address_error\" class=\"error\" style=\"display:none;\">".MysqlQuery::getText($pConn, 294)/*Kies 'n afleweringsadres of tik 'n adres in*/."</div>";
-										$vString .="<div id=\"pargo_address_error\" class=\"error\" style=\"display:none;\">".MysqlQuery::getText($pConn, 449)/*Kies asseblief 'n Pargo afleweringsadres*/."</div>";
+								$vString .="<div class='row space-bottom'>";
+									$vString .= "<div class='col-xs-12'>";
+										$vString .="<div id='delivery_courier_error' class='error' style='display:none;'>".MysqlQuery::getText($pConn, 282)/*Kies 'n versendingsopsie*/."</div>";
+										$vString .="<div id='delivery_address_error' class='error' style='display:none;'>".MysqlQuery::getText($pConn, 294)/*Kies 'n afleweringsadres of tik 'n adres in*/."</div>";
+										$vString .="<div id='pargo_address_error' class='error' style='display:none;'>".MysqlQuery::getText($pConn, 449)/*Kies asseblief 'n Pargo afleweringsadres*/."</div>";
 									$vString .="</div>";
 								$vString .="</div>";//row
 
 						$vString .= "</div>";//Body
 
-							$vString .= "<div class=\"form-footer\">";
-								$vString .="<div class=\"row\">";
-				                    $vString .="<div class=\"col-xs-12\">";
-										$vString .= "<a href=\"".$_SESSION['SessionGrafLanguage']."/".(isset($_SESSION['SessionGrafUserId']) ? $_SESSION['SessionGrafUserId'] : $_SESSION['SessionGrafUserSessionId'])."/".MysqlQuery::getText($pConn, 285)/*BestelNou*/."\" title=\"".MysqlQuery::getText($pConn, 56)/*Terug*/."\"><button type=\"button\" id=\"backCButton\" class=\"btn btn-primary\">".MysqlQuery::getText($pConn, 56)/*Terug*/."</button></a>";
-										$vString .= "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button type=\"submit\" id=\"cartSubmitStep2\" class=\"btn btn-primary no-display\" title=\"".MysqlQuery::getText($pConn, 122)/*Gaan voort*/."\">".MysqlQuery::getText($pConn, 122)/*Gaan voort*/."</button>";
+							$vString .= "<div class='form-footer'>";
+								$vString .="<div class='row'>";
+				                    $vString .="<div class='col-xs-12'>";
+										$vString .= "<a href='".$_SESSION['SessionGrafLanguage']."/".(isset($_SESSION['SessionGrafUserId']) ? $_SESSION['SessionGrafUserId'] : $_SESSION['SessionGrafUserSessionId'])."/".MysqlQuery::getText($pConn, 285)/*BestelNou*/."' title='".MysqlQuery::getText($pConn, 56)/*Terug*/."'><button type='button' id='backCButton' class='btn btn-primary'>".MysqlQuery::getText($pConn, 56)/*Terug*/."</button></a>";
+										$vString .= "<button type='submit' id='cartSubmitStep2' class='btn btn-primary no-display space-left' title='".MysqlQuery::getText($pConn, 122)/*Gaan voort*/."'>".MysqlQuery::getText($pConn, 122)/*Gaan voort*/."</button>";
 									$vString .="</div>";
 								$vString .="</div>";
 							$vString .="</div>";//footer
                         }
                         else {
-							$vString .="<div class=\"row\">";
-								$vString .= "<div class=\"col-xs-12\">";
-									$vString .= "<h5 class=\"gray\">".MysqlQuery::getText($pConn, 123)/*Jou mandjie is leeg*/."</h5>";
-									$vString .= "<hr class=\"light-gray\">";
+							$vString .="<div class='row'>";
+								$vString .= "<div class='col-xs-12'>";
+									$vString .= "<h5 class='gray'>".MysqlQuery::getText($pConn, 123)/*Jou mandjie is leeg*/."</h5>";
+									$vString .= "<hr class='light-gray'>";
 								$vString .="</div>";
 							$vString .="</div>";
 					    }
 					$vString .= "</div>";//center
 				$vString .= "</div>";//form-border
-				$vString .= "<input type=\"hidden\" name=\"deliver_name\" id=\"deliver_name\" value=\"".$vResults[20][0]."\">";
-				$vString .= "<input type=\"hidden\" name=\"deliver_address1\" id=\"deliver_address1\" value=\"".$vResults[14][0]."\">";
-				$vString .= "<input type=\"hidden\" name=\"deliver_address2\" id=\"deliver_address2\" value=\"".$vResults[15][0]."\">";
-				$vString .= "<input type=\"hidden\" name=\"deliver_city\" id=\"deliver_city\" value=\"".$vResults[16][0]."\">";
-				$vString .= "<input type=\"hidden\" name=\"deliver_province\" id=\"deliver_province\" value=\"".$vResults[17][0]."\">";
-				$vString .= "<input type=\"hidden\" name=\"deliver_country\" id=\"deliver_country\" value=\"".$vResults[18][0]."\">";
-				$vString .= "<input type=\"hidden\" name=\"deliver_code\" id=\"deliver_code\" value=\"".$vResults[19][0]."\">";
-				$vString .= "<input type=\"hidden\" name=\"deliver_phone\" id=\"deliver_phone\" value=\"".$vResults[21][0]."\">";
-				$vString .= "<input type=\"hidden\" name=\"courier_type\" id=\"courier_type\" value=\"".$vResults[22][0]."\">";
-				$vString .= "<input type=\"hidden\" name=\"courier_detail\" id=\"courier_detail\" value=\"".$vResults[23][0]."\">";
-				$vString .= "<input type=\"hidden\" name=\"courier_cost\" id=\"courier_cost\" value=\"".$vResults[24][0]."\">";
-				$vString .= "<input type=\"hidden\" name=\"price\" id=\"price\" value=\"".$vResults[25][0]."\">";
-				$vString .= "<input type=\"hidden\" name=\"total_price\" id=\"total_price\" value=\"".$vResults[26][0]."\">";
-				$vString .= "<input type=\"hidden\" name=\"delivery_address_type\" id=\"delivery_address_type\" value=\"".$vResults[28][0]."\">";
+
 			$vString .= "</form>";
 ?>
 			<Script>
