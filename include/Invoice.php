@@ -43,15 +43,15 @@ require_once('tcpdf/tcpdf.php');
 	$pdf->SetFont('helvetica', 'B', 12, '', true);
 	$pdf->Cell(0,7,$vGeneral->prepareStringForDisplay($_SESSION['SessionGrafUserFirstname'])." ".$vGeneral->prepareStringForDisplay($_SESSION['SessionGrafUserSurname']),0,1);
 	$pdf->SetFont('helvetica', '', 11, '', true);
-	(!empty($vOrderResult[4][0]) ? $pdf->Cell(0,6,$vGeneral->prepareStringForDisplay($vOrderResult[4][0]),0,1) : "");
-	(!empty($vOrderResult[5][0]) ? $pdf->Cell(0,6,$vGeneral->prepareStringForDisplay($vOrderResult[5][0]),0,1) : "");
-	(!empty($vOrderResult[6][0]) ? $pdf->Cell(0,6,$vGeneral->prepareStringForDisplay($vOrderResult[6][0]),0,1) : "");
-	(!empty($vOrderResult[7][0]) ? $pdf->Cell(0,6,$vGeneral->prepareStringForDisplay($vOrderResult[7][0]),0,1) : "");
-	(!empty($vOrderResult[8][0]) ? $pdf->Cell(0,6,$vOrderResult[8][0],0,1) : "");
-	(!empty($vOrderResult[9][0]) ? $pdf->Cell(0,6,$vOrderResult[9][0],0,1) : "");
+	(!empty($vOrderResult[4][0]) ? $pdf->Cell(0,6,$vGeneral->prepareStringForDisplay($vOrderResult[4][0]),0,1) : "");//Address1
+	(!empty($vOrderResult[5][0]) ? $pdf->Cell(0,6,$vGeneral->prepareStringForDisplay($vOrderResult[5][0]),0,1) : "");//Address2
+	(!empty($vOrderResult[6][0]) ? $pdf->Cell(0,6,$vGeneral->prepareStringForDisplay($vOrderResult[6][0]),0,1) : "");//City
+	(!empty($vOrderResult[7][0]) ? $pdf->Cell(0,6,$vGeneral->prepareStringForDisplay($vOrderResult[7][0]),0,1) : "");//Province
+	(!empty($vOrderResult[8][0]) ? $pdf->Cell(0,6,$vOrderResult[8][0],0,1) : "");//Country TODO
+	(!empty($vOrderResult[9][0]) ? $pdf->Cell(0,6,$vOrderResult[9][0],0,1) : "");//Code
 
-	$pdf->Cell(0,5,$_SESSION['SessionGrafUserPhone'],0,1);
-	$pdf->Cell(0,5,$_SESSION['SessionGrafUserEmail'],0,1);
+	$pdf->Cell(0,5,(isset($_SESSION['SessionGrafUserPhone']) ?$_SESSION['SessionGrafUserPhone'] : $vOrderResult[28][0]),0,1);
+	$pdf->Cell(0,5,(isset($_SESSION['SessionGrafUserEmail']) ? $_SESSION['SessionGrafUserEmail'] : $vOrderResult[32][0]),0,1);
 	$pdf->Cell(0,6,'',0,1);
 
 	if(!empty($vOrderResult[27][0]) || !empty($vOrderResult[28][0])){

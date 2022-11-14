@@ -2,23 +2,24 @@
     if(!isset($_SESSION['SessionGrafUserId'])){
 
     }
-		    $subject = "Webwerf bestelling";
-		    $to = "carin@ceit.cc";
-
-		    $headersGraf  = "MIME-Version: 1.0" . "\r\n";
-		    $headersGraf .= "Content-type: text/html; charset=UTF-8" . "\r\n";
-		    $headersGraf .= "From: ".$_SESSION['SessionGrafUserFirstname']." ".$_SESSION['SessionGrafUserSurname']."<".$_SESSION['SessionGrafUserEmail'].">". "\r\n";
-		    $message = "Nuwe boeke bestelling:<br><br>";
-		    $message  .= "Bestelling geplaas deur: ".$_SESSION['SessionGrafUserFirstname']." ".$_SESSION['SessionGrafUserSurname']."<br>";
-		    $message  .= "Boek bestelling verwysingsnommer: GRAF/".$vOrderResult[0][0]."/".$vOrderResult[3][0]."<br>";
-		    $message .=  "Totale prys: R ".$vOrderResult[13][0]."<br>";
-		    $message .= "Betalingsmetode: ".MysqlQuery::getLookupPerId($conn, $vOrderResult[14][0])."<br>";
-		    (!empty($vOrderResult[16][0]) ? $message .= "Afleweringsboodskap: ".$vOrderResult[16][0]."<br>" : $message .= "");
+//		    $subject = "Webwerf bestelling";
+//		    $to = "carin@ceit.cc";
+//
+//		    $headersGraf  = "MIME-Version: 1.0" . "\r\n";
+//		    $headersGraf .= "Content-type: text/html; charset=UTF-8" . "\r\n";
+//		    $headersGraf .= "From: ".$_SESSION['SessionGrafUserFirstname']." ".$_SESSION['SessionGrafUserSurname']."<".$_SESSION['SessionGrafUserEmail'].">". "\r\n";
+//		    $message = "Nuwe boeke bestelling:<br><br>";
+//		    $message  .= "Bestelling geplaas deur: ".$_SESSION['SessionGrafUserFirstname']." ".$_SESSION['SessionGrafUserSurname']."<br>";
+//		    $message  .= "Boek bestelling verwysingsnommer: GRAF/".$vOrderResult[0][0]."/".$vOrderResult[3][0]."<br>";
+//		    $message .=  "Totale prys: R ".$vOrderResult[13][0]."<br>";
+//		    $message .= "Betalingsmetode: ".MysqlQuery::getLookupPerId($conn, $vOrderResult[14][0])."<br>";
+//		    (!empty($vOrderResult[16][0]) ? $message .= "Afleweringsboodskap: ".$vOrderResult[16][0]."<br>" : $message .= "");
 //		    mail($to, $subject, $message, $headersGraf);
 
 		    //##################################################################################### Client email start
+            $vReceiverFullname = (isset($_SESSION['SessionGrafUserFirstname']) ? $_SESSION['SessionGrafUserFirstname'] : $vOrderResult[27][0]).(isset($_SESSION['SessionGrafUserSurname']) ?? ' '.$_SESSION['SessionGrafUserSurname']);
 		    $messageClient = "";
-		    $messageClient  .= "<p style=\"font-family: arial; font-size: 14px; color: #404040; line-height: 10px;\">".$_SESSION['SessionGrafUserFirstname']." ".$_SESSION['SessionGrafUserSurname'].",<br><br>";
+		    $messageClient  .= "<p style=\"font-family: arial; font-size: 14px; color: #404040; line-height: 10px;\">".$vReceiverFullname.",<br><br>";
 		    if($vOrderResult[14][0] == 16 && $vOrderResult[17][0] == 0){//EFT && not paid
 		    	$messageClient .= MysqlQuery::getText($conn, 306)/*Baie dankie vir jou bestelling*/." <b>GRAF/".$vOrderResult[0][0]."/".$vOrderResult[3][0]."</b>. ";
 	    		$messageClient .= MysqlQuery::getText($conn, 406)/*Ons prosesseer die bestelling sodra die betaling in ons rekening reflekteer.*/."<br><br>";
@@ -93,8 +94,8 @@
 		    $messageClient  .= "<img src=\"".$_SESSION['SessionGrafFullServerUrl']."images/logo.png\" height=\"120\" width=\"245\" alt=\"Graffiti\">";
 // 		    //#####################################################################################Client email content end
 		    $subjectClient = MysqlQuery::getText($conn, 305)/*Graffiti - Webwerf bestelling*/;
- 		    $toClient = $_SESSION['SessionGrafUserEmail'];
- 		    $clientName = $_SESSION['SessionGrafUserFirstname']." ".$_SESSION['SessionGrafUserSurname'];
+ 		    $toClient = (isset($_SESSION['SessionGrafUserEmail'] ? $_SESSION['SessionGrafUserEmail'] : $vOrderResult[32][0]);
+ 		    $clientName = $vReceiverFullname;
  		    $fromClient = "Graffiti";
  		    $filename = "Invoice.pdf";
  		    $pdfdoc = $pdf->Output($filename, "S");

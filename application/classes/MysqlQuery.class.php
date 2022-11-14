@@ -1790,15 +1790,15 @@ class MysqlQuery {
 	}
 
 	public static function getOrder($pConn, $pWhere, $pOrder, $pBindLetters,  $pBindParams, $pLimit){
-		$vSqlString = "select id, client_id, order_date, temp_salt, address1, address2, city, province, country, code, courier_type, courier_cost, price, total_price, payment_type, submitted, message, paid, processed, posted, tracking_no, completed, note, courier_detail, paid_email, processed_email, posted_email, receiver_name, receiver_phone, settled, posted_date, courier_comp from orders ".$pWhere." ".$pOrder." ".$pLimit;
+		$vSqlString = "select id, client_id, order_date, temp_salt, address1, address2, city, province, country, code, courier_type, courier_cost, price, total_price, payment_type, submitted, message, paid, processed, posted, tracking_no, completed, note, courier_detail, paid_email, processed_email, posted_email, receiver_name, receiver_phone, settled, posted_date, courier_comp, receiver_email from orders ".$pWhere." ".$pOrder." ".$pLimit;
 //		error_log("SQL: ".$vSqlString."--".$pBindParams[0]."--".$pBindParams[1]."--".$pBindParams[2], 3, "C:/Temp/php_errors.log");
 		$stmt = $pConn->prepare($vSqlString);
 		array_unshift($pBindParams, $pBindLetters);
 		call_user_func_array(array($stmt, 'bind_param'), $pBindParams);
         $id = 0;
-        $client_id=$order_date=$temp_salt=$address1=$address2=$city=$province=$country=$code=$courier_type=$courier_cost=$price=$total_price=$payment_type=$submitted=$message=$paid=$processed=$posted=$tracking_no=$completed=$note=$courier_detail=$paid_email=$processed_email=$posted_email=$receiver_name=$receiver_phone=$settled=$posted_date=$courier_comp = '';
+        $client_id=$order_date=$temp_salt=$address1=$address2=$city=$province=$country=$code=$courier_type=$courier_cost=$price=$total_price=$payment_type=$submitted=$message=$paid=$processed=$posted=$tracking_no=$completed=$note=$courier_detail=$paid_email=$processed_email=$posted_email=$receiver_name=$receiver_phone=$settled=$posted_date=$courier_comp=$receiver_email = '';
 		if($stmt->execute() == true) {
-			$stmt->bind_result($id, $client_id, $order_date, $temp_salt, $address1, $address2, $city, $province, $country, $code, $courier_type, $courier_cost, $price, $total_price, $payment_type, $submitted, $message, $paid, $processed, $posted, $tracking_no, $completed, $note, $courier_detail, $paid_email, $processed_email, $posted_email, $receiver_name, $receiver_phone, $settled, $posted_date, $courier_comp);
+			$stmt->bind_result($id, $client_id, $order_date, $temp_salt, $address1, $address2, $city, $province, $country, $code, $courier_type, $courier_cost, $price, $total_price, $payment_type, $submitted, $message, $paid, $processed, $posted, $tracking_no, $completed, $note, $courier_detail, $paid_email, $processed_email, $posted_email, $receiver_name, $receiver_phone, $settled, $posted_date, $courier_comp, $receiver_email);
 			while ($stmt->fetch()) {
 				if($id && $id > 0) {
 					$vId[] = $id;
@@ -1833,11 +1833,12 @@ class MysqlQuery {
 					$vSettled[] = $settled;
 					$vPostedDate[] = $posted_date;
 					$vCourierComp[] = $courier_comp;
+                    $vReceiver_email[] = $receiver_email;
 				}
 			}
 		}
 		$stmt->close();
-		return array($vId, $vClient_id, $vOrder_date, $vTemp_salt, $vAddress1, $vAddress2, $vCity, $vProvince, $vCountry, $vCode, $vCourier_type, $vCourier_cost, $vPrice, $vTotal_price, $vPayment_type ,$vSubmitted, $vMessage, $vPaid, $vProcessed ,$vPosted, $vTracking_no ,$vCompleted, $vNote, $vCourier_detail, $vPaidEmail, $vProcessedEmail, $vPostedEmail, $vReceiverName, $vReceiverPhone, $vSettled, $vPostedDate, $vCourierComp);
+		return array($vId, $vClient_id, $vOrder_date, $vTemp_salt, $vAddress1, $vAddress2, $vCity, $vProvince, $vCountry, $vCode, $vCourier_type, $vCourier_cost, $vPrice, $vTotal_price, $vPayment_type ,$vSubmitted, $vMessage, $vPaid, $vProcessed ,$vPosted, $vTracking_no ,$vCompleted, $vNote, $vCourier_detail, $vPaidEmail, $vProcessedEmail, $vPostedEmail, $vReceiverName, $vReceiverPhone, $vSettled, $vPostedDate, $vCourierComp, $vReceiver_email);
 	}
 
 	public static function getOrderDetail($pConn, $pWhere, $pId){
