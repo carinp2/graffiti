@@ -1815,7 +1815,7 @@ class CmsParts {
 			$vBindLetters = "i";
 			$vBindParams[] =& $vValue;
 			$vLimit = "";
-			$vWhere = " WHERE id = ?";
+			$vWhere = " WHERE c.id = ?";
 		}
 		else if($pData['client_id'] == 0 && $pData['type'] != "searchClient"){
 			($pData['type'] == "validated_0" ? $vValue = 0 : $vValue = 1);
@@ -1824,20 +1824,20 @@ class CmsParts {
 			$vBindLetters = "i";
 			$vBindParams[] =& $vValue;
 			$vLimit = "";
-			$vWhere = " WHERE validated = ?";
+			$vWhere = " WHERE c.validated = ?";
 		}
 		else if($pData['client_id'] == -1 && $pData['type'] == "searchClient"){
 			$vClient1 = "%{$pData['client']}%";
 			$vClient2 = "%{$pData['client']}%";
 			$vClient3 = "%{$pData['client']}%";
-			$vOrder = "ORDER BY firstname ASC";
+			$vOrder = "ORDER BY c.firstname ASC";
 			$vBindParams = array();
 			$vBindLetters = "sss";
 			$vBindParams[] =& $vClient1;
 			$vBindParams[] =& $vClient2;
 			$vBindParams[] =& $vClient3;
 			$vLimit = "";
-			$vWhere = " WHERE lower(firstname) LIKE ? OR lower(surname) LIKE ? OR lower(email) LIKE ?";
+			$vWhere = " WHERE lower(c.firstname) LIKE ? OR lower(c.surname) LIKE ? OR lower(c.email) LIKE ?";
 		}
 
 		$vString = "";

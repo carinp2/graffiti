@@ -335,8 +335,6 @@ $( window ).on( "load", function() {
             var password = $('#login #login_password').val();
             var language = $('#login #login_language').val();
             var url = $('#login #redirect-url').val();
-            var vNewUrl = url.replace("/en/", "/"+language+"/");
-            var vNewUrl = url.replace("/af/", "/"+language+"/");
             
             if(username.length == 0){
                 var error = true;
@@ -358,10 +356,10 @@ $( window ).on( "load", function() {
 	                	$('#login_many').fadeOut(500);          
 	                	$('#login').modal('hide');
 	                	if( language == "af"){
-	                		window.location.href = "af/Tuisblad";
+							window.parent.location.reload();
 	                	}
 	                	else if( language == "en"){
-	                		window.location.href = "en/Home";
+							window.parent.location.reload();
 	                	}
 	               	 }
 	                 else if(result == 'error'){
@@ -472,7 +470,7 @@ $( window ).on( "load", function() {
               	}
            });    
 	   }
-    });    
+    });
     
     $.fn.calculateTotalBookCost = function() {
 		var sum = 0;
@@ -655,24 +653,6 @@ $( window ).on( "load", function() {
     
     //Courier selection start    
     $("#courier-type").change(function(){
-    	// $("#delivery-postal, #delivery-physical, #delivery-new").prop("disabled", false);
-    	// $("#delivery-postal").prop('checked', false);
-    	// $("#delivery-physical").prop('checked', false);
-    	// $("#delivery-new").prop('checked', false);
-    	//
-    	// $("#postal-check").removeClass( "selected-div" );
-		// $("#physical-check").removeClass( "selected-div" );
-		// $("#new-check").removeClass( "selected-div" );
-		
-		//  //$("#new_name").val('');
-		//  $("#new_1").val('');
-		//  $("#new_2").val('');
-		//  $("#new_city").val('');
-		//  $("#new_province").val('');
-		//  $("#new_country").val('');
-		//  $("#new_code").val('');
-		//  //$("#new_phone").val('');
-
 		$("#cart-courier-cost").html("");
 		$("#cart-total-order-cost").html("");
     	$("#total-cart-cost").addClass( "no-display" );
@@ -683,14 +663,34 @@ $( window ).on( "load", function() {
 
 		$('#delivery_courier_error').fadeOut(500);   
 		$('#delivery_address_error').fadeOut(500);   	
-		$('#pargo_address_error').fadeOut(500);   	
+		$('#pargo_address_error').fadeOut(500);
+		$('#cart_email').removeClass('validation');
+		$('#deliver_name').removeClass('validation');
+		$('#deliver_phone').removeClass('validation');
+		$("#deliver_address1").val('');
+		$('#deliver_address1').removeClass('validation');
+		$("#deliver_address2").val('');
+		$("#deliver_city").val('');
+		$('#deliver_city').removeClass('validation');
+		$('#deliver_city').prop('required',true);
+		$('#deliver_city_a').fadeIn();
+		$("#deliver_province").val('');
+		$('#deliver_province').removeClass('validation');
+		$('#deliver_province').prop('required',true);
+		$('#deliver_province_a').fadeIn();
+		$("#deliver_country").val(1);
+		$("#deliver_code").val('');
+		$('#deliver_code').removeClass('validation');
+		$('#deliver_code').prop('required',true);
+		$('#deliver_code_a').fadeIn();
 		
     	var select = $("#courier-type option:selected").val();
 		if (select != "") {
 			$('#cartSubmitStep2').fadeIn(500);
-		}    	
+		}
+
     	switch(select){
-	    	case "1": //Normal postage
+	    	case "1": //Normal postage - Not used by 07-11-2022
 	    		$("#text-cart-courier-cost").removeClass( "no-display");
 	    		$("#normal-cart-message").removeClass( "no-display" );
 	    		$("#courier-cart-message").addClass( "no-display" );
@@ -709,12 +709,9 @@ $( window ).on( "load", function() {
 	    		$("#cart-total-order-cost").html("R "+ total_cost);
 	    		$("#total-cart-cost").removeClass( "no-display" );
 	    		$("#country-cart-pargo-select").addClass( "no-display");
-	    		
-    			// $("#delivery-postal").prop('checked', true);
-    			// $("#postal-check").addClass( "selected-div" );
 	    	break;	    	
 	
-	    	case "204": //Near
+	    	case "204": //Near - Not used by 07-11-2022
 	    		$("#text-cart-courier-cost").removeClass( "no-display");
 	    		$("#normal-cart-message").removeClass( "no-display" );
 	    		$("#courier-cart-message").addClass( "no-display" );
@@ -733,20 +730,9 @@ $( window ).on( "load", function() {
 	    		$("#cart-total-order-cost").html("R "+ total_cost);
 	    		$("#total-cart-cost").removeClass( "no-display" );
 	    		$("#country-cart-pargo-select").addClass( "no-display");
-
-    			
-				// if($('#delivery-physical').length && $('#physical-check').length){
-				// 	$("#delivery-physical").prop('checked', true);
-				// 	$("#physical-check").addClass( "selected-div" );
-				// }
-				// else {
-				// 	$("#delivery-postal").prop('checked', true);
-				// 	$("#postal-check").addClass( "selected-div" );
-				// }
-    		
 	    	break;
 	    	
-	    	case "2": //Courier - Aramex Main cities
+	    	case "2": //Courier - Aramex Main cities - Not used by 07-11-2022
 	    		$("#text-cart-courier-cost").removeClass( "no-display");
 	    		$("#normal-cart-message").removeClass( "no-display" );
 	    		$("#courier-cart-message").removeClass( "no-display" );
@@ -768,9 +754,7 @@ $( window ).on( "load", function() {
 	    		$("#country-cart-pargo-select").removeClass( "no-display");
 	    		$("#text-cart-courier-cost").removeClass( "no-display");
 	    		$("#normal-cart-message").removeClass( "no-display" );
-	    		$("#courier-cart-message").removeClass( "no-display" );    		
-	    		
-	    		// $("#delivery-postal, #delivery-physical, #delivery-new").prop("disabled", true);
+	    		$("#courier-cart-message").removeClass( "no-display" );
 	    		
 	    		var book_cost =  $("#cart-total-all-books-price").html().substr(2);
 
@@ -783,7 +767,7 @@ $( window ).on( "load", function() {
 	    		$("#cart-courier-cost").html("R "+delivery_cost);
 	    		var total_cost = parseInt(book_cost)+parseInt(delivery_cost);
 	    		$("#cart-total-order-cost").html("R "+ total_cost);
-	    		$("#total-cart-cost").removeClass( "no-display" );	    		
+	    		$("#total-cart-cost").removeClass( "no-display" );
 	    	break;
 	    	
 	    	case "4": //Collect
@@ -794,38 +778,30 @@ $( window ).on( "load", function() {
 	    		var book_cost =  $("#cart-total-all-books-price").html().substr(2);
 	    		var total_cost = book_cost;
 	    		$("#cart-total-order-cost").html("R "+ total_cost);
-	    		$("#total-cart-cost").removeClass( "no-display" );	 
-	    		$("#country-cart-pargo-select").addClass( "no-display")
+	    		$("#total-cart-cost").fadeIn( "no-display" );
+	    		$("#country-cart-pargo-select").fadeOut( "no-display")
 
-	    		//Select delivery address 	    		
-		    	// $("#delivery-postal").prop('checked', false);
-		    	// $("#delivery-physical").prop('checked', false);
-		    	// $("#delivery-new").prop('checked', false);
-				//
-		    	// $("#postal-check").removeClass( "selected-div" );
-    			// $("#physical-check").removeClass( "selected-div" );
-    			// $("#new-check").removeClass( "selected-div" );
-
-				 // $("#new_1").val('Graffiti Zambezi Junction');
-				 // $("#new_2").val(' ');
-				 // $("#new_city").val(' ');
-				 // $("#new_province").val(' ');
-				 // $("#new_country").val(' ');
-				 // $("#new_code").val('    ');
-				 // //$("#new_phone").val(' ');
-				 //
-				 // $("#delivery-new").prop('checked', true);
-			     // $("#new-check").addClass( "selected-div" );
-			     // $("#delivery-postal, #delivery-physical, #delivery-new").prop("disabled", true);
+				$("#deliver_address1").val('Graffiti Zambezi Junction');
+				$("#deliver_address2").val('');
+				$("#deliver_city").val('');
+				$('#deliver_city').prop('required',false);
+				$('#deliver_city_a').fadeOut('no-display');
+				$("#deliver_province").val('');
+				$('#deliver_province').prop('required',false);
+				$('#deliver_province_a').fadeOut('no-display');
+				$("#deliver_country").val(1);
+				$("#deliver_code").val('');
+				$('#deliver_code').prop('required',false);
+				$('#deliver_code_a').fadeOut();
 		    	break;	 
 	    		
-	    	case "5": //Other country
+	    	case "5": //Other country - Not used by 07-11-2022
 	    		$("#country-cart-courier-select").removeClass( "no-display" );
 	    		$("#country-cart-pargo-select").addClass( "no-display")
 	    		$("#courier-cart-message").addClass( "no-display" );
 	    	break;   	
 	    	
-	    	case "6": //Courier -  CourierIT Regional
+	    	case "6": //Courier -  CourierIT Regional - Not used by 07-11-2022
 	    		$("#text-cart-courier-cost").removeClass( "no-display");
 	    		$("#normal-cart-message").removeClass( "no-display" );
 	    		$("#courier-cart-message").removeClass( "no-display" );
@@ -838,9 +814,6 @@ $( window ).on( "load", function() {
 	    		$("#cart-total-order-cost").html("R "+ total_cost);
 	    		$("#total-cart-cost").removeClass( "no-display" );	    		
 	    		$("#country-cart-pargo-select").addClass( "no-display");
-	    		
-    			// $("#delivery-postal").prop('checked', true);
-    			// $("#postal-check").addClass( "selected-div" );
 	    	break;	    
 	    	
 	    	case "7": //Courier -  Aramex
@@ -862,65 +835,36 @@ $( window ).on( "load", function() {
     		$("#cart-total-order-cost").html("R "+ total_cost);
     		$("#total-cart-cost").removeClass( "no-display" );	    
     		$("#country-cart-pargo-select").addClass( "no-display");
-
-    		// if($('#delivery-physical').length && $('#physical-check').length){
-			// 	$("#delivery-physical").prop('checked', true);
-			// 	$("#physical-check").addClass( "selected-div" );
-    		// }
-    		// else {
-			// 	$("#delivery-postal").prop('checked', true);
-			// 	$("#postal-check").addClass( "selected-div" );
-    		// }
-			
 	    	break;	     		
     	}
     });
     //Country selection
-    $("#country-select").change(function(){
-		var selectCourier = $("#courier-type option:selected").val();
-		if(selectCourier == 5){
-    		$("#text-cart-courier-cost").removeClass( "no-display");
-    		$("#normal-cart-message").removeClass( "no-display" );
-    		$("#courier-cart-message").addClass( "no-display" );
-    		
-    		var country_cost = $("#country-select option:selected").val();
-    		$("#cart-courier-cost").html("R "+country_cost);
-
-    		var book_cost =  $("#cart-total-all-books-price").html().substr(2);
-    		var courier_cost = country_cost
-    		var total_cost = parseInt(book_cost)+parseInt(courier_cost);
-    		$("#cart-total-order-cost").html("R "+ total_cost);
-    		$("#total-cart-cost").removeClass( "no-display" );	      
-    		var country = $("#country-select option:selected").val();
-    		if(country != "" && country > 0){
-    			$('#delivery_courier_error').fadeOut(500);   
-    			$('#cartSubmitStep2').fadeIn(500);  
-    		}
-		}
-	});
+    // $("#country-select").change(function(){
+	// 	var selectCourier = $("#courier-type option:selected").val();
+	// 	if(selectCourier == 5){
+    // 		$("#text-cart-courier-cost").removeClass( "no-display");
+    // 		$("#normal-cart-message").removeClass( "no-display" );
+    // 		$("#courier-cart-message").addClass( "no-display" );
+    //
+    // 		var country_cost = $("#country-select option:selected").val();
+    // 		$("#cart-courier-cost").html("R "+country_cost);
+	//
+    // 		var book_cost =  $("#cart-total-all-books-price").html().substr(2);
+    // 		var courier_cost = country_cost
+    // 		var total_cost = parseInt(book_cost)+parseInt(courier_cost);
+    // 		$("#cart-total-order-cost").html("R "+ total_cost);
+    // 		$("#total-cart-cost").removeClass( "no-display" );
+    // 		var country = $("#country-select option:selected").val();
+    // 		if(country != "" && country > 0){
+    // 			$('#delivery_courier_error').fadeOut(500);
+    // 			$('#cartSubmitStep2').fadeIn(500);
+    // 		}
+	// 	}
+	// });
     //Country selection end
     
     //Courier submit start
 	$("#cartSubmitStep2").bind("click touchstart",function(e){
-		//Update final delivery info start
-		 if($("#delivery-postal").is(':checked')){
-			 var deliveryType =$("#delivery-postal").attr('data-src');    		
-			 //$.fn.upDateDeliveryAddress(deliveryType);
-		 }
-		 else if($("#delivery-physical").is(':checked')){
-			 var deliveryType =$("#delivery-physical").attr('data-src');    		
-		 }
-		 else if($("#delivery-new").is(':checked')){
-			 var deliveryType =$("#delivery-new").attr('data-src');    		
-		 }
-		 else {
-			 var error = true;
-			 $('#delivery_address_error').fadeIn(500); 
-			 $('#cartSubmitStep2').fadeOut(500);   
-		 }
-		 $.fn.upDateDeliveryAddress(deliveryType);
-		//Update final delivery info end
-	
 		var courier_type = $("#orderCourierForm #courier-type").val();
 		if(courier_type == 5){
 			var courier_detail = $("#orderCourierForm #country-select option:selected").attr("data");
@@ -928,10 +872,7 @@ $( window ).on( "load", function() {
 		else if (courier_type == 3){
 			var courier_detail = $("#orderCourierForm #pargo_point_code").val();
 		}
-	  	var courier_cost = $("#cart-courier-cost").html().substr(2);
-	  	var deliver_address1 = $("#orderCourierForm #deliver_address1").val();
-	  	var deliver_city = $("#orderCourierForm #deliver_city").val();
-	  	var deliver_code = $("#orderCourierForm #deliver_code").val();
+	  	var courier_cost = $("#cart-courier-cost").html().substring(2);
 	  	var total_cost = $("#cart-total-order-cost").html().substr(2);
 	  	var cost = $("#orderCourierForm #cart-total-all-books-price").html().substr(2);
 	  	 
@@ -941,23 +882,57 @@ $( window ).on( "load", function() {
 	  	$("#orderCourierForm #total_price").val(total_cost);
 	  	$("#orderCourierForm #price").val(cost);
 
+		var vError = false;
+		if( $('#cart_email').val().length == 0){
+			vError = true;
+			$('#cart_email').addClass('validation');
+		}
+		if($('#cart_password').prop("required") && $('#cart_password').val().length == 0){
+			vError = true;
+			$('#cart_password').addClass('validation');
+		}
+		if($('#deliver_name').val().length == 0){;
+			vError = true;
+			$('#deliver_name').addClass('validation');
+		}
+		if($('#deliver_phone').val().length == 0){
+			vError = true;
+			$('#deliver_phone').addClass('validation');
+		}
+		if($('#deliver_address1').val().length == 0){
+			vError = true;
+			$('#deliver_address1').addClass('validation');
+		}
+		if($('#deliver_city').prop("required") && $('#deliver_city').val().length == 0){
+			vError = true;
+			$('#deliver_city').addClass('validation');
+		}
+		if($('#deliver_province').prop("required") && $('#deliver_province').val().length == 0){
+			vError = true;
+			$('#deliver_province').addClass('validation');
+		}
+		if($('#deliver_code').prop("required") && $('#deliver_code').val().length == 0){
+			vError = true;
+			$('#deliver_code').addClass('validation');
+		}
+
         if(courier_type == ""){
         	var error = true;
         	$('#orderCourierForm #courier-type').addClass("validation");
-        	$('#cartSubmitStep2').fadeOut(500);   
+        	// $('#cartSubmitStep2').fadeOut(500);
         }
         else {
         	$('#orderCourierForm #courier-type').removeClass("validation");
-        	$('#cartSubmitStep2').fadeIn(500);   
+        	// $('#cartSubmitStep2').fadeIn(500);
         }		  	
         if(courier_type == 5 && courier_detail == ""){
         	var error = true;
         	$('#orderCourierForm #country-select').addClass("validation");
-        	$('#cartSubmitStep2').fadeOut(500);   
+        	// $('#cartSubmitStep2').fadeOut(500);
         }
         else {
         	$('#orderCourierForm #country-select').removeClass("validation");
-        	$('#cartSubmitStep2').fadeIn(500);   
+        	// $('#cartSubmitStep2').fadeIn(500);
         }	  
         
         if(courier_type == 3 && deliver_address1.length == 0){
@@ -967,41 +942,41 @@ $( window ).on( "load", function() {
         if(courier_cost.length == 0){
             var error = true;
             $('#delivery_courier_error').fadeIn(500); 
-            $('#cartSubmitStep2').fadeOut(500);   
+            // $('#cartSubmitStep2').fadeOut(500);
             return false; 
         }else{
         	$('#delivery_courier_error').fadeOut(500);   
-        	$('#cartSubmitStep2').fadeIn(500);   
+        	// $('#cartSubmitStep2').fadeIn(500);
         }
 
-        if((deliver_address1.length == 0 || deliver_city.length == 0 || deliver_code.length == 0)  && courier_type != 3){
+        if(vError == true && courier_type != 3){
             var error = true;
             $('#delivery_address_error').fadeIn(500); 
-            $('#cartSubmitStep2').fadeOut(500);   
+            // $('#cartSubmitStep2').fadeOut(500);
             return false; 
         }else{
         	$('#delivery_address_error').fadeOut(500);   
-        	$('#cartSubmitStep2').fadeIn(500);   
+        	// $('#cartSubmitStep2').fadeIn(500);
         }  
         
-        if((deliver_address1.length == 0 || deliver_city.length == 0 || deliver_code.length == 0)  && courier_type == 3){
+        if(vError == true && courier_type == 3){
             var error = true;
             $('#pargo_address_error').fadeIn(500); 
-            $('#cartSubmitStep2').fadeOut(500);   
+            // $('#cartSubmitStep2').fadeOut(500);
             return false; 
         }else{
         	$('#pargo_address_error').fadeOut(500);   
-        	$('#cartSubmitStep2').fadeIn(500);   
+        	// $('#cartSubmitStep2').fadeIn(500);
         }          
         
         if(total_cost.length == 0){
             var error = true;
             $('#delivery_courier_error').fadeIn(500); 
-            $('#cartSubmitStep2').fadeOut(500);   
+            // $('#cartSubmitStep2').fadeOut(500);
             return false; 
         }else{
         	$('#delivery_courier_error').fadeOut(500);   
-        	$('#cartSubmitStep2').fadeIn(500);   
+        	// $('#cartSubmitStep2').fadeIn(500);
         }        
         
         if(error == false){
@@ -1009,41 +984,42 @@ $( window ).on( "load", function() {
         	$("#orderCourierForm").submit();
         }	    
         else if(error == "pargo-error"){
-        	$('#cartSubmitStep2').fadeOut(500);   
+        	// $('#cartSubmitStep2').fadeOut(500);
         	$('#pargo_address_error').fadeIn(500);   
         }
         else {
-        	$('#cartSubmitStep2').fadeOut(500);   
+        	// $('#cartSubmitStep2').fadeOut(500);
         	$('#delivery_incomplete').fadeIn(500);   
         }         
 //        e.preventDefault();
 	});    
 	
 	$("#orderCourierForm").submit(function(e){
+
 		var vDeliver_address1 = $("#deliver_address1").val();
 		var vCourier_type = $("#courier_type").val();
 		var vCourier_cost = $("#courier_cost").val();
 		var vPrice = $("#price").val();
 		var vTotal_price = $("#total_price").val();
-		var vDelivery_address_type = $("#delivery_address_type").val();
+		// var vDelivery_address_type = $("#delivery_address_type").val();
 		
 		if(vCourier_type.length == 0 || vCourier_cost.length == 0){
         	$('#orderCourierForm #courier-type').addClass("validation");
-        	$('#cartSubmitStep2').fadeOut(500);   
+        	// $('#cartSubmitStep2').fadeOut(500);
         	$('#delivery_courier_error').fadeIn(500); 
         	e.preventDefault();
         }
 		if(vPrice.length == 0 || vTotal_price.length == 0 || vCourier_cost.length == 0){
         	$('#orderCourierForm #courier-type').addClass("validation");
-        	$('#cartSubmitStep2').fadeOut(500);   
+        	// $('#cartSubmitStep2').fadeOut(500);
         	e.preventDefault();
         	location.reload();
         }
-		if(vDelivery_address_type.length == 0 || vDeliver_address1.length == 0){
+		if(vDeliver_address1.length == 0){
             $('#delivery_address_error').fadeIn(500); 
-            $('#cartSubmitStep2').fadeOut(500);   
+            // $('#cartSubmitStep2').fadeOut(500);
         	e.preventDefault();
-        }		
+        }
 	});
 	//Courier submit end
 	
@@ -1052,7 +1028,7 @@ $( window ).on( "load", function() {
     	if ($(this).is(':checked')) {
     		var payment_type =$(this).val();		
     		$('#payment_type_error').fadeOut(500);   
-    		$('#paymentSubmit').fadeIn(500);   
+    		$('#paymentSubmit').fadeIn(500);
 			$("[id^=payment-]").prop('checked', false);
 			$(this).prop('checked', true);
 			$("[id^=payment-check-]").removeClass( "selected-div" );
@@ -1095,20 +1071,9 @@ $( window ).on( "load", function() {
 	});	
     
     //Check delivery address & courier option on "back" load
-    $("#courier-type").trigger('change');   
-    $("#country-select").trigger('change');   
+    $("#courier-type").trigger('change');
+    // $("#country-select").trigger('change');
     $("#tc").trigger('change');
-    
-    if ($("#courier-type").val() == 3) {
-    	$("#delivery-new").prop('checked', true);
-    }
-    
-    if ($("#delivery-new").is(':checked') && $("#courier-type").val() != 3) {
-    	$("#new_1, #new_2, #new_city, #new_province, #new_country, #new_code").prop("disabled", false);
-    }
-    else if($("#delivery-new").is(':checked') && $("#courier-type").val() == 3){
-    	$("#new_1, #new_2, #new_city, #new_province, #new_country, #new_code").prop("disabled", true);
-    }
     
     if ($("#tc").is(':checked')) {
     	//$("#cartSubmitStep1").fadeIn("slow");

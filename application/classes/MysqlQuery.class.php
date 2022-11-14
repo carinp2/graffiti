@@ -133,7 +133,7 @@ class MysqlQuery {
 		else {
 			$sqlString = rtrim($q, ', ') . ';';
 		}
-//		error_log("Update: ".$sqlString, 3, "../error.log");
+//		error_log("Update: ".$sqlString, 3, 'C:/a_Server/wamp64/logs/php_error.log');
 		if(mysqli_query($pConn, $sqlString)){
 			$vResult = 1;
 		}
@@ -1181,6 +1181,7 @@ class MysqlQuery {
 		}
 
 		$vSqlString = "select id, firstname, surname, email, password, validated, salt,special_discount, phone from clients where upper(email) = ? and validated = ?";
+
 		$stmt = $pConn->prepare($vSqlString);
 		$stmt->bind_param("si", $pUpperUsername, $vValidate);
         $id=0;
@@ -1227,6 +1228,7 @@ class MysqlQuery {
 					}
 
 					$stmt->close();
+
 					$vResult = 1;
 					//$vResult = $vSqlString."-".$pUsername."--".$vValidate;
 				}
@@ -1300,15 +1302,17 @@ class MysqlQuery {
 	}
 
 	public static function getClients($pConn, $pWhere, $pOrder, $pBindLetters,  $pBindParams, $pLimit){
-		$vSqlString = "select id, firstname, surname, email, validated, phone, postal_address1, postal_address2, postal_city, postal_province, postal_country, postal_code, physical_address1, physical_address2, physical_city, physical_province, physical_country, physical_code, newsletter, language, special_discount, physical_country_id from clients ".$pWhere." ".$pOrder." ".$pLimit;
-		//error_log($vSqlString."//".$pBindParams[0]."//".$pBindParams[1]."//".$pBindParams[2]);
+		$vSqlString = "select c.id, c.firstname, c.surname, c.email, c.validated, c.phone, c.postal_address1, c.postal_address2, c.postal_city, c.postal_province, c.postal_country, c.postal_code, c.physical_address1, c.physical_address2, c.physical_city, c.physical_province, c.physical_country, c.physical_code, c.newsletter, c.language, c.special_discount, c.physical_country_id, lc.".$_SESSION['SessionGrafLanguage']." AS country_string 
+            from clients c 
+            LEFT JOIN lk_country lc ON c.physical_country = lc.id ".$pWhere." ".$pOrder." ".$pLimit;
+		error_log($vSqlString."//".$pBindParams[0]."//".$pBindParams[1]."//".$pBindParams[2]);
 		$stmt = $pConn->prepare($vSqlString);
 		array_unshift($pBindParams, $pBindLetters);
 		call_user_func_array(array($stmt, 'bind_param'), $pBindParams);
         $id=0;
-        $firstname=$surname=$email=$validated=$phone=$postal_address1=$postal_address2=$postal_city=$postal_province=$postal_country=$postal_code=$physical_address1=$physical_address2=$physical_city=$physical_province=$physical_country=$physical_code=$newsletter=$language=$special_discount=$physical_country_id = '';
+        $firstname=$surname=$email=$validated=$phone=$postal_address1=$postal_address2=$postal_city=$postal_province=$postal_country=$postal_code=$physical_address1=$physical_address2=$physical_city=$physical_province=$physical_country=$physical_code=$newsletter=$language=$special_discount=$physical_country_id=$country_string = '';
 		if($stmt->execute() == true) {
-			$stmt->bind_result($id, $firstname, $surname, $email, $validated, $phone, $postal_address1, $postal_address2, $postal_city, $postal_province, $postal_country, $postal_code, $physical_address1, $physical_address2, $physical_city, $physical_province, $physical_country, $physical_code, $newsletter, $language, $special_discount, $physical_country_id);
+			$stmt->bind_result($id, $firstname, $surname, $email, $validated, $phone, $postal_address1, $postal_address2, $postal_city, $postal_province, $postal_country, $postal_code, $physical_address1, $physical_address2, $physical_city, $physical_province, $physical_country, $physical_code, $newsletter, $language, $special_discount, $physical_country_id, $country_string);
 			while ($stmt->fetch()) {
 				if($id && $id > 0) {
 					$vId[] = $id;
@@ -1333,11 +1337,12 @@ class MysqlQuery {
 					$vLanguage[] = $language;
 					$vSpecial_discount[] = $special_discount;
                     $vPhysical_country_id[] = $physical_country_id;
+                    $vCountryString[] = $country_string;
 				}
 			}
 		}
 		$stmt->close();
-		return array($vId, $vFirstname, $vSurname, $vEmail, $vValidated, $vPhone, $vPostal_address1, $vPostal_address2, $vPostal_city, $vPostal_province, $vPostal_code, $vPostal_country, $vPhysical_address1, $vPhysical_address2, $vPhysical_city, $vPhysical_province, $vPhysical_country, $vPhysical_code, $vNewsletter, $vLanguage, $vSpecial_discount,$vPhysical_country_id);
+		return array($vId, $vFirstname, $vSurname, $vEmail, $vValidated, $vPhone, $vPostal_address1, $vPostal_address2, $vPostal_city, $vPostal_province, $vPostal_code, $vPostal_country, $vPhysical_address1, $vPhysical_address2, $vPhysical_city, $vPhysical_province, $vPhysical_country, $vPhysical_code, $vNewsletter, $vLanguage, $vSpecial_discount,$vPhysical_country_id,$vCountryString);
 	}
 
 	public static function getOrderClient($pConn, $pId){
@@ -1429,23 +1434,23 @@ class MysqlQuery {
 	}
 
 	public static function getCart($pConn, $pWhere, $pOrder, $pBindLetters,  $pBindParams, $pLimit){
-        include_once "BookPrice.php";
-        $vBookPrice = new BookPrice();
+//        include_once "BookPrice.php";
+//        $vBookPrice = new BookPrice();
 
 		//$vAutoDiscount = MysqlQuery::getAutoDiscount($pConn);
 		$vSqlString = "select w.id, w.book_id, w.client_id, w.number, w.add_date, w.temp_salt, w.order_date, w.order_reference, w.order_id, b.title, b.price, b.new, b.top_seller, b.special, b.special_price, b.blob_path, ";
 		$vSqlString .= "b.in_stock, b.default_discount, b.date_publish, b.soon_discount, b.language, b.category, b.sub_category, w.address1, w.address2, w.city, w.province, w.country, w.code, w.receiver_name, ";
-		$vSqlString .= "w.receiver_phone, w.courier_type, w.courier_detail, w.courier_cost, w.price as order_price, w.total_price, w.message, w.delivery_address_type from cart w ";
+		$vSqlString .= "w.receiver_phone, w.courier_type, w.courier_detail, w.courier_cost, w.price as order_price, w.total_price, w.message, w.delivery_address_type,w.receiver_email from cart w ";
 		$vSqlString .= "LEFT JOIN books AS b ON b.id = w.book_id ";
 		$vSqlString .= $pWhere." ".$pOrder." ".$pLimit;
-		//error_log("getCart: ".$vSqlString."--".$pBindParams[0], 0, "C:/Temp/php_errors.log");
+//		error_log("getCart: ".$vSqlString."--".$pBindParams[0], 0);
 		$stmt = $pConn->prepare($vSqlString);
 		array_unshift($pBindParams, $pBindLetters);
 		call_user_func_array(array($stmt, 'bind_param'), $pBindParams);
         $id=0;
-        $book_id=$client_id=$number=$add_date=$temp_salt=$order_date=$order_reference=$order_id=$title=$vFinalPrice=$price=$new=$top_seller=$special=$special_price=$blob_path=$in_stock=$default_discount=$date_publish=$soon_discount=$language=$category=$sub_category=$address1=$address2=$city=$province=$country=$code=$receiver_name=$receiver_phone=$courier_type=$courier_detail=$courier_cost=$order_price=$total_price=$message=$delivery_address_type = '';
+        $book_id=$client_id=$number=$add_date=$temp_salt=$order_date=$order_reference=$order_id=$title=$vFinalPrice=$price=$new=$top_seller=$special=$special_price=$blob_path=$in_stock=$default_discount=$date_publish=$soon_discount=$language=$category=$sub_category=$address1=$address2=$city=$province=$country=$code=$receiver_name=$receiver_phone=$courier_type=$courier_detail=$courier_cost=$order_price=$total_price=$message=$delivery_address_type=$receiver_email = '';
 		if($stmt->execute() == true) {
-			$stmt->bind_result($id, $book_id, $client_id, $number, $add_date, $temp_salt, $order_date, $order_reference, $order_id, $title, $price, $new, $top_seller, $special, $special_price, $blob_path, $in_stock, $default_discount, $date_publish, $soon_discount, $language, $category, $sub_category, $address1, $address2, $city, $province, $country, $code, $receiver_name, $receiver_phone, $courier_type, $courier_detail, $courier_cost, $order_price, $total_price, $message, $delivery_address_type);
+			$stmt->bind_result($id, $book_id, $client_id, $number, $add_date, $temp_salt, $order_date, $order_reference, $order_id, $title, $price, $new, $top_seller, $special, $special_price, $blob_path, $in_stock, $default_discount, $date_publish, $soon_discount, $language, $category, $sub_category, $address1, $address2, $city, $province, $country, $code, $receiver_name, $receiver_phone, $courier_type, $courier_detail, $courier_cost, $order_price, $total_price, $message, $delivery_address_type, $receiver_email);
 			while ($stmt->fetch()) {
 				if($id && $id > 0) {
 					$vId[] = $id;
@@ -1498,12 +1503,13 @@ class MysqlQuery {
                     $vNew[] = $new;
                     $vTopSeller[] = $top_seller;
                     $vLanguage[] = $language;
+                    $vReceiver_email[] = $receiver_email;
 				}
 			}
 		}
 		$stmt->close();
 		if(isset($vId)){
-            return array($vId, $vBookId, $vClientId, $vNumber, $vAddDate, $vTempSalt, $vOrderDate, $vOrderReference, $vOrderId, $vTitle, $vFinalPrice, $vBlobPath, $vInStock, $vDatePublish, $vAddress1, $vAddress2, $vCity, $vProvince, $vCountry, $vCode, $vReceiverName, $vReceiverPhone, $vCourierType, $vCourierDetail, $vCourierCost, $vOrderPrice, $vTotalPrice, $vMessage, $vDeliveryAddressType, $vPrice, $vDefaultDiscount, $vSpecial, $vSpecialPrice, $vNew, $vTopSeller, $vSoonDiscount, $vLanguage);
+            return array($vId, $vBookId, $vClientId, $vNumber, $vAddDate, $vTempSalt, $vOrderDate, $vOrderReference, $vOrderId, $vTitle, $vFinalPrice, $vBlobPath, $vInStock, $vDatePublish, $vAddress1, $vAddress2, $vCity, $vProvince, $vCountry, $vCode, $vReceiverName, $vReceiverPhone, $vCourierType, $vCourierDetail, $vCourierCost, $vOrderPrice, $vTotalPrice, $vMessage, $vDeliveryAddressType, $vPrice, $vDefaultDiscount, $vSpecial, $vSpecialPrice, $vNew, $vTopSeller, $vSoonDiscount, $vLanguage, $vReceiver_email);
         }
         else {
             return array();
@@ -1577,6 +1583,22 @@ class MysqlQuery {
 		$stmt->close();
 		return $vCount;
 	}
+
+    public static function updateCartClient($pConn, $pWhere, $pBindLetters, $pBindParams)
+    {
+        $vSqlString = 'update cart set client_id = ? '.$pWhere;
+        error_log($vSqlString, 0);
+        $stmt = $pConn->prepare($vSqlString);
+        array_unshift($pBindParams, $pBindLetters);
+        call_user_func_array(array($stmt, 'bind_param'), $pBindParams);
+        if ($stmt->execute() == true) {
+            $vResult = 1;
+        } else {
+            $vResult = 0;
+        }
+        $stmt->close();
+        return $vResult;
+    }
 
 	public static function getCountryCourierCost($pConn, $pNum){
 		$vValue = 8;
@@ -1826,9 +1848,9 @@ class MysqlQuery {
 		$vSqlString = "select od.id, od.order_id, od.book_id, od.price, od.number_books, od.temp_salt, b.title, b.in_stock, b.author, b.isbn, b.price as original_price from orders_detail od ";
 		$vSqlString .= "LEFT JOIN books AS b ON b.id = od.book_id ";
 		$vSqlString .= "where ".$pWhere;
-		//error_log("SQL: ".$vSqlString." - ".$pId, 0, "C:/Temp/php_errors.log");
+		error_log("SQL: ".$vSqlString." - ".$pId,  3, 'C:/a_Server/wamp64/logs/php_error.log');
 		$stmt = $pConn->prepare($vSqlString);
-		$stmt->bind_param("s", $pId);
+		$stmt->bind_param("i", $pId);
         $vResult = array();
         $id = 0;
         $order_id=$book_id=$price=$number_books=$temp_salt=$title=$in_stock=$author=$isbn=$original_price = '';

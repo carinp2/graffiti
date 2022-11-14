@@ -271,8 +271,7 @@ class Pages {
 
 			$vUrl = General::curPageURL();
 
-			$vString = "<form class=\"form-horizontal\" name=\"orderForm\" id=\"orderForm\" role=\"form\" method=\"post\" action=\"".$_SESSION['SessionGrafLanguage']."/".$pClientId."/".MysqlQuery::getText($pConn, 283)/*BestelNouKoerier*/."\">";
-			$vString .= "<div id=\"form-border\">";
+			$vString = "<div id=\"form-border\">";
 			$vString .= "<div id=\"center\">";
 					$vString .= "<div class=\"form-header\">";
 							$vString .= "<h1 class=\"red\">".MysqlQuery::getText($pConn, 17)/*Bestel nou*/."</h1>";
@@ -288,15 +287,73 @@ class Pages {
 					$vString .= "</div>";//header
 					$vString .= "<div class=\"form-body\">";
 
-							$vString .="<div class=\"row\">";
-								$vString .= "<div class=\"col-xs-12\">";
-									$vString .= "<h4 class=\"green\">".MysqlQuery::getText($pConn, 280)/*Stap*/." 1.&nbsp;&nbsp;".MysqlQuery::getText($pConn, 16)/*Jou mandjie*/."</h4>";
-									//$vString .= " <h5 class=\"red\">".MysqlQuery::getText($pConn, 111)/*Die posgeld is gratis wanneer jou bestelling R400 oorskry en binne Suid-Afrika versend word.*/."</h5>";
-									$vString .= "<hr class=\"light-gray\">";
-								$vString .="</div>";
-							$vString .="</div>";
+                        $vString .="<div class=\"row\">";
+                            $vString .= "<div class=\"col-xs-12\">";
+                                $vString .= "<h4 class=\"green\">".MysqlQuery::getText($pConn, 280)/*Stap*/." 1.&nbsp;&nbsp;".MysqlQuery::getText($pConn, 16)/*Jou mandjie*/."</h4>";
+                                //$vString .= " <h5 class=\"red\">".MysqlQuery::getText($pConn, 111)/*Die posgeld is gratis wanneer jou bestelling R400 oorskry en binne Suid-Afrika versend word.*/."</h5>";
+                                $vString .= "<hr class=\"light-gray\">";
+                            $vString .="</div>";
+                        $vString .="</div>";
+
+                        if(!isset($_SESSION['SessionGrafUserId'])) {
+                            $vCartUrl = General::curPageURL();
+                            $vString .= "<div class='row'>";
+                                $vString .= "<div class='col-xs-12 line'>";
+                                    $vString .= "<h5 class='red'><i class='fa fa-angle-double-right fa-lg' aria-hidden='true'></i><span class='cursor-p' onClick='toggleLogin(1);'>&nbsp;&nbsp;" . MysqlQuery::getText($pConn, 499)/*Reeds 'n klient..*/ . '</span>';
+                                    $vString .= "<button type='button' onClick='toggleLogin(1);' class='btn btn-primary space-left'>".MysqlQuery::getText($pConn, 237)/*Teken aan*/."</button></h5>";
+                                    if(isset($_SESSION['SessionGrafCartLoginMessage'])){
+                                        $vString .= "<p class='red cursor-p' onClick='toggleLogin(1);'>".$_SESSION['SessionGrafCartLoginMessage']."</p>";
+                                        unset($_SESSION['SessionGrafCartLoginMessage']);
+                                    }
+                                $vString .= "</div>";
+                            $vString .= "</div>";
+                            
+                            
+                            $vString.= "<form name='cartLoginForm' id='cartLoginForm' method='post' action='process.php'>
+                            <input type='hidden' name='type' value='logincart'>
+                            <input type='hidden' name='language' value='".$_GET['lang']."'>
+                            <input type='hidden' name='current_url' value='".$vCartUrl."'>
+                            <div id='cartLogin' class='no-display line space-bottom'>
+                                <div class='row'>
+                                    <div class='col-xs-12 col-md-6 space-left'>                    
+                                        <label for='login_username' class='green space-top-small'>".MysqlQuery::getText($pConn, 239)/*Gebruikersnaam / Epos*/.":</label>
+                                        <div class='w-inline-50'>
+                                            <input type='text' class='form-control' name='login_username' id='cart_login_username' value='".($_COOKIE["cookie_graf_remun"] ?? '')."' placeholder='".MysqlQuery::getText($pConn, 239)/*Gebruikersnaam / Epos*/."' required>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class='row'>
+                                    <div class='col-xs-12 col-md-6 space-left'>
+                                        <label for='login_password' class='green space-top-small'>".MysqlQuery::getText($pConn, 99)/*Wagwoord*/.":</label>
+                                        <div class='w-inline-50'>
+                                            <input type='password' class='form-control' name='login_password' id='cart_login_password' value='' placeholder='".MysqlQuery::getText($pConn, 99)/*Wagwoord*/."' required autocomplete='off'>&nbsp;&nbsp;
+                                            <span toggle='#login_password' class='fa fa-fw fa-eye field-icon toggle-password'></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class='row space-left'>
+                                    <div class='col-xs-12 space-bottom'>
+                                        <button type='submit' id='loginSubmitCart' class='btn btn-primary'>".MysqlQuery::getText($pConn, 122)/*Gaan voort*/."</button>
+                                        <button type='button' onClick='toggleLogin(0);' class='btn btn-primary space-left'>".MysqlQuery::getText($pConn, 54)/*Maak toe*/."</button>
+                                    </div>
+                                </div>
+                            </div>
+                            </form>
+
+                            <div class='row'>
+                                <div class='col-xs-6'>
+                                    <div id='login_error' class='error' style='display:none;'>" . MysqlQuery::getText($pConn, 244)/*Jou Gebruikersnaam / Epos of Wagwoord is verkeerd...*/ . "</div>
+                                    <div id='login_complete' class='complete' style='display:none;'>" . MysqlQuery::getText($pConn, 243)/*Voltooi asseblief die verpligte velde*/ . "</div>
+                                </div>
+                            </div>";
+                        }
+                        else {
+                            unset($_SESSION['SessionGrafCartLoginMessage']);
+                        }
+
 					if(!empty($vResults) && count($vResults[0]) > 0){
-				//			$vBooksString = MysqlQuery::getText($pConn, 157)/*Boeke*/.":&nbsp;&nbsp;";
+                        $vString .= "<form class=\"form-horizontal\" name=\"orderForm\" id=\"orderForm\" role=\"form\" method=\"post\" action=\"".$_SESSION['SessionGrafLanguage']."/".$pClientId."/".MysqlQuery::getText($pConn, 283)/*BestelNouKoerier*/."\">";
+							$vString .= "<h5 class=\"green\"><i class=\"fa fa-angle-double-right fa-lg\" aria-hidden=\"true\"></i>&nbsp;&nbsp;".MysqlQuery::getText($pConn, 281)/*Jou Boeke*/.":</h5>";
 							for($x = 0; $x < count($vResults[0]); $x++){
 
                                 //Final Price start
@@ -306,26 +363,7 @@ class Pages {
                                 $vSoonDiscountPrice = round($vResults[29][$x]-($vResults[29][$x]*$vResults[30][$x]));
                                 $vNormalPrice = $vResults[29][$x];
                                 $vPriceDisplayType = "query";
-                                include "include/BookPriceDisplay.php";
-//                                if($vResults[33][$x] == 1 || $vResults[34][$x] == 1 && ( $vNewTopDiscountPrice < $vSpecialDiscountPrice) && $vNewTopDiscountPrice < $vClientDiscountPrice){
-//                                    $vFinalPrice = $vNewTopDiscountPrice;
-//                                }
-//                                //on special and special price smaller than price and special price bigger than 0
-//                                else if($vResults[31][$x] == 1 && ($vSpecialDiscountPrice < $vResults[29][$x] && $vSpecialDiscountPrice < $vClientDiscountPrice)){
-//                                    $vFinalPrice = $vSpecialDiscountPrice;
-//                                }
-//                                //Soon & soon discount and soon discount smaller than price and soon discount smaller than client discount
-//                                else if(($vResults[35][$x] == 1 && ($vSoonDiscountPrice < $vResults[29][$x] && $vSoonDiscountPrice < $vClientDiscountPrice)) || ($vResults[36][$x] == 'en' && ($vSoonDiscountPrice < $vResults[29][$x] && $vSoonDiscountPrice < $vClientDiscountPrice)) || ($vResults[36][$x] == 'af' && ($vSoonDiscountPrice < $vResults[29][$x] && $vSoonDiscountPrice < $vClientDiscountPrice))){
-//                                    $vFinalPrice = $vSoonDiscountPrice;
-//                                }
-//                                //Price bigger client discount price and special price bigger client special price
-//                                else if($vClientDiscountPrice < $vResults[29][$x] && $vClientDiscountPrice <  $vSpecialDiscountPrice){
-//                                    $vFinalPrice = $vClientDiscountPrice;
-//                                }
-//                                else {
-//                                    $vFinalPrice = $vNormalPrice;
-//                                }
-//                                //Final Price end
+                                $price = $vResults[29][$x];
                                 include "include/BookPriceDisplay.php";
 
 								$vTotalBookPrice = $vResults[3][$x] * $vFinalPrice;
@@ -423,7 +461,45 @@ class Pages {
 					    $vString .= "$('#total-price').val(sum); ";
 					$vString .= "});";
 				$vString .= "});";
-			$vString .="</Script>";
+
+                $vString .= "function toggleLogin(value){
+                    $('#login_complete').fadeOut(200);
+                    if(value == 1){
+                        $(cartLogin).removeClass('no-display');
+                    }
+                    else {
+                        $(cartLogin).addClass('no-display');
+                    }
+                }
+                
+                $('#loginSubmitCart').click(function (e){
+                    $('#login_error').fadeOut(500);
+                    $('#login_complete').fadeOut(500);
+                    e.preventDefault();
+                    var error = false;
+                
+                    var username = $('#cart_login_username') . val();
+                    var password = $('#cart_login_password') . val();
+                
+                    if (username.length == 0) {
+                        error = true;
+                        $('#cart_login_username').addClass('validation');
+                    } else {
+                        $('#cart_login_username').removeClass('validation');
+                    }
+                    if (password.length == 0) {
+                        error = true;
+                        $('#cart_login_password').addClass('validation');
+                    } else {
+                        $('#cart_login_password').removeClass('validation');
+                    }
+                    if (error == false) {
+                        $('#cartLoginForm').submit();
+                    } else {
+                        $('#login_complete').fadeIn(500);
+                    }
+                });";
+            $vString .="</Script>";
 		}
 		else {
 			$vString = "An error occurred with the order";//TODO ERROR
@@ -432,8 +508,8 @@ class Pages {
 	}
 
 	public static function returnCheckoutCourierForm($pConn, $pClientId){
-		$vPargo = Modal::openPargo($pConn);
-		$vString = $vPargo;
+//		$vPargo = Modal::openPargo($pConn);
+//		$vString = $vPargo;
 
 		if((isset($_SESSION['SessionGrafUserId']) && $pClientId == $_SESSION['SessionGrafUserId']) || (isset($_SESSION['SessionGrafUserSessionId']) && $pClientId == $_SESSION['SessionGrafUserSessionId'])){
 			$vOrder = " ORDER BY b.title ";
@@ -450,14 +526,15 @@ class Pages {
                 $vCBindLetters = (is_int($pClientId) ? "i" : "s");
                 $vCBindParams[] = &$pClientId;
                 $vCLimit = "";
-                $vCWhere = " WHERE id = ?";
+                $vCWhere = " WHERE c.id = ?";
                 $vClientResults = MysqlQuery::getClients($pConn, $vCWhere, $vCOrder, $vCBindLetters, $vCBindParams, $vCLimit);
             }
 
 			//$vCourierResults = MysqlQuery::getLookup($pConn, "courier");//id, text, sort
 			$vCourierResults = MysqlQuery::getCourierSelection($pConn, 9999);//$vId, $vCourier_type
+//            $vCountryResults = MysqlQuery::getCourierCountry($pConn, 1);//$vId, $vCountry
 
-			$vString .= "<form class=\"form-horizontal\" name=\"orderCourierForm\" id=\"orderCourierForm\" role=\"form\" method=\"post\" action=\"".$_SESSION['SessionGrafLanguage']."/".$pClientId."/".MysqlQuery::getText($pConn, 279)/*Betaling*/."\">";
+			$vString = "<form class=\"form-horizontal\" name=\"orderCourierForm\" id=\"orderCourierForm\" role=\"form\" method=\"post\" action=\"".$_SESSION['SessionGrafLanguage']."/".$pClientId."/".MysqlQuery::getText($pConn, 279)/*Betaling*/."\">";
 				$vString .= "<div id=\"form-border\">";
 					$vString .= "<div id=\"center\">";
 
@@ -498,6 +575,7 @@ class Pages {
                                     $vSoonDiscountPrice = round($vResults[29][$x]-($vResults[29][$x]*$vResults[30][$x]));
                                     $vNormalPrice = $vResults[29][$x];
                                     $vPriceDisplayType = "query";
+                                    $price = $vResults[29][$x];
                                     include "include/BookPriceDisplay.php";
                                     //Final Price end
 
@@ -531,16 +609,16 @@ class Pages {
 
 								$vString .= "<div class=\"row row-grid\">";
 										$vString .= "<div class=\"col-xs-12 col-md-8 row-grid green checkbox-inline\">";
-											$vString .= "<select name=\"courier-type\" id=\"courier-type\" size='4' class='form-control'>";
+											$vString .= "<select name=\"courier-type\" id=\"courier-type\" size='3' class='form-control'>";
 												//$vString .= "<option value=\"\">".MysqlQuery::getText($pConn, 291)/*Kies 'n opsie*/."</option>";
 						            			if(count($vCourierResults[0]) > 0){
 						            				for($c = 0; $c < count($vCourierResults[0]); $c++){
 						            					$vString .= "<option value=\"".$vCourierResults[0][$c]."\"";
 						            					//Set default courier selection
-						            						if($vResults[22][0] == $vCourierResults[0][$c]){
+						            						if(isset($vResults[22][0]) && $vResults[22][0] == $vCourierResults[0][$c]){
 						            							$vString .= " selected";
 						            						}
-						            						else if($vCourierResults[0][$c] == 7){
+						            						else if(!isset($vResults[22][0]) && $vCourierResults[0][$c] == 7){
                                                                 $vString .= " selected";
                                                             }
 						            					$vString .= ">".$vCourierResults[1][$c]."</option>";
@@ -591,7 +669,7 @@ class Pages {
 											$vString .= "<div class=\"no-display\" id=\"courierit-regional-cart-courier-cost\">".$vCourierITRegionalCourierCostResults[1]."</div>";
 											$vString .= "<div class=\"no-display\" id=\"courierit-jhbpta-cart-courier-cost\">".$vCourierITJhbPtaCourierCostResults[1]."</div>";
 											$vString .= "<div class=\"no-display\" id=\"deliver-near-cart-courier-cost\">".$vNearDeliverResults[1]."</div>";
-											$vString .= "<div class=\"col-right green\" id=\"cart-courier-cost\"></div>";
+											$vString .= "<div class=\"col-right green\" id=\"cart-courier-cost\">".(isset($vResults[24][0]) ? 'R '.$vResults[24][0] : '')."</div>";
 										$vString .= "</div>";
 										$vString .= "<div class=\"col-md-1 row-grid col-right\"></div>";
 								$vString .="</div>";//row
@@ -620,19 +698,19 @@ class Pages {
                                 //Delivery address
                                 $vString .= "<div class=\"row\">";
                                     $vString .= "<div class=\"col-xs-12\">";
-                                        $vString .= "<h5 class=\"red\"><i class=\"fa fa-angle-double-right fa-lg\" aria-hidden=\"true\"></i>&nbsp;&nbsp;" . MysqlQuery::getText($pConn, 289)/* Afleweringsadres & Ontvanger naam en kontaknommer */ . '</h5>';
+                                        $vString .= "<h5 class=\"red\"><i class=\"fa fa-angle-double-right fa-lg\" aria-hidden=\"true\"></i>&nbsp;&nbsp;" . MysqlQuery::getText($pConn, 289)/* Afleweringsbesonderhede */ . '</h5>';
                                     $vString .= '</div>';
                                 $vString .= '</div>';//row
 
 								$vString .= "<div class=\"row row-grid\">";
                                     //Set values when courier & delivery info have been captured
-                                    if(isset($vResults[28][0]) && !empty($vResults[28][0])){
+                                    if(isset($vResults[14][0]) && !empty($vResults[14][0]) || isset($vResults[16][0]) && !empty($vResults[16][0])){
                                         $vDeliver_name = $vResults[20][0];
                                         $vDeliver_address1 = $vResults[14][0];
                                         $vDeliver_address2 = $vResults[15][0];
                                         $vDeliver_city = $vResults[16][0];
                                         $vDeliver_province = $vResults[17][0];
-                                        $vDeliver_country = $vResults[18][0];
+//                                        $vDeliver_country = $vResults[18][0];
                                         $vDeliver_code = $vResults[19][0];
                                         $vDeliver_phone = $vResults[21][0];
                                         $vCourier_type = $vResults[22][0];
@@ -642,6 +720,7 @@ class Pages {
                                         $vTotal_price = $vResults[26][0];
                                         $vDelivery_address_type = $vResults[28][0];
                                         $vDelivery_message = $vResults[27][0];
+                                        $vReceiver_email = $vResults[37][0];
                                     }
                                     //Else use client saved physical address
                                     else if(isset($vClientResults) && count($vClientResults) > 0){
@@ -650,7 +729,7 @@ class Pages {
                                         $vDeliver_address2 = $vClientResults[13][0];
                                         $vDeliver_city = $vClientResults[14][0];
                                         $vDeliver_province = $vClientResults[15][0];
-                                        $vDeliver_country = $vClientResults[16][0];
+//                                        $vDeliver_country = $vClientResults[16][0];
                                         $vDeliver_code = $vClientResults[17][0];
                                         $vDeliver_phone = $vClientResults[5][0];
                                         $vCourier_type = '';
@@ -660,40 +739,105 @@ class Pages {
                                         $vTotal_price = $vResults[26][0];
                                         $vDelivery_address_type = 2;
                                         $vDelivery_message = $vResults[27][0];
+                                        $vReceiver_email = $vClientResults[3][0];
                                     }
                                     $vString .= "<div class='col-xs-12 col-md-6 space-left'>";
-                                        $vString .= "<div>
-                                            <label for='deliver_name' class='green'>".MysqlQuery::getText($pConn, 383)/*Ontvanger naam*/.": </label>
-                                            <input type='text' name='deliver_name' id='deliver_name' value='" . ($vDeliver_name ?? '') . "' maxlength='50' class='form-control'>
+
+                                    if (!isset($_SESSION['SessionGrafUserId'])) {
+                                        $vCartUrl = General::curPageURL();
+                                        $vString .= "
+                                        <div style='padding-bottom: 10px;'>
+                                            <label for='save_info' class='green'>" . MysqlQuery::getText($pConn, 500)/*Stoor vir gebruik later*/ . "&nbsp;&nbsp;</label>
+                                            <input type='checkbox' name='save_info' id='save_info' value='1' class='form-control-sm'>                                          
+                                        </div>
+                                        <div>
+                                            <label for='cart_email' class='green'>".MysqlQuery::getText($pConn, 490)/*Epos*/.": </label>
+                                            <div class='w-inline-80'>
+                                                <input type='text' name='cart_email' id='cart_email' value='' maxlength='50' class='form-control' required value='".(isset($vReceiver_email) ?? $vReceiver_email)."' onChange='checkEmail(this.value, \"deliver_email_error\", \"cartSubmitStep2\");'>
+                                                <i class='fa fa-asterisk fa-required red' aria-hidden='true'></i>         
+                                            </div>                                         
+                                        </div>                                        
+                                        <span id='cartInfo' class='no-display space-bottom'>
+                                            <div>
+                                                <label for='cart_password' class='green space-top-small'>".MysqlQuery::getText($pConn, 99)/*Wagwoord*/.":</label>
+                                                <div class='w-inline-80'>
+                                                    <input type='password' class='form-control' name='cart_password' id='cart_password' value='' autocomplete='off'>&nbsp;&nbsp;
+                                                    <span toggle='#login_password' class='fa fa-fw fa-eye field-icon toggle-password'></span>
+                                                </div>
+                                            </div>
+                                            <div class='w-inline-80'>
+                                                <div id='deliver_email_error' class='message-error no-display'>".MysqlQuery::getText($pConn, 501)/*Jou e-pos bestaan reeds in ons databasis. Voltooi jou wagwoord en teken aan.*/."<br>
+                                                    <button type='submit' id='loginSubmitCart2' class='btn btn-primary'>".MysqlQuery::getText($pConn, 122)/*Gaan voort*/."</button>
+                                                    <button type='button' data-target='#login' data-toggle='modal' class='btn btn-primary'>".MysqlQuery::getText($pConn, 237)/*Teken aan*/."</button>
+                                                </div> 
+                                                <input type='hidden' name='language' value='".$_GET['lang']."'>
+                                                <input type='hidden' name='current_url' value='".$vCartUrl."'>                                                
+                                            </div>  
+                                            <div class='row'>
+                                                <div class='col-xs-6'>
+                                                    <div id='login_error' class='error' style='display:none;'>" . MysqlQuery::getText($pConn, 244)/*Jou Gebruikersnaam / Epos of Wagwoord is verkeerd...*/ . "</div>
+                                                    <div id='login_complete' class='complete' style='display:none;'>" . MysqlQuery::getText($pConn, 243)/*Voltooi asseblief die verpligte velde*/ . "</div>
+                                                </div>
+                                            </div>                                                                                         
+                                        </span>";
+                                    }
+
+                                    $vString .= "<div>
+                                            <label for='deliver_name' class='green space-top'>".MysqlQuery::getText($pConn, 383)/*Ontvanger naam*/.": </label>
+                                            <div class='w-inline-80'>
+                                                <input type='text' name='deliver_name' id='deliver_name' value='" . ($vDeliver_name ?? '') . "' maxlength='50' class='form-control' required>
+                                                <i class='fa fa-asterisk fa-required red' aria-hidden='true'></i>
+                                            </div>                          
                                         </div>
                                         <div>
                                             <label for='deliver_phone' class='green space-top-small'>".MysqlQuery::getText($pConn, 384)/*Ontvanger kontaknommer*/.": </label>
-                                            <input type='text' name='deliver_phone' id='deliver_phone' value='" . ($vDeliver_phone ?? '') . "' maxlength='25' class='form-control'>
+                                            <div class='w-inline-80'>
+                                                <input type='text' name='deliver_phone' id='deliver_phone' value='" . ($vDeliver_phone ?? '') . "' maxlength='25' class='form-control' required>
+                                                <i class='fa fa-asterisk fa-required red' aria-hidden='true'></i>
+                                            </div>                                            
                                         </div>
                                         <div>
                                             <label for='deliver_address1' class='green space-top-small'>".MysqlQuery::getText($pConn, 181)/*Adres*/.": </label>
-                                            <input type='text' name='deliver_address1' id='deliver_address1' value='".($vDeliver_address1 ?? '')."' maxlength='45' class='form-control'>
-                                            <input type='text' name='deliver_address2' id='deliver_address2' value='".($vDeliver_address2 ?? '')."' maxlength='50' class='form-control'>
+                                            <div class='w-inline-80'>
+                                                <input type='text' name='deliver_address1' id='deliver_address1' value='".($vDeliver_address1 ?? '')."' maxlength='45' class='form-control' required>
+                                                <i class='fa fa-asterisk fa-required red' aria-hidden='true'></i>
+                                            </div>                                            
+                                            <input type='text' name='deliver_address2' id='deliver_address2' value='".($vDeliver_address2 ?? '')."' maxlength='50' class='form-control w-inline-80'>
                                         </div>
                                         <div>
-                                            <label for='deliver_city' class='green space-top-small'>".MysqlQuery::getText($pConn, 98)/*Stad / Dorp*/.": </label>
-                                            <input type='text' name='deliver_city' id='deliver_city' value='".($vDeliver_city ?? '')."' maxlength='45' class='form-control'>
+                                            <label for='deliver_city' class='green space-top-small'>".MysqlQuery::getText($pConn, 98)/*Stad / Dorp*/.":</label>
+                                            <div class='w-inline-80'>
+                                                <input type='text' name='deliver_city' id='deliver_city' value='" . ($vDeliver_city ?? '') . "' maxlength='45' class='form-control'>
+                                                <i id='deliver_city_a' class='fa fa-asterisk fa-required red' aria-hidden='true'></i>
+                                            </div>
                                         </div>
                                         <div>
                                             <label for='deliver_province' class='green space-top-small'>".MysqlQuery::getText($pConn, 248)/*Provinsie*/.": </label>
-                                            <input type='text' name='deliver_province' id='deliver_province' value='".($vDeliver_province ?? '')."' maxlength='45' class='form-control'>
+                                            <div class='w-inline-80'>
+                                                <input type='text' name='deliver_province' id='deliver_province' value='".($vDeliver_province ?? '')."' maxlength='45' class='form-control' required>
+                                                <i id='deliver_province_a' class='fa fa-asterisk fa-required red' aria-hidden='true'></i>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <label for='deliver_country' class='green space-top-small'>".MysqlQuery::getText($pConn, 229)/*Land*/.": </label>
-                                            <input type='text' name='deliver_country' id='deliver_country' value='".($vDeliver_country ?? '')."' maxlength='45' class='form-control'>
+                                        <div class='form-group'>
+                                            <label for='deliver_country' class='green space-top-small'>".MysqlQuery::getText($pConn, 229)/*Land*/.":</label>
+                                            <div class='w-inline-80'>
+                                                <select name='deliver_country' id='deliver_country' class='form-control' required>
+                                                    <option value='1' selected>Suid Afrika / South Africa</option>
+                                                </select><i class='fa fa-asterisk fa-required red' aria-hidden='true'></i>
+                                            </div>
                                         </div>
                                         <div>
                                             <label for='deliver_code' class='green space-top-small'>".MysqlQuery::getText($pConn, 71)/*Poskode*/.": </label>
-                                            <input type='text' name='deliver_code' id='deliver_code' value='".($vDeliver_code ?? '')."' maxlength='6' class='form-control'>
+                                            <div class='w-inline-80'>
+                                                <input type='text' name='deliver_code' id='deliver_code' value='".($vDeliver_code ?? '')."' maxlength='6' class='form-control' required>
+                                                <i id='deliver_code_a' class='fa fa-asterisk fa-required red' aria-hidden='true'></i>
+                                            </div>
                                         </div>
                                         <div>
                                             <label for='message' class='green space-top-small'>".MysqlQuery::getText($pConn, 153)/*Aflewerings boodskap*/.": </label>
-                                            <textarea name='message' id='message' wrap='soft' cols='70' rows='3' maxlength='255' class='form-control'>".$vDelivery_message."</textarea>
+                                            <div class='w-inline-90'>
+                                                <textarea name='message' id='message' wrap='soft' cols='70' rows='3' maxlength='255' class='form-control'>".$vDelivery_message."</textarea>
+                                            </div>
                                         </div>                                        
                                         <input type='hidden' name='pargo_point_code' id='pargo_point_code' value='".$vCourier_detail."'>
                                         <input type='hidden' name='courier_type' id='courier_type' value='".$vCourier_type."'>
@@ -709,7 +853,7 @@ class Pages {
 								$vString .="<div class='row space-bottom'>";
 									$vString .= "<div class='col-xs-12'>";
 										$vString .="<div id='delivery_courier_error' class='error' style='display:none;'>".MysqlQuery::getText($pConn, 282)/*Kies 'n versendingsopsie*/."</div>";
-										$vString .="<div id='delivery_address_error' class='error' style='display:none;'>".MysqlQuery::getText($pConn, 294)/*Kies 'n afleweringsadres of tik 'n adres in*/."</div>";
+										$vString .="<div id='delivery_address_error' class='error' style='display:none;'>".MysqlQuery::getText($pConn, 243)/*Voltooi die verpligte velde*/."</div>";
 										$vString .="<div id='pargo_address_error' class='error' style='display:none;'>".MysqlQuery::getText($pConn, 449)/*Kies asseblief 'n Pargo afleweringsadres*/."</div>";
 									$vString .="</div>";
 								$vString .="</div>";//row
@@ -748,12 +892,44 @@ class Pages {
 					    $('#total-price').val(sum);
 					});
 
-					var v_deliver_type = $("#delivery_address_type").val();
-					if(v_deliver_type.length == 0){
-				    	$("#cartSubmitStep1").addClass("no-display");
+					var v_courier_type = $("#courier-type").val();
+					if(v_courier_type > 0){
+				    	$("#cartSubmitStep2").removeClass("no-display");
 					} else {
-						$("#cartSubmitStep1").removeClass("no-display");
+						$("#cartSubmitStep2").addClass("no-display");
 					}
+                    //
+                    // if($('#courier-type').val() == 3 || $('#courier-type').val() == 4 || $('#courier-type').val() == 7){
+                    //     $('#text-cart-courier-cost').removeClass('no-display');
+                    //     $('#cart-courier-cost').removeClass('no-display');
+                    // }
+                    // else{
+                    //     $('#text-cart-courier-cost').addClass('no-display');
+                    //     $('#cart-courier-cost').addClass('no-display');
+                    // }
+
+                    if($('#courier-type').val() == 4){
+                        $('#deliver_city').prop('required', false);
+                        $('#deliver_city_a').addClass('no-display');
+                        $('#deliver_province').prop('required', false);
+                        $('#deliver_province_a').addClass('no-display');
+                        $('#deliver_code').prop('required',false);
+                        $('#deliver_code_a').addClass('no-display');
+                    }
+
+                    $('#save_info').click(function (e) {
+                        if ($('#save_info')[0].checked) {
+                            $('#cartInfo').removeClass('no-display');
+                            $('#cart_email').val('');
+                            $('#cart_password').prop('required', true);
+                            $('#deliver_email_error').addClass('no-display')
+                        } else {
+                            $('#cartInfo').addClass('no-display');
+                            $('#cart_email').val('');
+                            $('#cart_password').prop('required', false);
+                            $('#deliver_email_error').addClass('no-display')
+                        }
+                    });
 
 				});
 
@@ -766,37 +942,79 @@ class Pages {
 				function selectPargoPoint(item){
 					$('#pargo_address_error').fadeOut(500);
 					if(typeof item.data["storeName"] != "undefined"){
-				    	$("#delivery-postal").prop('checked', false);
-				    	$("#delivery-physical").prop('checked', false);
-				    	$("#delivery-new").prop('checked', false);
-
-				    	$("#postal-check").removeClass( "selected-div" );
-		    			$("#physical-check").removeClass( "selected-div" );
-		    			$("#new-check").removeClass( "selected-div" );
-
-// 						 if((item.data["address2"] && item.data["address2"].length > 0) && (item.data["suburb"] && item.data["suburb"].length > 0)){
-// 							var stringDiv = ", ";
-// 						 }
-// 						 else {
-// 							 var stringDiv = "";
-// 						 }
-						 //$("#new_name").val(item.data["storeName"]);
-						 $("#new_1").val(item.data["storeName"]);
-						 $("#new_2").val(item.data["address1"]);
-						 $("#new_city").val( item.data["city"]);
-						 $("#new_province").val( item.data["province"]);
-						 $("#new_country").val("RSA");
-						 $("#new_code").val(item.data["postalcode"]);
-						 $("#pargo_point_code").val(item.data["pargoPointCode"]);
-
-						 $("#country-cart-pargo-select").addClass( "no-display");
-					     $("#delivery-new").prop('checked', true);
-					     $("#new-check").addClass( "selected-div" );
-						 $('#delivery_address_error').fadeOut(500);
-						 $('#cartSubmitStep2').fadeIn(500);
-				        return false;
+                        $("#deliver_address1").val(item.data["storeName"]);
+                        $("#deliver_address2").val(item.data["address1"]);
+                        $("#deliver_city").val( item.data["city"]);
+                        $("#deliver_province").val( item.data["province"]);
+                        $("#deliver_country").val(1);
+                        $("#deliver_code").val(item.data["postalcode"]);
+                        $("#pargo_point_code").val(item.data["pargoPointCode"]);
+                        $("#country-cart-pargo-select").addClass( "no-display");
+                        $('#delivery_address_error').fadeOut(500);
+                        $('#cartSubmitStep2').fadeIn(500);
+                        return false;
 					}
 				}
+
+                function checkEmail(vValue, vMessage, vButton) {
+                    if ($('#save_info').is(':checked')) {
+                        $.ajax({
+                            url: 'process.php',
+                            cache: false,
+                            async: true,
+                            global: false,
+                            dataType: 'json',
+                            type: 'POST',
+                            data: {
+                                email: vValue,
+                                type: 'check_email'
+                            },
+                            success: function (result) {
+                                if (result == 0) {
+                                    $('#' + vMessage).addClass('no-display');
+                                    $('#' + vButton).fadeIn();
+                                } else if (result > 0) {
+                                    $('#' + vMessage).removeClass('no-display');
+                                    $('#' + vButton).fadeOut();
+                                }
+                            }
+                        });
+                    }
+                }
+
+                $('#loginSubmitCart2').click(function (e){
+                    $('#login_error').fadeOut(500);
+                    $('#login_complete').fadeOut(500);
+                    e.preventDefault();
+                    var error = false;
+
+                    var username = $('#cart_email') . val();
+                    var password = $('#cart_password') . val();
+
+                    if (username.length == 0) {
+                        error = true;
+                        $('#cart_email').addClass('validation');
+                    } else {
+                        $('#cart_email').removeClass('validation');
+                    }
+                    if (password.length == 0) {
+                        error = true;
+                        $('#cart_password').addClass('validation');
+                    } else {
+                        $('#cart_password').removeClass('validation');
+                    }
+                    if (error == false) {
+                        $.post('process.php', {
+                            type: 'logincart',
+                            language: $('#language').val(),
+                            current_url: $('#current_url').val(),
+                            login_username: $('#cart_email').val(),
+                            login_password: $('#cart_password').val()
+                        })
+                    } else {
+                        $('#login_complete').fadeIn(500);
+                    }
+                });
 			</Script>
         <?php
 		}
@@ -809,10 +1027,10 @@ class Pages {
 	}
 
 	public static function returnCheckoutPaymentForm($pConn, $pData){
-		if($pData['client_id'] == $_SESSION['SessionGrafUserId']){
+		if($pData['client_id'] == $_SESSION['SessionGrafUserId'] || $pData['client_id'] == $_SESSION['SessionGrafUserSessionId']){
 			$vOrder = " ORDER BY b.title ";
 			$vBindParams = array();
-			$vBindLetters = "i";
+			$vBindLetters = (isset($_SESSION['SessionGrafUserId']) ? 'i' : 's');
 			$vBindParams[] = & $pData['client_id'];
 			$vLimit = "";
 			$vWhere = " WHERE client_id = ? and order_date is NULL and order_reference is NULL and order_id is NULL and temp_salt is not NULL";
@@ -827,7 +1045,7 @@ class Pages {
 			}
 			$vPaymentResults = MysqlQuery::getLookup($pConn, "payment");
 			$vDeliveryCostText = MysqlQuery::getCourierTextPerId($pConn, $vResults[22][0]);
-			$vShortDeliveryCostText = substr($vDeliveryCostText, 0, strpos($vDeliveryCostText, "|"));
+			$vShortDeliveryCostText = (str_contains($vDeliveryCostText, '|') ? substr($vDeliveryCostText, 0, strpos($vDeliveryCostText, "|")) : $vDeliveryCostText);
 			$vString = "";
 
 			$vString .= "<form class=\"form-horizontal\" name=\"orderPaymentForm\" id=\"orderPaymentForm\" role=\"form\" method=\"post\" action=\"".$_SESSION['SessionGrafLanguage']."/".$vResults[2][0]."/".MysqlQuery::getText($pConn, 297)/*BestelFinaal*/."\">";
@@ -863,9 +1081,22 @@ class Pages {
 								$vString .="</div>";//row
 						if(count($vResults[0]) > 0){
 								for($x = 0; $x < count($vResults[0]); $x++){
-									$vTotalBookPrice = $vResults[3][$x] * $vResults[10][$x];
-										($vResults[12][$x] == 0 && $vResults[13][$x] <= $_SESSION['now_date'] ? $vInStockMesssage = "<span class=\"text-small-normal red blink\"><b>&nbsp;&nbsp;(".MysqlQuery::getText($pConn, 293)/*Nie in voorraad - sal versending vertraag*/.")</b></span>" : $vInStockMesssage = "");
-										($vResults[13][$x] > $_SESSION['now_date'] ? $vPublicationMesssage = "<span class=\"text-small-normal red blink\"><b>&nbsp;&nbsp;(".MysqlQuery::getText($pConn, 412)/*Let asseblief op die publikasie datum. Versending sodra boek gepubliseer is.*/." - ".$vResults[13][$x].")</b></span>" : $vPublicationMesssage = "");
+                                    //Final Price start
+                                    $vNewTopDiscountPrice = round($vResults[29][$x] - ($vResults[29][$x] * $vResults[30][$x]));
+                                    $vSpecialDiscountPrice = (!empty($vResults[31][$x]) && $vResults[31][$x] > 0 ? $vResults[32][$x] : $vResults[29][$x]);
+                                    $vClientDiscountPrice = round($vResults[29][$x] - ($vResults[29][$x] * $_SESSION['SessionGrafSpecialDiscount']));
+                                    $vSoonDiscountPrice = round($vResults[29][$x] - ($vResults[29][$x] * $vResults[30][$x]));
+                                    $vNormalPrice = $vResults[29][$x];
+                                    $vPriceDisplayType = 'query';
+                                    $price = $vResults[29][$x];
+                                    include 'include/BookPriceDisplay.php';
+                                    //Final Price end
+
+                                    $vTotalBookPrice = $vResults[3][$x] * $vFinalPrice;
+
+//									$vTotalBookPrice = $vResults[3][$x] * $vResults[10][$x];
+                                    ($vResults[12][$x] == 0 && $vResults[13][$x] <= $_SESSION['now_date'] ? $vInStockMesssage = "<span class=\"text-small-normal red blink\"><b>&nbsp;&nbsp;(".MysqlQuery::getText($pConn, 293)/*Nie in voorraad - sal versending vertraag*/.")</b></span>" : $vInStockMesssage = "");
+                                    ($vResults[13][$x] > $_SESSION['now_date'] ? $vPublicationMesssage = "<span class=\"text-small-normal red blink\"><b>&nbsp;&nbsp;(".MysqlQuery::getText($pConn, 412)/*Let asseblief op die publikasie datum. Versending sodra boek gepubliseer is.*/." - ".$vResults[13][$x].")</b></span>" : $vPublicationMesssage = "");
 										//($vResults[12][$x] == 0 ? $vInStockMesssage = "<span class=\"text-small-normal red\">&nbsp;&nbsp;(".MysqlQuery::getText($pConn, 293)/*Nie in voorraad - sal versending vertraag*/.")</span>" : $vInStockMesssage = "");
 									//Books
 									$vString .= "<div class=\"row row-grid\">";
@@ -877,7 +1108,7 @@ class Pages {
 								}
 								//Total book cost
 								$vString .= "<div class=\"row row-grid space-bottom\">";
-										$vString .= "<div class=\"col-xs-6 col-md-6 row-grid gray\">".MysqlQuery::getText($pConn, 107)/*Totaal*/."</div>";
+										$vString .= "<div class=\"col-xs-6 col-md-6 row-grid gray\">".MysqlQuery::getText($pConn, 107)/*Sub Totaal*/."</div>";
 										$vString .= "<div class=\"col-xs-6 col-md-5 row-grid col-right gray\" id=\"cart-total-all-books-price\"></div>";
 										$vString .= "<div class=\"col-md-1 row-grid col-right\"></div>";
 								$vString .="</div>";//row
@@ -886,18 +1117,18 @@ class Pages {
 								$vString .="<div class=\"row\">";
 									$vString .="<hr class=\"light-gray\">";
 									$vString .= "<div class=\"col-xs-12\">";
-										$vString .= "<h5 class=\"gray\"><i class=\"fa fa-angle-double-right fa-lg\" aria-hidden=\"true\"></i>&nbsp;&nbsp;".$vShortDeliveryCostText."</h5>";
+										$vString .= "<h5 class=\"gray\"><i class=\"fa fa-angle-double-right fa-lg\" aria-hidden=\"true\"></i>&nbsp;&nbsp;".MysqlQuery::getText($pConn, 108)/*Versendingskoste*/."</h5>";
 									$vString .="</div>";
 								$vString .="</div>";//row
 
 								$vString .= "<div class=\"row row-grid\">";
-										$vString .= "<div class=\"col-xs-6 col-md-6 row-grid\">".$vCourierType;
+										$vString .= "<div class=\"col-xs-6 col-md-6 row-grid\">".$vShortDeliveryCostText;
 										if($vResults[22][0] == 5){//Other country
 											$vString .= " - ".$vCourierDetail[1];
 										}
-										else if(!empty($vCourierDetail)){
-
-										}
+//										else if(!empty($vCourierDetail)){
+//
+//										}
 										$vString .= "</div>";
 										$vString .= "<div class=\"col-xs-6 col-md-5 row-grid col-right\">R ".$vResults[24][0]."</div>";
 										$vString .= "<div class=\"col-md-1 row-grid col-right\"></div>";
@@ -921,17 +1152,22 @@ class Pages {
 									$vString .="</div>";//row
 
 									$vString .= "<div class=\"row row-grid\">";
-											$vString .= "<div class=\"col-xs-12 col-md-12 row-grid\">";
-												(!empty($vResults[20][0]) ? $vString .= $vResults[20][0]."<br>" : $vString .= "");
-												(!empty($vResults[21][0]) ? $vString .= $vResults[21][0]."<br>" : $vString .= "");
-												(!empty($vResults[14][0]) ? $vString .= $vResults[14][0] : $vString .= "");
-												(!empty($vResults[15][0]) ? $vString .= ", ".$vResults[15][0] : $vString .= "");
-												(!empty($vResults[16][0]) ? $vString .= ", ".$vResults[16][0] : $vString .= "");
-												(!empty($vResults[17][0]) ? $vString .= ", ".$vResults[17][0] : $vString .= "");
-												(!empty($vResults[18][0]) ? $vString .= ", ".$vResults[18][0] : $vString .= "");
-												(!empty($vResults[19][0]) ? $vString .= ", ".$vResults[19][0]."<br>"  : $vString .= "");
-												(!empty($vResults[27][0]) ? $vString .= "<br>".MysqlQuery::getText($pConn, 153)/*Aflewerings boodskap*/.": ".$vResults[27][0] : $vString .= "");
-											$vString .="</div>";
+                                        $vString .= "<div class=\"col-xs-12 col-md-12 row-grid\">";
+                                            if (!empty($vResults[18][0])) {
+                                                $vCountryString = MysqlQuery::getCourierCountry($pConn, $vResults[18][0]);
+                                            } else {
+                                                $vCountryString = '';
+                                            }
+                                            (!empty($vResults[20][0]) ? $vString .= $vResults[20][0].'<br>' : $vString .= '');
+                                            (!empty($vResults[21][0]) ? $vString .= $vResults[21][0].'<br>' : $vString .= '');
+                                            (!empty($vResults[14][0]) ? $vString .= $vResults[14][0] : $vString .= '');
+                                            (!empty($vResults[15][0]) ? $vString .= ', '.$vResults[15][0] : $vString .= '');
+                                            (!empty($vResults[16][0]) ? $vString .= ', '.$vResults[16][0] : $vString .= '');
+                                            (!empty($vResults[17][0]) ? $vString .= ', '.$vResults[17][0] : $vString .= '');
+                                            (!empty($vResults[18][0]) ? $vString .= ', Suid Afrika / South Africa' : $vString .= '');
+                                            (!empty($vResults[19][0]) ? $vString .= ', '.$vResults[19][0]  : $vString .= '');
+                                            (!empty($vResults[27][0]) ? $vString .= '<br>'.MysqlQuery::getText($pConn, 153)/*Aflewerings boodskap*/.': '.$vResults[27][0] : $vString .= '');
+                                        $vString .="</div>";
 									$vString .="</div>";//row
 								}
 
@@ -989,6 +1225,7 @@ class Pages {
 
 				$vTempSalt = General::createSalt(5);
 				$vString .= "<input type=\"hidden\" name=\"deliver_name\" id=\"deliver_name\" value=\"".$vResults[20][0]."\">";
+                $vString .= "<input type=\"hidden\" name=\"cart_email\" id=\"cart_email\" value=\"".$vResults[37][0]."\">";
 				$vString .= "<input type=\"hidden\" name=\"deliver_address1\" id=\"deliver_address1\" value=\"".$vResults[14][0]."\">";
 				$vString .= "<input type=\"hidden\" name=\"deliver_address2\" id=\"deliver_address2\" value=\"".$vResults[15][0]."\">";
 				$vString .= "<input type=\"hidden\" name=\"deliver_city\" id=\"deliver_city\" value=\"".$vResults[16][0]."\">";
@@ -1001,7 +1238,7 @@ class Pages {
 				$vString .= "<input type=\"hidden\" name=\"courier_cost\" id=\"courier_cost\" value=\"".$vResults[24][0]."\">";
 				$vString .= "<input type=\"hidden\" name=\"price\" id=\"price\" value=\"".$vResults[25][0]."\">";
 				$vString .= "<input type=\"hidden\" name=\"total_price\" id=\"total_price\" value=\"".$vResults[26][0]."\">";
-				$vString .= "<input type=\"hidden\" name=\"message\" id=\"message\" value=\"".General::prepareStringForQuery($vResults[27][0])."\">";
+				$vString .= "<input type=\"hidden\" name=\"message\" id=\"message\" value=\"".$vResults[27][0]."\">";
 				$vString .= "<input type=\"hidden\" name=\"temp_salt\" id=\"temp_salt\" value=\"".$vTempSalt."\">";
 			$vString .= "</form>";
 
@@ -1059,9 +1296,11 @@ class Pages {
 
 				$vBooks = "&nbsp;<b>".MysqlQuery::getText($pConn, 281)/*Jou boeke*/."</b>:<br>";
 				$vBooks .= "<ul>";
-					for($b = 0; $b < count($vOrderDetailResult[0]); $b++){
-						$vBooks .= "<li>".$vOrderDetailResult[4][$b]." x ".$vOrderDetailResult[6][$b]." - ".$vOrderDetailResult[8][$b]." @ R ".$vOrderDetailResult[3][$b]."</li>";
-					}
+                if(isset($vOrderDetailResult['id'])){
+                    for($b = 0; $b < count($vOrderDetailResult['id']); $b++){
+                        $vBooks .= "<li>".$vOrderDetailResult['number_books'][$b]." x ".$vOrderDetailResult['title'][$b]." - ".$vOrderDetailResult['author'][$b]." @ R ".$vOrderDetailResult['price'][$b]."</li>";
+                    }
+                }
 				$vBooks .= "</ul>";
 
 				$vMessageTop = MysqlQuery::getText($pConn, 301);/*Jou bestelling detail is as volg:*/
@@ -1079,7 +1318,7 @@ class Pages {
 				if($vOrderResult[10][0] != 4){//Not collect
 					$vMessage .= "<br><b>".MysqlQuery::getText($pConn, 288)/*Afleweringsadres*/."</b>:<br>".$vDeliveryAddress."<br>";
 				}
-				(!empty($vOrderResult[16][0]) ? $vMessage .= "<br>&nbsp;<b>".MysqlQuery::getText($pConn, 153)/*Aflewerings boodskap*/."</b>: ".$vOrderResult[16][0]."<br>" : $vMessage .= "");
+				(!empty($vOrderResult[16][0]) && $vOrderResult[16][0] != 'NULL' ? $vMessage .= "<br>&nbsp;<b>".MysqlQuery::getText($pConn, 153)/*Aflewerings boodskap*/."</b>: //".$vOrderResult[16][0]."//<br>" : $vMessage .= "");
 
 				if($pPaymentType == 16){
 					$vHeadingText = "&nbsp;".MysqlQuery::getText($pConn, 161);/*'n Bewys van die bestelling is per epos aan jou gestuur.*/

@@ -1,57 +1,120 @@
 <?php
 if($vPage == "Betaling" || $vPage == "Payment"){
-		$vClientId = $vRequest->getParameter('id');
-		if(!empty($vRequest->getParameter('price') || !empty($vRequest->getParameter('courier_type') || !empty($vRequest->getParameter('total_price'))))){
-			$vData['receiver_name'] = $vRequest->getParameter('deliver_name');
-			$vData['address1'] = $vRequest->getParameter('deliver_address1');
-			$vData['address2'] = $vRequest->getParameter('deliver_address2');
-			$vData['city'] = $vRequest->getParameter('deliver_city');
-			$vData['province'] = $vRequest->getParameter('deliver_province');
-			$vData['country'] = $vRequest->getParameter('deliver_country');
-			$vData['code'] = $_POST['deliver_code'];//Stop leading 0 to be removed
-			$vData['receiver_phone'] = General::prepareStringForQuery($_POST['deliver_phone']);//Stop leading 0 to be removed
-			$vData['courier_type'] = $vRequest->getParameter('courier_type');
-			$vData['courier_detail'] = $vRequest->getParameter('courier_detail');
-			$vData['courier_cost'] = $vRequest->getParameter('courier_cost');
-			$vData['price'] = $vRequest->getParameter('price');
-			$vData['total_price'] = $vRequest->getParameter('total_price');
-			$vData['message'] = $vRequest->getParameter('message');
-			$vData['delivery_address_type'] = $vRequest->getParameter('delivery_address_type');
-			$vQueryResult = MysqlQuery::doUpdate($conn, "cart", $vData, " client_id = ".$vClientId." and order_date is NULL and order_reference is NULL and order_id is NULL and temp_salt is not NULL");
-			$vData['client_id'] = $vRequest->getParameter('id');
-		}
-		else {
-			$vData['client_id'] = $vRequest->getParameter('id');
-		}
+    $vClientId = $_GET['id'];
+    if(!empty($_POST['price']) || !empty($_POST['courier_type']) || !empty($_POST['total_price'])){
+
+        if(isset($_POST['save_info']) && $_POST['save_info'] == 1){
+            $vGraf = 0;
+            $vClient = 0;
+            $vQueryResult = 0;
+
+            $hasher = new PasswordHashClass(8, FALSE);
+            $alfa = '1234567890qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM';
+            $temp_token = '';
+            for ($i = 0; $i < 20; $i++) {
+                $temp_token .= $alfa[rand(0, strlen($alfa))];
+            }
+            $random_token = '';
+            for ($i = 0; $i < 30; $i++) {
+                $random_token .= $alfa[rand(0, strlen($alfa))];
+            }
+
+            $vIsUniqueUser = MysqlQuery::checkClient($conn, strtoupper($_POST['cart_email']));
+            if ($vIsUniqueUser == 0) {
+                $hash = hash('sha256', $_POST['cart_password']);
+                $salt = General::createSalt(15);
+                $hash = hash('sha256', $salt . $hash);
+                $vData['firstname'] = filter_var($_POST['deliver_name'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+                $vData['email'] = filter_var($_POST['cart_email'], FILTER_SANITIZE_EMAIL);
+                $vData['phone'] = filter_var($_POST['deliver_phone'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+                $vData['password'] = $hash;
+                $vData['validated'] = 1;
+                $vData['salt'] = $salt;
+                $vData['physical_address1'] = filter_var($_POST['deliver_address1'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+                $vData['physical_address2'] = filter_var($_POST['deliver_address2'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+                $vData['physical_city'] = filter_var($_POST['deliver_city'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+                $vData['physical_province'] = filter_var($_POST['deliver_province'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+                $vData['physical_country'] = filter_var($_POST['deliver_country'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+                $vData['physical_code'] = filter_var($_POST['deliver_code'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+                $vData['temp_token'] = $temp_token;
+                $vData['newsletter'] = 1;
+                $vData['language'] = $_SESSION['SessionGrafLanguage'];
+                $vData['special_discount'] = 0.00;
+                $vClientId = MysqlQuery::doInsert($conn, 'clients', $vData);
+
+                if(isset($vClientId) && $vClientId > 0){
+                    $vQueryResult = 0;
+                    $_SESSION['SessionGrafUserId'] = $vClientId;
+                    $_SESSION['SessionGrafUserFirstname'] = $vData['firstname'];
+                    $_SESSION['SessionGrafUserSurname'] = "";
+                    $_SESSION['SessionGrafUserEmail'] = $vData['email'];
+                    $_SESSION['SessionGrafSpecialDiscount'] = $vData['special_discount'];
+                    $_SESSION['SessionGrafUserPhone'] = $vData['phone'];
+                    setcookie('cookie_graf_ui', $vClientId, 0, '/', '', false, true);
+
+                    if (isset($_SESSION['SessionGrafUserSessionId']) && isset($_SESSION['SessionGrafUserId'])) {
+                        $vData['client_id'] = $_SESSION['SessionGrafUserId'];
+                        $vQueryCartResult = MysqlQuery::doUpdate($conn, 'cart', $vData, "client_id = '" . $_SESSION['SessionGrafUserSessionId'] . "' AND order_id IS NULL");
+                        if ($vQueryCartResult == 1) {
+                            unset($_SESSION['SessionGrafUserSessionId']);
+                        }
+                    }
+                }
+            }
+        }
+
+        $vData['receiver_name'] = filter_var($_POST['deliver_name'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+        $vData['receiver_email'] = filter_var($_POST['cart_email'], FILTER_SANITIZE_EMAIL);
+        $vData['address1'] = filter_var($_POST['deliver_address1'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+        $vData['address2'] = filter_var($_POST['deliver_address2'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+        $vData['city'] = filter_var($_POST['deliver_city'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+        $vData['province'] = filter_var($_POST['deliver_province'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+        $vData['country'] = filter_var($_POST['deliver_country'], FILTER_SANITIZE_NUMBER_INT);
+        $vData['code'] = filter_var($_POST['deliver_code'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);//Stop leading 0 to be removed
+        $vData['receiver_phone'] = filter_var($_POST['deliver_phone'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+        $vData['courier_type'] = filter_var($_POST['courier_type'], FILTER_SANITIZE_NUMBER_INT);
+        $vData['courier_detail'] = filter_var($_POST['courier_detail'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+        $vData['courier_cost'] = filter_var($_POST['courier_cost'], FILTER_SANITIZE_NUMBER_INT);
+        $vData['price'] = filter_var($_POST['price'], FILTER_SANITIZE_NUMBER_FLOAT);
+        $vData['total_price'] = filter_var($_POST['total_price'], FILTER_SANITIZE_NUMBER_FLOAT);
+        $vData['message'] = filter_var($_POST['message'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+        $vQueryResult = MysqlQuery::doUpdate($conn, "cart", $vData, " client_id = '".$vClientId."' and order_date is NULL and order_reference is NULL and order_id is NULL and temp_salt is not NULL");
+
+        $vData['client_id'] = $vClientId;
+    }
+    else {
+        $vData['client_id'] = $vClientId;
+    }
 }
 else if($vPage == "BestelFinaal" || $vPage == "OrderFinal"){
-		$vData['order_date'] = $_SESSION['now_date'];
-		$vData['temp_salt'] = $vRequest->getParameter('temp_salt');
-		$vData['client_id'] = $vRequest->getParameter('id');
-		$vData['receiver_name'] = General::prepareStringForQuery($vRequest->getParameter('deliver_name'));
-		$vData['address1'] = General::prepareStringForQuery($vRequest->getParameter('deliver_address1'));
-		$vData['address2'] = General::prepareStringForQuery($vRequest->getParameter('deliver_address2'));
-		$vData['city'] = General::prepareStringForQuery($vRequest->getParameter('deliver_city'));
-		$vData['province'] = General::prepareStringForQuery($vRequest->getParameter('deliver_province'));
-		$vData['country'] = General::prepareStringForQuery($vRequest->getParameter('deliver_country'));
-		$vData['code'] = $_POST['deliver_code'];//Stop leading 0 to be removed
-		$vData['receiver_phone'] = General::prepareStringForQuery($_POST['deliver_phone']);//Stop leading 0 to be removed
-		$vData['courier_type'] = $vRequest->getParameter('courier_type');
-		$vData['courier_detail'] = General::prepareStringForQuery($vRequest->getParameter('courier_detail'));
-		$vData['courier_cost'] = $vRequest->getParameter('courier_cost');
-		$vData['price'] = $vRequest->getParameter('price');
-		$vData['total_price'] = $vRequest->getParameter('total_price');
-		$vData['message'] = General::prepareStringForQuery($vRequest->getParameter('message'));
-		$vData['payment_type'] = $vRequest->getParameter('payment_type');
-		$vData['submitted'] = 1;
+    $vData['order_date'] = $_SESSION['now_date'];
+    $vData['temp_salt'] = filter_var($_POST['temp_salt'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+    $vData['client_id'] = $_GET['id'];
+    $vData['receiver_name'] = filter_var($_POST['deliver_name'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+    $vData['receiver_email'] = filter_var($_POST['cart_email'], FILTER_SANITIZE_EMAIL);
+    $vData['address1'] = filter_var($_POST['deliver_address1'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+    $vData['address2'] = filter_var($_POST['deliver_address2'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+    $vData['city'] = filter_var($_POST['deliver_city'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+    $vData['province'] = filter_var($_POST['deliver_province'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+    $vData['country'] = filter_var($_POST['deliver_country'], FILTER_SANITIZE_NUMBER_INT);
+    $vData['code'] = filter_var($_POST['deliver_code'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);//Stop leading 0 to be removed
+    $vData['receiver_phone'] = filter_var($_POST['deliver_phone'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+    $vData['courier_type'] = filter_var($_POST['courier_type'], FILTER_SANITIZE_NUMBER_INT);
+    $vData['courier_detail'] = filter_var($_POST['courier_detail'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+    $vData['courier_cost'] = filter_var($_POST['courier_cost'], FILTER_SANITIZE_NUMBER_INT);
+    $vData['price'] = filter_var($_POST['price'], FILTER_SANITIZE_NUMBER_FLOAT);
+    $vData['total_price'] = filter_var($_POST['total_price'], FILTER_SANITIZE_NUMBER_FLOAT);
+    $vData['message'] = filter_var($_POST['message'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+    $vData['payment_type'] = filter_var($_POST['payment_type'], FILTER_SANITIZE_NUMBER_INT);
+    $vData['submitted'] = 1;
 
-		$vOrder = " ORDER BY b.title ";
-		$vBindParams = array();
-		$vBindLetters = "i";
-		$vBindParams[] = & $vData['client_id'];
-		$vLimit = "";
-		$vWhere = " WHERE client_id = ? and order_date is NULL and order_reference is NULL and order_id is NULL and temp_salt is not NULL";
-		$vCartResults = MysqlQuery::getCart($conn, $vWhere, $vOrder, $vBindLetters, $vBindParams, $vLimit);
+    $vOrder = " ORDER BY b.title ";
+    $vBindParams = array();
+    $vBindLetters = (isset($_SESSION['SessionGrafUserId']) ? 'i' : 's');
+    $vBindParams[] = & $vData['client_id'];
+    $vLimit = "";
+    $vWhere = " WHERE w.client_id = ? and order_date is NULL and w.order_reference is NULL and w.order_id is NULL and w.temp_salt is not NULL";
+    $vCartResults = MysqlQuery::getCart($conn, $vWhere, $vOrder, $vBindLetters, $vBindParams, $vLimit);
 
 	if(strlen($vData['temp_salt']) == 5){
 		$vQueryResult = MysqlQuery::doInsert($conn, 'orders', $vData);
@@ -59,9 +122,23 @@ else if($vPage == "BestelFinaal" || $vPage == "OrderFinal"){
 		for($od = 0; $od < count($vCartResults[0]); $od++){
 			$vDataDetail['order_id'] = $vOrderId;
 			$vDataDetail['book_id'] = $vCartResults[1][$od];
-			$vDataDetail['price'] = $vCartResults[10][$od];
+//			$vDataDetail['price'] = $vCartResults[10][$od];
 			$vDataDetail['number_books'] = $vCartResults[3][$od];
 			$vDataDetail['temp_salt'] = $vData['temp_salt'];
+
+            //Final Price start
+            $vNewTopDiscountPrice = round($vCartResults[29][$od] - ($vCartResults[29][$od] * $vCartResults[30][$od]));
+            $vSpecialDiscountPrice = (!empty($vCartResults[31][$od]) && $vCartResults[31][$od] > 0 ? $vCartResults[32][$od] : $vCartResults[29][$od]);
+            $vClientDiscountPrice = round($vCartResults[29][$od] - ($vCartResults[29][$od] * $_SESSION['SessionGrafSpecialDiscount']));
+            $vSoonDiscountPrice = round($vCartResults[29][$od] - ($vCartResults[29][$od] * $vCartResults[30][$od]));
+            $vNormalPrice = $vCartResults[29][$od];
+            $vPriceDisplayType = 'query';
+            $price = $vCartResults[29][$od];
+            include 'include/BookPriceDisplay.php';
+            //Final Price end
+
+            $vDataDetail['price'] = $vCartResults[3][$od] * $vFinalPrice;
+
 			$vQueryResult = MysqlQuery::doInsert($conn, "orders_detail", $vDataDetail);
 
 			$vCartUData['order_id'] = $vOrderId;
@@ -86,7 +163,7 @@ else if($vPage == "BestelFinaal" || $vPage == "OrderFinal"){
 
                 echo "<Script>";
                 echo "$(document).ready(function(){";
-                 	echo "$('#GraffitiForm').submit();";
+                 	echo "alert(0);$('#GraffitiForm').submit();";
                 echo "});";
                 echo "</Script>";
 		}
@@ -231,38 +308,36 @@ else if($vPage == "BestellingSukses" || $vPage == "OrderSuccess"){
 	MysqlQuery::doUpdate($conn, "cart", $vCartData, "order_id = ".$vData['reference']);
 }
 else if($vPage == "BestellingFout" || $vPage == "OrderError"){
-		$threedsecure = $_POST ["_3DSTATUS"];
-		$acquirerDateTime = $_POST ["_ACQUIRERDATETIME"];
-		$price = $_POST ["_AMOUNT"];
-		$cardCountry = $_POST ["_CARDCOUNTRY"];
-		$countryCode = $_POST ["_COUNTRYCODE"];
-		$currencyCode = $_POST ["_CURRENCYCODE"];
-		$merchantReference = $_POST ["_MERCHANTREFERENCE"];
-		$transactionIndex = $_POST ["_TRANSACTIONINDEX"];
-		$payMethod = $_POST ["_PAYMETHOD"];
+    $threedsecure = $_POST ["_3DSTATUS"];
+    $acquirerDateTime = $_POST ["_ACQUIRERDATETIME"];
+    $price = $_POST ["_AMOUNT"];
+    $cardCountry = $_POST ["_CARDCOUNTRY"];
+    $countryCode = $_POST ["_COUNTRYCODE"];
+    $currencyCode = $_POST ["_CURRENCYCODE"];
+    $merchantReference = $_POST ["_MERCHANTREFERENCE"];
+    $transactionIndex = $_POST ["_TRANSACTIONINDEX"];
+    $payMethod = $_POST ["_PAYMETHOD"];
 
-		$errorCode = $_POST ['_ERROR_CODE'];
-		$errorMessage = $_POST ['_ERROR_MESSAGE'];
-		$errorDetail = $_POST ['_ERROR_DETAIL'];
-		$errorSource = $_POST ['_ERROR_SOURCE'];
+    $errorCode = $_POST ['_ERROR_CODE'];
+    $errorMessage = $_POST ['_ERROR_MESSAGE'];
+    $errorDetail = $_POST ['_ERROR_DETAIL'];
+    $errorSource = $_POST ['_ERROR_SOURCE'];
 
-		$bankErrorCode = $_POST ["_BANK_ERROR_CODE"];
-		$bankErrorMessage = $_POST ["_BANK_ERROR_MESSAGE"];
+    $bankErrorCode = $_POST ["_BANK_ERROR_CODE"];
+    $bankErrorMessage = $_POST ["_BANK_ERROR_MESSAGE"];
 
-		$vErrorString = "";
-		$vErrorString .= "Failed Transaction<br />";
-		$vErrorString .= "Result: " . $result."<br />";
-		$vErrorString .= "Error Code: " . $errorCode."<br />";
-		$vErrorString .= "Error Message: " . $errorMessage."<br />";
-		$vErrorString .= "Error Details: " . $errorDetail."<br />";
-		$vErrorString .= "Error Source: " . $errorSource."<br />";
-		$vErrorString .= "Bank Error Code: " . $bankErrorCode."<br />";
-		$vErrorString .= "Bank Error Message: " . $bankErrorMessage;
+    $vErrorString = "";
+    $vErrorString .= "Failed Transaction<br />";
+    $vErrorString .= "Result: " . $result."<br />";
+    $vErrorString .= "Error Code: " . $errorCode."<br />";
+    $vErrorString .= "Error Message: " . $errorMessage."<br />";
+    $vErrorString .= "Error Details: " . $errorDetail."<br />";
+    $vErrorString .= "Error Source: " . $errorSource."<br />";
+    $vErrorString .= "Bank Error Code: " . $bankErrorCode."<br />";
+    $vErrorString .= "Bank Error Message: " . $bankErrorMessage;
 
-		echo $vErrorString;
-		$vEmailDetail2 = "vPage = BestellingFout op OrderQueries ln 145.  ".$vErrorString;
-		mail("webmaster@graffitibooks.co.za", "Bestellingsfout", $vEmailDetail2, "From: Server");
-
+    echo $vErrorString;
+    $vEmailDetail2 = "vPage = BestellingFout op OrderQueries ln 145.  ".$vErrorString;
+    mail("webmaster@graffitibooks.co.za", "Bestellingsfout", $vEmailDetail2, "From: Server");
 }
-
-	?>
+?>

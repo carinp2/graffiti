@@ -360,7 +360,7 @@ class Parts {
 
         $vTempClientId = (isset($_SESSION['SessionGrafUserId']) ? $_SESSION['SessionGrafUserId'] : $_SESSION['SessionGrafUserSessionId']);
 		$vBindParams = array();
-		$vBindLetters = "i";
+		$vBindLetters = (isset($_SESSION['SessionGrafUserId']) ? 'i' : 's');
 		$vBindParams[] = & $vTempClientId;
         $vString = "";
 		$vString .= "\n<div id=\"header\">";
@@ -576,7 +576,6 @@ class Parts {
 						$vString .= "cbpHorizontalMenu.init();";
 					$vString .= "});";
  					$vString .="$(window).on('load', function() {";
- 						//$vString .="$(\".se-pre-con\").fadeOut(\"slow\");";
  						$vString .="$(\"#admin-menu\").fadeIn(\"slow\");";
  					$vString .="});";
 			$vString .= "</script>";

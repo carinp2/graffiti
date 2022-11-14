@@ -4,7 +4,7 @@
  * Created on 2016-11_02
  */
 session_start();
-session_cache_limiter( 'nocache' );
+//session_cache_limiter( 'nocache' );
 require_once ("application/classes/General.class.php");
 $vGeneral = new General();
 

@@ -1,4 +1,7 @@
 <?php
+    if(!isset($_SESSION['SessionGrafUserId'])){
+
+    }
 		    $subject = "Webwerf bestelling";
 		    $to = "carin@ceit.cc";
 
@@ -88,9 +91,7 @@
 		    $messageClient .= MysqlQuery::getText($conn, 405)/*Tel: 012 - 548 2356*/."</p>";
 		    $messageClient  .= "<p style=\"font-family: arial; font-size: 12px; color: #202020; line-height: 20px;\"><a href=\"https://www.graffitiboeke.co.za\" title=\"Graffiti\">www.graffitiboeke.co.za</a></p><br>";
 		    $messageClient  .= "<img src=\"".$_SESSION['SessionGrafFullServerUrl']."images/logo.png\" height=\"120\" width=\"245\" alt=\"Graffiti\">";
-		    //$messageClient .= $_SESSION['SessionGrafServerUrl']."images/logo.png";
 // 		    //#####################################################################################Client email content end
-
 		    $subjectClient = MysqlQuery::getText($conn, 305)/*Graffiti - Webwerf bestelling*/;
  		    $toClient = $_SESSION['SessionGrafUserEmail'];
  		    $clientName = $_SESSION['SessionGrafUserFirstname']." ".$_SESSION['SessionGrafUserSurname'];

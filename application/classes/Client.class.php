@@ -14,7 +14,7 @@ class Client {
 			$vBindLetters = "i";
 			$vBindParams[] = & $pId;
 			$vLimit = "LIMIT 1";
-			$vWhere = "WHERE id = ?";
+			$vWhere = "WHERE c.id = ?";
 			$vResults = MysqlQuery::getClients($pConn, $vWhere, $vOrder, $vBindLetters,  $vBindParams, $vLimit);
 			$vHeading = MysqlQuery::getText($pConn, 273)/*Jou profiel*/;
 			$vSubHeading = "";
@@ -164,25 +164,16 @@ class Client {
 								$vString .= "</div>";
 							$vString .= "</div>";
 						$vString .="</div>";
-                        $vCountryResults = MysqlQuery::getCountryCourierCost($pConn, 1);//$vId, $vCountry, $vCost
+//                        $vCountryResults = MysqlQuery::getCountryCourierCost($pConn, 1);//$vId, $vCountry, $vCost
 						$vString .="<div class='row'>";
 							$vString .="<div class='form-group'>";
 								$vString .= "<div class='col-xs-12'>";
-									$vString .= "<label for='physical_country' class='form-label'>".MysqlQuery::getText($pConn, 229)/*Land*/.":</label>";
-//									$vString .= "<input type='text' name='physical_country' id='physical_country' value='".(isset($vResults[16][0]) ? $vResults[16][0] : '')."' required size='45' maxlength='45'><i class='fa fa-asterisk fa-required red' aria-hidden='true'></i>";
-                                    $vString .= "<select name='physical_country' id='physical_country' required>";
-                                            $vString .= "<option value='0'>".MysqlQuery::getText($pConn, 110)/*Kies jou land*/."</option>";
-                                            $vString .= "<option value='1' ".($vResults[21][0] == 1 ? 'selected' : '').">Suid Afrika / South Africa</option>";
-                                            if(count($vCountryResults[0]) > 0){
-                                                for($cc = 0; $cc < count($vCountryResults[0]); $cc++){
-                                                    $vString .= "<option value='".$vCountryResults[0][$cc]."' data='".$vCountryResults[0][$cc]."'";
-                                                        if($vResults[21][0] == $vCountryResults[0][$cc]){
-                                                            $vString .= " selected";
-                                                        }
-                                                    $vString .= ">".$vCountryResults[1][$cc]."</option>";
-                                                }
-                                            }
-                                        $vString .= "</select><i class='fa fa-asterisk fa-required red' aria-hidden='true'></i>";
+                                    $vString .= "<div class='w-inline-50'>
+									    <label for='physical_country' class='form-label'>".MysqlQuery::getText($pConn, 229)/*Land*/.":</label>
+                                        <select name='physical_country' id='physical_country' class='form-control' required>
+                                            <option value='1' ".($vResults[21][0] == 1 ? 'selected' : '').">Suid Afrika / South Africa</option>
+                                        </select><i class='fa fa-asterisk fa-required red' aria-hidden='true'></i>
+                                    </div>";
 								$vString .= "</div>";
 							$vString .= "</div>";
 						$vString .="</div>";
@@ -217,8 +208,9 @@ class Client {
 							$vString .="<div class='form-group'>";
 								$vString .= "<div class='col-xs-12'>";
 									$vString .= "<hr class='light-gray'>";
+                                    $vString .= "<div class='w-inline-50'>";
 									$vString .= "<label for='language' class='form-label' >".MysqlQuery::getText($pConn, 361)/*Taal voorkeur*/.":</label>";
-									$vString .= "<select name='client_language' id='client_language'>";
+									$vString .= "<select name='client_language' id='client_language' class='form-control'>";
 									for($l = 0; $l < count($vLanguageResults[0]); $l++){
 										$vString .= "<option value='".substr(strtolower($vLanguageResults[1][$l]), 0,2)."'";
 										if(!empty($vResults[19][0]) && $vResults[19][0] == substr(strtolower($vLanguageResults[1][$l]), 0,2)){
@@ -227,7 +219,7 @@ class Client {
 										$vString .= ">".$vLanguageResults[1][$l]."</option>";
 									}
 									$vString .= "</select>";
-								$vString .= "</div>";
+								$vString .= "</div></div>";
 							$vString .= "</div>";
 						$vString .="</div>";
 // 						$vString .="<div class='row'>";
@@ -336,7 +328,7 @@ class Client {
 								$vString .="</div>";
 							$vString .="</div>";
 						$vString .="</div>";//row
-						if(count($vResults[0]) > 0){
+						if(isset($vResults[0]) && count($vResults[0]) > 0){
 								for($x = 0; $x < count($vResults[0]); $x++){
 									//Books
 									$vString .= "<div class='row row-grid line'>";
@@ -409,7 +401,7 @@ class Client {
 					$vString .= "</div>";
 				$vString .= "</div>";//Header
 				$vString .= "<div class='form-body'>";
-						if(count($vResults[0]) > 0){
+						if(isset($vResults[0]) && count($vResults[0]) > 0){
 								for($x = 0; $x < count($vResults[0]); $x++){
 									$vResultsBooks = MysqlQuery::getOrderDetail($pConn, "order_id = ?", $vResults[0][$x]);//$vId, $vOrder_id, $vBook_id, $vPrice, $vNumber_books, $vTemp_salt, $vTitle, $vInStock
 									$vReferenceNo = "GRAF/".$vResults[0][$x]."/".$vResults[3][$x];

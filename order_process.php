@@ -37,7 +37,7 @@ if($vType == "update-cart" || $vType == "update-cart-on-checkout"){
             ($vType == "update-cart-on-checkout" ? $vNumber = $_POST['book_number'] : $vNumber = $vExistsNumber+1);
             $vOrder = "";
             $vBindParams = array();
-            $vBindLetters = "ii";
+            $vBindLetters = (isset($_SESSION['SessionGrafUserId']) ? "ii" : "si");
             $vBindParams[] =& $vData['client_id'];
             $vBindParams[] =& $_POST['book_id'];
             $vLimit = "";

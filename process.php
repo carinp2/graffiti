@@ -176,7 +176,7 @@ else if($vType == "login"){
 	$vUsername = $_POST['login_username'];
 	$vPassword = $_POST['login_password'];
 	$vLanguage = $_POST['login_language'];
-	$vRemember = $_POST['remember'];
+	$vRemember = (isset($_POST['remember']) ?? 0);
 
 	$vQueryResult = $vQuery->doLogin($conn, $vUsername, $vPassword, $vRemember, $vLanguage);
 
@@ -192,6 +192,36 @@ else if($vType == "login"){
 	else {
 		echo $_SESSION['SessionGrafLoginNo'];
 	}
+} //######################################## Login from shopping cart
+else if ($vType == 'logincart') {
+    $vQueryResult = 0;
+    $vUsername = $_POST['login_username'];
+    $vPassword = $_POST['login_password'];
+    $vLanguage = $_POST['language'];
+    $vRemember = 0;
+    $vCurrentUrl = $_POST['current_url'];
+
+    $vQueryResult = $vQuery->doLogin($conn, $vUsername, $vPassword, $vRemember, $vLanguage);
+
+    if ($vQueryResult == 1) {
+        if(isset($_SESSION['SessionGrafUserSessionId']) && isset($_SESSION['SessionGrafUserId'])) {
+            $vData['client_id'] = $_SESSION['SessionGrafUserId'];
+            $vQueryCartResult = MysqlQuery::doUpdate($conn, 'cart', $vData, "client_id = '" . $_SESSION['SessionGrafUserSessionId'] . "' AND order_id IS NULL");
+            if ($vQueryCartResult == 1) {
+                $_SESSION['SessionGrafCartLoginMessage'] = "<b>*</b> ".MysqlQuery::getText($conn, 258)/*Jy is suksesvol aangeteken!*/." <b>*</b>";
+                $vNewUrl = str_replace($_SESSION['SessionGrafUserSessionId'], $_SESSION['SessionGrafUserId'], $vCurrentUrl);
+                unset($_SESSION['SessionGrafUserSessionId']);
+                echo "<Script>
+                    window.location.href = '$vNewUrl';
+                </Script>";
+            }
+        }
+    } else {
+        $_SESSION['SessionGrafCartLoginMessage'] = "<b>*</b> ".MysqlQuery::getText($conn, 244)/*Jou Gebruikersnaam / E-pos of Wagwoord is verkeerd. Probeer asseblief weer.*/." <b>*</b>";
+        echo "<Script>
+            window.location.href= '$vCurrentUrl';
+        </Script>";
+    }
 }
 //######################################## Password reset
 else if($vType == "password-reset"){
@@ -288,5 +318,8 @@ else if($vType == "competition_entry"){
         echo 2;
     }
 }
-
+else if($vType == 'check_email'){
+    $vIsUniqueUser = MysqlQuery::checkClient($conn, strtoupper($_POST['email']));
+    echo $vIsUniqueUser;
+}
 include "include/connect/CloseConnect.php";
