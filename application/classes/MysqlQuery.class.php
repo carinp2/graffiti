@@ -89,7 +89,9 @@ class MysqlQuery {
 		$n = '';
 		foreach($pData as $key=>$val) {
 			$n .= "$key, ";
-			if($val == 'null' || empty($val))
+            if($val == 0)
+                $v .= "0, ";
+            elseif($val == 'null' || empty($val))
 				$v .= "NULL, ";
 			elseif(strtolower($val) == 'now()')
 				$v .= "NOW(), ";
@@ -97,7 +99,7 @@ class MysqlQuery {
 				$v .= "'" . $val . "', ";
 		}
 		$q .= "(" . rtrim($n, ', ') . ") VALUES (" . rtrim($v, ', ') . ");";
-// 		error_log("Insert: ".$q, 0, "C:/Temp/php_errors.log");
+//        error_log('Insert: ' . $q, 3, 'C:/a_Server/wamp64/logs/php_error.log');
 		if(mysqli_query($pConn, $q)){
 			$vResult = mysqli_insert_id($pConn);
 		}
@@ -133,7 +135,7 @@ class MysqlQuery {
 		else {
 			$sqlString = rtrim($q, ', ') . ';';
 		}
-//		error_log("Update: ".$sqlString, 3, 'C:/a_Server/wamp64/logs/php_error.log');
+		//error_log("Update: ".$sqlString, 3, 'C:/a_Server/wamp64/logs/php_error.log');
 		if(mysqli_query($pConn, $sqlString)){
 			$vResult = 1;
 		}
@@ -447,6 +449,7 @@ class MysqlQuery {
 		$stmt = $pConn->prepare($vSqlString);
 		$stmt->bind_param("ii", $pSection, $pActive);
         $id = 0;
+        $vCategoryId = array();
 		if($stmt->execute() == true) {
 			$stmt->bind_result($id);
 			while ($stmt->fetch()) {
@@ -604,6 +607,7 @@ class MysqlQuery {
 		$stmt = $pConn->prepare($vSqlString);
 		$stmt->bind_param("ii", $pSection, $pActive);
         $id = 0;
+        $vSubCategoryId = array();
 		if($stmt->execute() == true) {
 			$stmt->bind_result($id);
 			while ($stmt->fetch()) {
@@ -658,7 +662,7 @@ class MysqlQuery {
 	//error_log("SQL: ".$vSqlString." - ".$vId, 0, "C:/Temp/php_errors.log");
 	$stmt = $pConn->prepare($vSqlString);
 	$stmt->bind_param("i", $vId);
-        $language = '';
+    $language = '';
 	if($stmt->execute() == true) {
 		$stmt->bind_result($language);
 		while ($stmt->fetch()) {
@@ -668,7 +672,7 @@ class MysqlQuery {
 		}
 	}
 	$stmt->close();
-	return General::prepareStringForDisplay($vLanguage);
+	return $vLanguage;
 	}
 
 	public static function getCarouselImages($pConn, $pWhere){
@@ -1305,7 +1309,7 @@ class MysqlQuery {
 		$vSqlString = "select c.id, c.firstname, c.surname, c.email, c.validated, c.phone, c.postal_address1, c.postal_address2, c.postal_city, c.postal_province, c.postal_country, c.postal_code, c.physical_address1, c.physical_address2, c.physical_city, c.physical_province, c.physical_country, c.physical_code, c.newsletter, c.language, c.special_discount, c.physical_country_id, lc.".$_SESSION['SessionGrafLanguage']." AS country_string 
             from clients c 
             LEFT JOIN lk_country lc ON c.physical_country = lc.id ".$pWhere." ".$pOrder." ".$pLimit;
-		error_log($vSqlString."//".$pBindParams[0]."//".$pBindParams[1]."//".$pBindParams[2]);
+//		error_log($vSqlString."//".$pBindParams[0]."//".$pBindParams[1]."//".$pBindParams[2], 3, 'C:/a_Server/wamp64/logs/php_error.log');
 		$stmt = $pConn->prepare($vSqlString);
 		array_unshift($pBindParams, $pBindLetters);
 		call_user_func_array(array($stmt, 'bind_param'), $pBindParams);
@@ -1368,6 +1372,30 @@ class MysqlQuery {
 		$stmt->close();
 		return array($vId, $vFirstname, $vSurname, $vEmail, $vPhone, $vLanguage);
 	}
+
+    public static function getOrderClientTemp($pConn, $pOrderId)
+    {
+        $vSqlString = 'select client_id, receiver_name, receiver_email, receiver_phone from orders WHERE id = ?';
+        //error_log("SQL: ".$vSqlString." ".$pId, 0, "C:/Temp/php_errors.log");
+        $stmt = $pConn->prepare($vSqlString);
+        $stmt->bind_param('i', $pOrderId);
+        $client_id=$receiver_name=$receiver_email=$receiver_phone = '';
+        if ($stmt->execute() == true) {
+            $stmt->bind_result($client_id, $receiver_name, $receiver_email, $receiver_phone);
+            while ($stmt->fetch()) {
+                if ($client_id && !empty($client_id)) {
+                    $vId = $client_id;
+                    $vFirstname = $receiver_name;
+                    $vSurname = '';
+                    $vEmail = $receiver_email;
+                    $vPhone = $receiver_phone;
+                    $vLanguage = 'en';
+                }
+            }
+        }
+        $stmt->close();
+        return array($vId, $vFirstname, $vSurname, $vEmail, $vPhone, $vLanguage);
+    }
 
 	public static function getClientsMin($pConn, $pWhere, $vFirstname, $vSurname){
 		$vSqlString = "select id, firstname, surname from clients WHERE ".$pWhere." order by surname asc";
@@ -1443,7 +1471,7 @@ class MysqlQuery {
 		$vSqlString .= "w.receiver_phone, w.courier_type, w.courier_detail, w.courier_cost, w.price as order_price, w.total_price, w.message, w.delivery_address_type,w.receiver_email from cart w ";
 		$vSqlString .= "LEFT JOIN books AS b ON b.id = w.book_id ";
 		$vSqlString .= $pWhere." ".$pOrder." ".$pLimit;
-//		error_log("getCart: ".$vSqlString."--".$pBindParams[0], 0);
+		//error_log("getCart: ".$vSqlString."--".$pBindParams[0], 3, "error.log");
 		$stmt = $pConn->prepare($vSqlString);
 		array_unshift($pBindParams, $pBindLetters);
 		call_user_func_array(array($stmt, 'bind_param'), $pBindParams);
@@ -1499,7 +1527,7 @@ class MysqlQuery {
                     $vPrice[] = $price;
                     $vDefaultDiscount[] = $default_discount;
                     $vSpecial[] = $special;
-                    $vSpecialPrice = $special_price;
+                    $vSpecialPrice[] = $special_price;
                     $vNew[] = $new;
                     $vTopSeller[] = $top_seller;
                     $vLanguage[] = $language;
@@ -1530,7 +1558,7 @@ class MysqlQuery {
 		$vSqlString = "select w.id, w.book_id, b.title, b.price, b.new, b.top_seller, b.special, b.special_price, b.blob_path, b.in_stock, b.default_discount from wishlist w ";
 		$vSqlString .= "LEFT JOIN books AS b ON b.id = w.book_id ";
 		$vSqlString .= $pWhere." ".$pOrder." ".$pLimit;
-		//error_log("getCart: ".$vSqlString."--".$pBindParams[0], 0, "C:/Temp/php_errors.log");
+		error_log("getCart: ".$vSqlString."--".$pBindParams[0], 3, 'C:/a_Server/wamp64/logs/php_error.log');
 		$stmt = $pConn->prepare($vSqlString);
 		array_unshift($pBindParams, $pBindLetters);
 		call_user_func_array(array($stmt, 'bind_param'), $pBindParams);
@@ -1550,7 +1578,13 @@ class MysqlQuery {
 			}
 		}
 		$stmt->close();
-		return array($vId, $vBookId, $vTitle, $vPrice, $vBlobPath, $vInStock);
+
+        if(isset($vId)){
+            return array($vId, $vBookId, $vTitle, $vPrice, $vBlobPath, $vInStock);
+        }
+        else {
+            return array();
+        }
 	}
 
 	public static function updateCart($pConn, $pWhere, $pBindLetters, $pBindParams, $pNumber){
@@ -1587,7 +1621,7 @@ class MysqlQuery {
     public static function updateCartClient($pConn, $pWhere, $pBindLetters, $pBindParams)
     {
         $vSqlString = 'update cart set client_id = ? '.$pWhere;
-        error_log($vSqlString, 0);
+        //error_log($vSqlString, 0);
         $stmt = $pConn->prepare($vSqlString);
         array_unshift($pBindParams, $pBindLetters);
         call_user_func_array(array($stmt, 'bind_param'), $pBindParams);
@@ -1641,6 +1675,26 @@ class MysqlQuery {
 		$stmt->close();
 		return array($vId, $vCountry);
 	}
+
+    public static function getCountry($pConn, $pId)
+    {
+        $vSqlString = 'select id, ' . $_SESSION['SessionGrafLanguage'] . ' as country from lk_country where id = ?';
+        $stmt = $pConn->prepare($vSqlString);
+        $stmt->bind_param('i', $pId);
+        $id = 0;
+        $country = '';
+        if ($stmt->execute() == true) {
+            $stmt->bind_result($id, $country);
+            while ($stmt->fetch()) {
+                if ($id && $id > 0) {
+                    $vId = $id;
+                    $vCountry = $country;
+                }
+            }
+        }
+        $stmt->close();
+        return array($vId, $vCountry);
+    }
 
 	public static function getCourierSelection($pConn, $pId){
 		$vSqlString = "select id, ".$_SESSION['SessionGrafLanguage']." as courier_type from courier_cost where id < ? and id in(3,7,4,5,204) order by 2 DESC";
@@ -1755,7 +1809,7 @@ class MysqlQuery {
 				}
 		}
 		$stmt->close();
-		if($vTrimYN == 1){
+		if($vTrimYN == 1 && (str_contains ($vAf, '|') || str_contains ($vEn, '|'))){
 			$vText =  substr($vAf, 0, strpos($vAf, "|"))."/".substr($vEn, 0, strpos($vEn, "|"));
 		}
 		else {
@@ -1790,7 +1844,9 @@ class MysqlQuery {
 	}
 
 	public static function getOrder($pConn, $pWhere, $pOrder, $pBindLetters,  $pBindParams, $pLimit){
-		$vSqlString = "select id, client_id, order_date, temp_salt, address1, address2, city, province, country, code, courier_type, courier_cost, price, total_price, payment_type, submitted, message, paid, processed, posted, tracking_no, completed, note, courier_detail, paid_email, processed_email, posted_email, receiver_name, receiver_phone, settled, posted_date, courier_comp, receiver_email from orders ".$pWhere." ".$pOrder." ".$pLimit;
+		$vSqlString = "select id, client_id, order_date, temp_salt, address1, address2, city, province, country, code, courier_type, courier_cost, price, total_price, payment_type, submitted, message, paid, processed, posted, tracking_no, completed, note, 
+            courier_detail, paid_email, processed_email, posted_email, receiver_name, receiver_phone, settled, posted_date, courier_comp, receiver_email 
+        from orders ".$pWhere." ".$pOrder." ".$pLimit;
 //		error_log("SQL: ".$vSqlString."--".$pBindParams[0]."--".$pBindParams[1]."--".$pBindParams[2], 3, "C:/Temp/php_errors.log");
 		$stmt = $pConn->prepare($vSqlString);
 		array_unshift($pBindParams, $pBindLetters);
@@ -1849,7 +1905,7 @@ class MysqlQuery {
 		$vSqlString = "select od.id, od.order_id, od.book_id, od.price, od.number_books, od.temp_salt, b.title, b.in_stock, b.author, b.isbn, b.price as original_price from orders_detail od ";
 		$vSqlString .= "LEFT JOIN books AS b ON b.id = od.book_id ";
 		$vSqlString .= "where ".$pWhere;
-		error_log("SQL: ".$vSqlString." - ".$pId,  3, 'C:/a_Server/wamp64/logs/php_error.log');
+		//error_log("SQL: ".$vSqlString." - ".$pId,  3, 'C:/a_Server/wamp64/logs/php_error.log');
 		$stmt = $pConn->prepare($vSqlString);
 		$stmt->bind_param("i", $pId);
         $vResult = array();

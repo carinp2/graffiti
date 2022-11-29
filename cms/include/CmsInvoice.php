@@ -47,42 +47,47 @@ if($vType == "invoice_print"){
 $pdf->Cell(0,10,'Verwysings / Reference #: '.$vRef.' ('.$vPaymentType.$vPubString.')',0,1);
 //$pdf->Cell(0,1,'',0,1);
 $pdf->SetFont('dejavusans', 'B', 12);
-$pdf->Cell(0,7,$vGeneral->prepareStringForDisplay($vClientResult[1])." ".$vGeneral->prepareStringForDisplay($vClientResult[2])." (".$vGeneral->prepareStringForDisplay($vClientResult[0]).")",0,1);
+if(isset($vClientResult[1]) && !empty($vClientResult[1])) {
+    $pdf->Cell(0, 7, $vGeneral->prepareStringForDisplay($vClientResult[1]) . " " . $vGeneral->prepareStringForDisplay($vClientResult[2]) . " (" . $vGeneral->prepareStringForDisplay($vClientResult[0]) . ")", 0, 1);
+}
 $pdf->SetFont('helvetica', '', 11, '', true);
-(!empty($vOrderResult[4][0]) ? $pdf->Cell(0,6,$vGeneral->prepareStringForDisplay($vOrderResult[4][0]),0,1) : "");
-(!empty($vOrderResult[5][0]) ? $pdf->Cell(0,6,$vGeneral->prepareStringForDisplay($vOrderResult[5][0]),0,1) : "");
-(!empty($vOrderResult[6][0]) ? $pdf->Cell(0,6,$vGeneral->prepareStringForDisplay($vOrderResult[6][0]),0,1) : "");
-(!empty($vOrderResult[7][0]) ? $pdf->Cell(0,6,$vOrderResult[7][0],0,1) : "");
-(!empty($vOrderResult[8][0]) ? $pdf->Cell(0,6,$vOrderResult[8][0],0,1) : "");
-(!empty($vOrderResult[9][0]) ? $pdf->Cell(0,6,$vOrderResult[9][0],0,1) : "");
+(strlen($vOrderResult[4][0]) > 1 ? $pdf->Cell(0,6,$vGeneral->prepareStringForDisplay($vOrderResult[4][0]),0,1) : "");//Address1
+(strlen($vOrderResult[5][0]) > 1 ? $pdf->Cell(0,6,$vGeneral->prepareStringForDisplay($vOrderResult[5][0]),0,1) : "");//Address2
+(strlen($vOrderResult[6][0]) > 1 ? $pdf->Cell(0,6,$vGeneral->prepareStringForDisplay($vOrderResult[6][0]),0,1) : "");//City
+(strlen($vOrderResult[7][0]) > 1 ? $pdf->Cell(0,6,$vOrderResult[7][0],0,1) : "");//Province
+(strlen($vOrderResult[8][0]) > 1 ? $pdf->Cell(0,6,$vCountryString[1],0,1) : "");//Country
+(strlen($vOrderResult[9][0]) > 1 ? $pdf->Cell(0,6,$vOrderResult[9][0],0,1) : "");//Code
 
-$pdf->Cell(0,5,$vClientResult[4],0,1);
-$pdf->Cell(0,5,$vClientResult[3],0,1);
+if(isset($vClientResult[1]) && !empty($vClientResult[1])) {
+    $pdf->Cell(0, 5, $vClientResult[4], 0, 1);//Phone
+    $pdf->Cell(0, 5, $vClientResult[3], 0, 1);//Email
+}
 $pdf->Cell(0,1,'',0,1);
 
 	if(!empty($vOrderResult[27][0]) || !empty($vOrderResult[28][0])){
 		$pdf->Cell(0,5,"Ontvanger / Receiver:",0,1);
 		if(!empty($vOrderResult[27][0])){
-			$pdf->Cell(0,5,$vGeneral->prepareStringForDisplay($vOrderResult[27][0]),0,1);
+			$pdf->Cell(0,5,$vGeneral->prepareStringForDisplay($vOrderResult[27][0]),0,1);//Receiver Name
 		}
 		if(!empty($vOrderResult[28][0])){
-			$pdf->Cell(0,5,$vGeneral->prepareStringForDisplay($vOrderResult[28][0]),0,1);
+			$pdf->Cell(0,5,$vGeneral->prepareStringForDisplay($vOrderResult[28][0]),0,1);//Receiver Phone
 		}
 	}
 	$pdf->Cell(0,2,'',0,1);
 }
 else if($vType == "invoice_print_wr"){
+    $pdf->Cell(0,10,'Verwysings / Reference #: '.$vRef.' ('.$vPaymentType.$vPubString.')',0,1);
 	$pdf->SetFont('dejavusans', 'B', 12);
-	$pdf->Cell(0,5,$vGeneral->prepareStringForDisplay($vOrderResult[27][0]),0,1);
+	$pdf->Cell(0,5,$vGeneral->prepareStringForDisplay($vOrderResult[27][0]),0,1);//Receiver Name
 	$pdf->SetFont('helvetica', '', 11, '', true);
-	(!empty($vOrderResult[4][0]) ? $pdf->Cell(0,6,$vGeneral->prepareStringForDisplay($vOrderResult[4][0]),0,1) : "");
-	(!empty($vOrderResult[5][0]) ? $pdf->Cell(0,6,$vGeneral->prepareStringForDisplay($vOrderResult[5][0]),0,1) : "");
-	(!empty($vOrderResult[6][0]) ? $pdf->Cell(0,6,$vGeneral->prepareStringForDisplay($vOrderResult[6][0]),0,1) : "");
-	(!empty($vOrderResult[7][0]) ? $pdf->Cell(0,6,$vOrderResult[7][0],0,1) : "");
-	(!empty($vOrderResult[8][0]) ? $pdf->Cell(0,6,$vOrderResult[8][0],0,1) : "");
-	(!empty($vOrderResult[9][0]) ? $pdf->Cell(0,6,$vOrderResult[9][0],0,1) : "");
+	(strlen($vOrderResult[4][0]) > 1 ? $pdf->Cell(0,6,$vGeneral->prepareStringForDisplay($vOrderResult[4][0]),0,1) : "");//Address1
+	(strlen($vOrderResult[5][0]) > 1 ? $pdf->Cell(0,6,$vGeneral->prepareStringForDisplay($vOrderResult[5][0]),0,1) : "");//Address2
+	(strlen($vOrderResult[6][0]) > 1 ? $pdf->Cell(0,6,$vGeneral->prepareStringForDisplay($vOrderResult[6][0]),0,1) : "");//City
+	(strlen($vOrderResult[7][0]) > 1 ? $pdf->Cell(0,6,$vOrderResult[7][0],0,1) : "");//Province
+	(strlen($vOrderResult[8][0]) > 1 ? $pdf->Cell(0,6,$vCountryString[1],0,1) : "");//Country
+	(strlen($vOrderResult[9][0]) > 1 ? $pdf->Cell(0,6,$vOrderResult[9][0],0,1) : "");//Code
 
-	(!empty($vOrderResult[9][0]) ? $pdf->Cell(0,6,$vOrderResult[28][0],0,1) : "");
+	(!empty($vOrderResult[9][0]) ? $pdf->Cell(0,6,$vOrderResult[28][0],0,1) : "");//Receiver Phone
 	$pdf->Cell(0,6,$vPubString2,0,1);
 	$pdf->Cell(0,6,'',0,1);
 }

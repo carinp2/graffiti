@@ -30,7 +30,12 @@ if($vType == "paid"){
     $vSalt = $_POST['salt'];
     $vInStock = $_POST['instock'];
     $vCourierType = $_POST['courier'];
-    $vClientResult = MysqlQuery::getOrderClient($conn, $vClientId);
+
+    if(is_numeric($vClientId)) {
+        $vClientResult = MysqlQuery::getOrderClient($conn, $vClientId);
+    } else {
+        $vClientResult = MysqlQuery::getOrderClientTemp($conn, $vOrderId);
+    }
 
     include_once 'include/CmsEmail.php';
 
@@ -52,7 +57,11 @@ else if($vType == "processed"){
     $vAmount = $_POST['amount'];
     $vSalt = $_POST['salt'];
     $vCourierType = $_POST['courier'];
-    $vClientResult = MysqlQuery::getOrderClient($conn, $vClientId);
+    if(is_numeric($vClientId)) {
+        $vClientResult = MysqlQuery::getOrderClient($conn, $vClientId);
+    } else {
+        $vClientResult = MysqlQuery::getOrderClientTemp($conn, $vOrderId);
+    }
 
     include_once 'include/CmsEmail.php';
 
@@ -74,7 +83,11 @@ else if($vType == "posted"){
     $vCourierType = $_POST['courier_type'];
     $vSalt = $_POST['salt'];
     $vCourierSelected = $_POST['courier_selected'];
-    $vClientResult = MysqlQuery::getOrderClient($conn, $vClientId);
+    if(is_numeric($vClientId)) {
+        $vClientResult = MysqlQuery::getOrderClient($conn, $vClientId);
+    } else {
+        $vClientResult = MysqlQuery::getOrderClientTemp($conn, $vOrderId);
+    }
 
     include_once 'include/CmsEmail.php';
 
@@ -168,7 +181,13 @@ else if($vType == "invoice_print" || $vType == "invoice_print_wr"){
 	$vOrderWhere = " WHERE id = ?";
 	$vOrderResult = MysqlQuery::getOrder($conn, $vOrderWhere, "", $vOrderBindLetters, $vOrderBindParams, $vOrderLimit);
 	$vOrderDetailResult = MysqlQuery::getOrderDetail($conn, "order_id = ?", $vOrderResult[0][0]);
-	$vClientResult = MysqlQuery::getOrderClient($conn,  $vRequest->getParameter('client_id'));
+//	$vClientResult = MysqlQuery::getOrderClient($conn,  $vRequest->getParameter('client_id'));
+
+    if(is_numeric($vRequest->getParameter('client_id'))) {
+        $vClientResult = MysqlQuery::getOrderClient($conn, $vRequest->getParameter('client_id'));
+    } else {
+        $vClientResult = MysqlQuery::getOrderClientTemp($conn, $vOrderId);
+    }
 
 	if($vOrderResult[10][0] != 5){
 		$vCourierType = MysqlQuery::getCourierTextPerIdBilingual($conn, $vOrderResult[10][0], 1);
@@ -185,6 +204,9 @@ else if($vType == "invoice_print" || $vType == "invoice_print_wr"){
 	else if($vOrderResult[14][0] == 57){
 		$vPaymentType = "Z";
 	}
+    if(isset($vOrderResult[8][0]) && $vOrderResult[8][0] > 0){
+        $vCountryString = MysqlQuery::getCountry($conn, $vOrderResult[8][0]);
+    }
 
 	include_once "include/CmsInvoice.php";
 }

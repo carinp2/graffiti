@@ -436,7 +436,7 @@ class Parts {
 		//$vSections = MysqlQuery::getSections($pConn, "", "ORDER BY sort_order", 0);//$vId, $vSection, $vUrl, $vDescription, $vSortOrder
 		$vPageUrl = MysqlQuery::getText($pConn, 14);//Soek
 
-		$vString = "\n\n	<nav id=\"cbp-hrmenu\" class=\"cbp-hrmenu\">";
+		$vString = "<nav id=\"cbp-hrmenu\" class=\"cbp-hrmenu\">";
 		    	$vString .= "<a href=\"".$_SESSION['SessionGrafLanguage']."/".MysqlQuery::getText($pConn, 203)/*Tuisblad*/."\" title=\"".MysqlQuery::getText($pConn, 1)/*Tuisblad*/."\"><span itemprop=\"brand\" itemscope itemtype=\"http://schema.org/Brand\"><img itemprop=\"logo\" src=\"images/logo.png\" id=\"topLogo\" alt=\"".MysqlQuery::getText($pConn, 1)."\" class=\"top-logo\"/><meta itemprop=\"name\" content=\"Graffiti\"></span></span></a>";
 		        $vString .= "<ul class=\"noborder\" >";
 		        	$vString .= "<li id=\"top\"><a href=\"".$_SESSION['SessionGrafLanguage']."/".MysqlQuery::getText($pConn, 203)/*Tuisblad*/."\" class=\"menu normal\" title=\"".MysqlQuery::getText($pConn, 1)/*Tuisblad*/."\">".MysqlQuery::getText($pConn, 203)/*Tuisblad*/."</a></li>";
@@ -563,15 +563,15 @@ class Parts {
 	public static function getPageBottom($pConn){
         $vString = "<a id=\"scrollToTop\" href=\"#header\" title=\"Top\"><i class=\"fa fa-chevron-up\" aria-hidden=\"true\"></i></a>";
 
-			$vString .= "<script type=\"text/javascript\" src=\"js/modernizr.js\"></script>";
-			$vString .= "<script src=\"js/lightbox.min.js\"></script>";
-			$vString .= "<script src=\"js/cbpHorizontalMenu.min.js\"></script>";
-			$vString .= "<script src=\"js/jquery.showmore.min.js\"></script>";
-			$vString .= "<script src=\"js/jquery-ui.min.js\"></script>";
-			$vString .= "<script src=\"js/modernizr.custom.js\"></script>";
-			$vString .= "<script src=\"js/bootstrap.min.js\" type=\"text/javascript\"></script>";
-			$vString .= "<script src=\"".$_SESSION['SessionGrafScript'] ."\" type=\"text/javascript\"></script>";
-			$vString .= "<script>";
+			$vString .= "\n<script type=\"text/javascript\" src=\"js/modernizr.js\"></script>";
+			$vString .= "\n<script src=\"js/lightbox.min.js\"></script>";
+			$vString .= "\n<script src=\"js/cbpHorizontalMenu.min.js\"></script>";
+			$vString .= "\n<script src=\"js/jquery.showmore.min.js\"></script>";
+			$vString .= "\n<script src=\"js/jquery-ui.min.js\"></script>";
+			$vString .= "\n<script src=\"js/modernizr.custom.js\"></script>";
+			$vString .= "\n<script src=\"js/bootstrap.min.js\" type=\"text/javascript\"></script>";
+			$vString .= "\n<script src=\"".$_SESSION['SessionGrafScript'] ."\" type=\"text/javascript\"></script>";
+			$vString .= "\n<script>";
 					$vString .= "$(function() {";
 						$vString .= "cbpHorizontalMenu.init();";
 					$vString .= "});";

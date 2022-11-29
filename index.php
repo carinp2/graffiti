@@ -29,7 +29,7 @@ require_once ("application/classes/Client.class.php");
 $vClient= new Client();
 require_once ("application/resources/PasswordHashClass.php");
 
-echo "SessionGrafUserId = ".(isset($_SESSION['SessionGrafUserId']) ?? 0)."/////";
+echo "SessionGrafUserId = ".(isset($_SESSION['SessionGrafUserId']) ?  $_SESSION['SessionGrafUserId'] : 0)."/////";
 echo "<br>/////SessionGrafUserSessionId: ".($_SESSION['SessionGrafUserSessionId'] ?? 0)."////";
 
 $vString = "";

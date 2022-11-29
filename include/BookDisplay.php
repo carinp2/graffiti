@@ -112,7 +112,7 @@
 							$vString .= "<div class=\"col-xs-8 col-md-9\">";
 						}
 								$vString .= "<div><h1 class=\"green\"><a href=\"".$_SESSION['SessionGrafFullServerUrl'].$_SESSION['SessionGrafLanguage']."/".$vResults[0][$x]."/".MysqlQuery::getText($pConn, 157)/*Boeke*/."\" itemprop=\"name\" title=\"".$vResults[4][$x]."\">".General::str_highlight($vResults[4][$x], $pSearchData['cat'])."</a>
-                                    <i class='fa fa-copy fa-xs gray space-left' onClick=\"copyToClipboard('".$_SESSION['SessionGrafFullServerUrl'].$_SESSION['SessionGrafLanguage']."/".$vResults[0][$x]."', '".MysqlQuery::getText($pConn, 498)."');\" data-url='".$_SESSION['SessionGrafFullServerUrl'].$_SESSION['SessionGrafLanguage']."/".$vResults[0][$x]."' data-toggle='tooltip' data-placement='top' data-original-title='".MysqlQuery::getText($pConn, 497)."'></i>
+                                    <i class='fa fa-copy fa-xs gray space-left' onClick=\"copyToClipboard('".$_SESSION['SessionGrafFullServerUrl'].$_SESSION['SessionGrafLanguage']."/".$vResults[0][$x]."/".MysqlQuery::getText($pConn, 157)/*Boeke*/."', '".MysqlQuery::getText($pConn, 498)."');\" data-url='".$_SESSION['SessionGrafFullServerUrl'].$_SESSION['SessionGrafLanguage']."/".$vResults[0][$x]."/".MysqlQuery::getText($pConn, 157)/*Boeke*/."' data-toggle='tooltip' data-placement='top' data-original-title='".MysqlQuery::getText($pConn, 497)."'></i>
                                     <span class='copied-toast text-xsmall'></span>                                    
                                     </h1></div>";//title
 								($vResults[20][$x] == "Penne / Pens" ? $vSubHead = "" : $vSubHead = $vResults[19][$x].": ");

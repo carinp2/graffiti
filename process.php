@@ -86,7 +86,7 @@ if($vType == "register"){
 
 			    $headersClient  = "MIME-Version: 1.0" . "\r\n";
 			    $headersClient .= "Content-type: text/html; charset=UTF-8" . "\r\n";
-			    $headersClient .= "From: carin@ceit.cc". "\r\n";
+			    $headersClient .= "From: carin@ceit.cc". "\r\n";//orders@graffitibooks.co.za
 
 			    $messageClient  = $_POST['firstname']." ".$_POST['surname'].",<br><br>";
                 $messageClient  .= MysqlQuery::getText($conn, 253)/*Dankie vir jou registrasie op Graffiti. Jou intekenbesonderhede is as volg:*/."<br><br>";
@@ -208,11 +208,11 @@ else if ($vType == 'logincart') {
             $vData['client_id'] = $_SESSION['SessionGrafUserId'];
             $vQueryCartResult = MysqlQuery::doUpdate($conn, 'cart', $vData, "client_id = '" . $_SESSION['SessionGrafUserSessionId'] . "' AND order_id IS NULL");
             if ($vQueryCartResult == 1) {
-                $_SESSION['SessionGrafCartLoginMessage'] = "<b>*</b> ".MysqlQuery::getText($conn, 258)/*Jy is suksesvol aangeteken!*/." <b>*</b>";
+                $_SESSION['SessionGrafCartLoginMessage'] = "<i class='fa fa-exclamation-circle fa-2x' aria-hidden='true'></i>&nbsp;&nbsp;<b>".MysqlQuery::getText($conn, 258)/*Jy is suksesvol aangeteken!*/."</b>";
                 $vNewUrl = str_replace($_SESSION['SessionGrafUserSessionId'], $_SESSION['SessionGrafUserId'], $vCurrentUrl);
                 unset($_SESSION['SessionGrafUserSessionId']);
                 echo "<Script>
-                    window.location.href = '$vNewUrl';
+                    window.location.href = '".$vNewUrl."';
                 </Script>";
             }
         }

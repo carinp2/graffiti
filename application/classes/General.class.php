@@ -227,10 +227,13 @@ $text = preg_replace($regex, $highlight, $text);
 	 * @return string
 	 */
 	public static function curPageURL() {
-		$pageURL = 'http';
+		$pageURL = '';
 		if(isset($_SERVER['HTTPS']) && $_SERVER["HTTPS"] != 0) {
-			$pageURL .= "http";
+			$pageURL .= "https";
 		}
+        else {
+            $pageURL .= 'http';
+        }
 		if($_SERVER["SERVER_NAME"] == 'graffiti') {
 			$pageURL .= "://";
 		}

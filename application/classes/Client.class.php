@@ -373,8 +373,7 @@ class Client {
 		if($pId > 0 && $pId == $_SESSION['SessionGrafUserId']){
 			$vOrder = "ORDER BY order_date DESC";
 			$vBindParams = array();
-			$vBindLetters = "";
-			$vBindLetters .= "i";
+            $vBindLetters = "i";
 			$vBindParams[] = & $pId;
 			$vLimit = "";
 			$vWhere = "WHERE client_id = ?";
@@ -448,11 +447,9 @@ class Client {
 // 													$vDispatchString = MysqlQuery::getText($pConn, 392)/*Nee*/;
 // 													$vString .= $vDispatchString;
 // 												}
-//$vId, $vClient_id, $vOrder_date, $vTemp_salt, $vAddress1, $vAddress2, $vCity, $vProvince, $vCountry, $vCode, $vCourier_type, $vCourier_cost, $vPrice, $vTotal_price, $vPayment_type ,$vSubmitted, $vMessage, $vPaid, $vProcessed ,
-//	0			1								2								3							4						5					6					7							8				9							10							11					12					13							14								15						16				17				18
-//$vPosted, $vTracking_no ,$vCompleted, $vNote, $vCourier_detail, $vPaidEmail, $vProcessedEmail, $vPostedEmail, $vReceiverName, $vReceiverPhone
-//		19					20								21				22				23									24							25								26							27									28
+
 												$vCourierType = MysqlQuery::getLookupPerId($pConn, $vResults[10][$x]);
+                                                $vCountryString = (!empty($vResults[8][$x]) && $vResults[8][$x] > 0 && $vResults[10][$x] <> 4 ? MysqlQuery::getCountry($pConn, $vResults[8][$x]) : '');
 												$vDispatchDetail = "";
 												(!empty($vResults[27][$x]) ? $vDispatchDetail .= $vResults[27][$x]."<br>" : $vDispatchDetail .= "");
 												(!empty($vResults[4][$x]) ? $vDispatchDetail .= $vResults[4][$x] : $vDispatchDetail .= "");
@@ -460,6 +457,7 @@ class Client {
 												(!empty($vResults[6][$x]) ? $vDispatchDetail .= ", ".$vResults[6][$x] : $vString .= "");
 												(!empty($vResults[7][$x]) ? $vDispatchDetail .= ", ".$vResults[7][$x] : $vDispatchDetail .= "");
 												(!empty($vResults[8][$x]) ? $vDispatchDetail .= ", ".$vResults[8][$x] : $vDispatchDetail .= "");
+                                                (!empty($vCountryString[1]) ? $vDispatchDetail .= ', ' . $vCountryString[1] : '');//Country
 												(!empty($vResults[9][$x]) ? $vDispatchDetail .= ", ".$vResults[9][$x]."<br>"  : $vDispatchDetail .= "");
 												(!empty($vResults[28][$x]) ? $vDispatchDetail .= $vResults[28][$x] : $vDispatchDetail .= "");
 												$vString .= "<a href='#orderhistorydispatch'  id='orderhistorydispatchicon_".$vResults[0][$x]."' class='".$vColorDispatch."' title='".MysqlQuery::getText($pConn, 387)/*Klik vir meer informasie*/."' data-toggle='modal' data-id='".$vResults[0][$x]."' data-dispatch='".$vSend."' data-dispatch-method='".$vCourierType."' data-dispatch-cost='".$vResults[11][$x]."' data-dispatch-tracking='".$vResults[20][$x]."' data-dispatch-detail='".$vDispatchDetail."' data-dispatch-message='".$vResults[16][$x]."'>";
@@ -484,26 +482,27 @@ class Client {
 									$vString .="</div>";//row
 									$vString .= "<div class='row row-grid line no-display' id='orderhistorybooksdetail_".$vResults[0][$x]."'>";
 										$vString .= "<div class='col-xs-12 col-md-12 row-grid'>";
-											for($b = 0; $b < count($vResultsBooks['id']); $b++){
-												$vString .= "<div class='row row-grid line'>";
-														$vString .= "<div class='col-xs-0  col-md-1 row-grid text-col-small'></div>";
-														$vString .= "<div class='col-xs-9  col-md-7 text-col-small'>";
-															$vString .= $vResultsBooks['number_books'][$b] ." x ".$vResultsBooks['title'][$b];
-															if($vResults[19][$x] == 0 && $vResultsBooks['in_stock'][$b] > 0){
-																$vString .= " <span class='text-small-normal red'>(".MysqlQuery::getText($pConn, 388)/*Gereed vir versending*/.")</span>";
-															}
-															else if($vResults[19][$x] == 0 && $vResultsBooks['in_stock'][$b] == 0){
-																$vString .= " <span class='text-small-normal red'>(".MysqlQuery::getText($pConn, 389)/*Nie in voorraad*/.")</span>";
-															}
-														$vString .="</div>";
-														$vString .="<div class='col-xs-2  col-md-2 col-right text-col-small'>";
-															$vString .= "R ".$vResultsBooks['price'][$b];
-														$vString .="</div>";
-														$vString .="<div class='col-xs-1  col-md-2 col-right text-col-small'>";
-														$vString .="</div>";
+                                        if(isset($vResultsBooks['id']) && count($vResultsBooks['id']) > 0) {
+                                            for ($b = 0; $b < count($vResultsBooks['id']); $b++) {
+                                                $vString .= "<div class='row row-grid line'>";
+                                                $vString .= "<div class='col-xs-0  col-md-1 row-grid text-col-small'></div>";
+                                                $vString .= "<div class='col-xs-9  col-md-7 text-col-small'>";
+                                                $vString .= $vResultsBooks['number_books'][$b] . " x " . $vResultsBooks['title'][$b];
+                                                if ($vResults[19][$x] == 0 && $vResultsBooks['in_stock'][$b] > 0) {
+                                                    $vString .= " <span class='text-small-normal red'>(" . MysqlQuery::getText($pConn, 388)/*Gereed vir versending*/ . ")</span>";
+                                                } else if ($vResults[19][$x] == 0 && $vResultsBooks['in_stock'][$b] == 0) {
+                                                    $vString .= " <span class='text-small-normal red'>(" . MysqlQuery::getText($pConn, 389)/*Nie in voorraad*/ . ")</span>";
+                                                }
+                                                $vString .= "</div>";
+                                                $vString .= "<div class='col-xs-2  col-md-2 col-right text-col-small'>";
+                                                $vString .= "R " . $vResultsBooks['price'][$b];
+                                                $vString .= "</div>";
+                                                $vString .= "<div class='col-xs-1  col-md-2 col-right text-col-small'>";
+                                                $vString .= "</div>";
 
-												$vString .="</div>";//row
-											}
+                                                $vString .= "</div>";//row
+                                            }
+                                        }
 											$vString .="<hr class='light-green'>";
 										$vString .="</div>";//col
 									$vString .="</div>";//row

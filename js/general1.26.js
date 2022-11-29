@@ -683,6 +683,13 @@ $( window ).on( "load", function() {
 		$('#deliver_code').removeClass('validation');
 		$('#deliver_code').prop('required',true);
 		$('#deliver_code_a').fadeIn();
+
+		$('#deliver_address1').prop('readonly', false);
+		$('#deliver_address2').prop('readonly', false);
+		$('#deliver_city').prop('readonly', false);
+		$('#deliver_province').prop('readonly', false);
+		$('#deliver_country').prop('disabled', '');
+		$('#deliver_code').prop('readonly', false);
 		
     	var select = $("#courier-type option:selected").val();
 		if (select != "") {
@@ -768,6 +775,15 @@ $( window ).on( "load", function() {
 	    		var total_cost = parseInt(book_cost)+parseInt(delivery_cost);
 	    		$("#cart-total-order-cost").html("R "+ total_cost);
 	    		$("#total-cart-cost").removeClass( "no-display" );
+
+				$('#deliver_address1').prop('readonly', true);
+				$('#deliver_address2').prop('readonly', true);
+				$('#deliver_city').prop('readonly', true);
+				$('#deliver_province').prop('readonly', true);
+				$('#deliver_country').prop('disabled', 'disabled');
+				$('#deliver_code').prop('readonly', true);
+
+				$('#loadSavedAddress').addClass('no-display');
 	    	break;
 	    	
 	    	case "4": //Collect
@@ -793,6 +809,15 @@ $( window ).on( "load", function() {
 				$("#deliver_code").val('');
 				$('#deliver_code').prop('required',false);
 				$('#deliver_code_a').fadeOut();
+
+				$('#deliver_address1').prop('readonly', true);
+				$('#deliver_address2').prop('readonly', true);
+				$('#deliver_city').prop('readonly', true);
+				$('#deliver_province').prop('readonly', true);
+				$('#deliver_country').prop('disabled', 'disabled');
+				$('#deliver_code').prop('readonly', true);
+
+				$('#loadSavedAddress').addClass('no-display');
 		    	break;	 
 	    		
 	    	case "5": //Other country - Not used by 07-11-2022
@@ -817,51 +842,29 @@ $( window ).on( "load", function() {
 	    	break;	    
 	    	
 	    	case "7": //Courier -  Aramex
-    		$("#text-cart-courier-cost").removeClass( "no-display");
-    		$("#normal-cart-message").removeClass( "no-display" );
-    		$("#courier-cart-message").removeClass( "no-display" );
+				$("#text-cart-courier-cost").removeClass( "no-display");
+				$("#normal-cart-message").removeClass( "no-display" );
+				$("#courier-cart-message").removeClass( "no-display" );
 
-			var book_cost =  $("#cart-total-all-books-price").html().substr(2);
-			// if(book_cost < 500){//Change on 03-06-2022
-			if(book_cost < 450){
-				var delivery_cost =  $("#courierit-jhbpta-cart-courier-cost").html();
-			}
-			else {
-				var delivery_cost = 0;
-			}	    		
-			$("#cart-courier-cost").html("R "+delivery_cost);
-			var total_cost = parseInt(book_cost)+parseInt(delivery_cost);			
+				var book_cost =  $("#cart-total-all-books-price").html().substr(2);
+				// if(book_cost < 500){//Change on 03-06-2022
+				if(book_cost < 450){
+					var delivery_cost =  $("#courierit-jhbpta-cart-courier-cost").html();
+				}
+				else {
+					var delivery_cost = 0;
+				}
+				$("#cart-courier-cost").html("R "+delivery_cost);
+				var total_cost = parseInt(book_cost)+parseInt(delivery_cost);
 
-    		$("#cart-total-order-cost").html("R "+ total_cost);
-    		$("#total-cart-cost").removeClass( "no-display" );	    
-    		$("#country-cart-pargo-select").addClass( "no-display");
-	    	break;	     		
+				$("#cart-total-order-cost").html("R "+ total_cost);
+				$("#total-cart-cost").removeClass( "no-display" );
+				$("#country-cart-pargo-select").addClass( "no-display");
+
+				$('#loadSavedAddress').removeClass('no-display');
+				break;
     	}
     });
-    //Country selection
-    // $("#country-select").change(function(){
-	// 	var selectCourier = $("#courier-type option:selected").val();
-	// 	if(selectCourier == 5){
-    // 		$("#text-cart-courier-cost").removeClass( "no-display");
-    // 		$("#normal-cart-message").removeClass( "no-display" );
-    // 		$("#courier-cart-message").addClass( "no-display" );
-    //
-    // 		var country_cost = $("#country-select option:selected").val();
-    // 		$("#cart-courier-cost").html("R "+country_cost);
-	//
-    // 		var book_cost =  $("#cart-total-all-books-price").html().substr(2);
-    // 		var courier_cost = country_cost
-    // 		var total_cost = parseInt(book_cost)+parseInt(courier_cost);
-    // 		$("#cart-total-order-cost").html("R "+ total_cost);
-    // 		$("#total-cart-cost").removeClass( "no-display" );
-    // 		var country = $("#country-select option:selected").val();
-    // 		if(country != "" && country > 0){
-    // 			$('#delivery_courier_error').fadeOut(500);
-    // 			$('#cartSubmitStep2').fadeIn(500);
-    // 		}
-	// 	}
-	// });
-    //Country selection end
     
     //Courier submit start
 	$("#cartSubmitStep2").bind("click touchstart",function(e){
@@ -873,6 +876,7 @@ $( window ).on( "load", function() {
 			var courier_detail = $("#orderCourierForm #pargo_point_code").val();
 		}
 	  	var courier_cost = $("#cart-courier-cost").html().substring(2);
+
 	  	var total_cost = $("#cart-total-order-cost").html().substr(2);
 	  	var cost = $("#orderCourierForm #cart-total-all-books-price").html().substr(2);
 	  	 
@@ -883,7 +887,8 @@ $( window ).on( "load", function() {
 	  	$("#orderCourierForm #price").val(cost);
 
 		var vError = false;
-		if( $('#cart_email').val().length == 0){
+		var error = "";
+		if($('#cart_email').prop("required") && $('#cart_email').val().length == 0){
 			vError = true;
 			$('#cart_email').addClass('validation');
 		}
@@ -933,9 +938,9 @@ $( window ).on( "load", function() {
         else {
         	$('#orderCourierForm #country-select').removeClass("validation");
         	// $('#cartSubmitStep2').fadeIn(500);
-        }	  
-        
-        if(courier_type == 3 && deliver_address1.length == 0){
+        }
+
+        if(courier_type == 3 && $('#deliver_address1').val().length == 0){
         	var error = "pargo-error";
         }
 	  	
@@ -949,7 +954,8 @@ $( window ).on( "load", function() {
         	// $('#cartSubmitStep2').fadeIn(500);
         }
 
-        if(vError == true && courier_type != 3){
+        // if(vError == true && courier_type != 3){
+		if(vError == true){
             var error = true;
             $('#delivery_address_error').fadeIn(500); 
             // $('#cartSubmitStep2').fadeOut(500);
@@ -958,16 +964,16 @@ $( window ).on( "load", function() {
         	$('#delivery_address_error').fadeOut(500);   
         	// $('#cartSubmitStep2').fadeIn(500);
         }  
-        
-        if(vError == true && courier_type == 3){
-            var error = true;
-            $('#pargo_address_error').fadeIn(500); 
-            // $('#cartSubmitStep2').fadeOut(500);
-            return false; 
-        }else{
-        	$('#pargo_address_error').fadeOut(500);   
-        	// $('#cartSubmitStep2').fadeIn(500);
-        }          
+        //
+        // if(vError == true && courier_type == 3){
+        //     var error = true;
+        //     $('#pargo_address_error').fadeIn(500);
+        //     // $('#cartSubmitStep2').fadeOut(500);
+        //     return false;
+        // }else{
+        // 	$('#pargo_address_error').fadeOut(500);
+        // 	// $('#cartSubmitStep2').fadeIn(500);
+        // }
         
         if(total_cost.length == 0){
             var error = true;
@@ -985,13 +991,15 @@ $( window ).on( "load", function() {
         }	    
         else if(error == "pargo-error"){
         	// $('#cartSubmitStep2').fadeOut(500);
-        	$('#pargo_address_error').fadeIn(500);   
-        }
+        	$('#pargo_address_error').fadeIn(500);
+			return false;
+		}
         else {
         	// $('#cartSubmitStep2').fadeOut(500);
-        	$('#delivery_incomplete').fadeIn(500);   
-        }         
-//        e.preventDefault();
+        	$('#delivery_incomplete').fadeIn(500);
+			return false;
+		}
+
 	});    
 	
 	$("#orderCourierForm").submit(function(e){
@@ -1071,7 +1079,7 @@ $( window ).on( "load", function() {
 	});	
     
     //Check delivery address & courier option on "back" load
-    $("#courier-type").trigger('change');
+    // $("#courier-type").trigger('change');
     // $("#country-select").trigger('change');
     $("#tc").trigger('change');
     
@@ -1405,7 +1413,7 @@ $("#searchForm #searchButton").on('click', function(e){
 });
 
 
-$('#password_forgot').on('click', function() {  alert(8);
+$('#password_forgot').on('click', function() {
 $("#login").fadeOut(slow);
 $("#password_reset").fadeIn(slow);
 });

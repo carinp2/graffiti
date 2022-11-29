@@ -23,7 +23,7 @@ if($vType == "paid"){
 	    else if($vInStock == 0 && $vCourierType != 4){//All not in stock && not collect at Graffiti
 	    	$messageClient .= MysqlQuery::getCmsText($conn, 400, $vClientResult[5])/*Let asseblief daarop dat jou bestelling versend sal word sodra al die boek...*/.".<br><br>";
 	    }
-	    $messageClient .= MysqlQuery::getText($conn, 401)/*Groete*/."<br>";
+	    $messageClient .= "<br>".MysqlQuery::getText($conn, 401)/*Groete*/."<br>";
 	    $messageClient .= "Graffiti Books & Stationery<br>";
 	    $messageClient .= MysqlQuery::getText($conn, 402)/*Winkel 10, Zambezi Junction*/."<br>";
 	    $messageClient .= MysqlQuery::getText($conn, 403)/*522 Breed Street*/."<br>";
@@ -53,7 +53,7 @@ else if($vType == "processed"){//$vId, $vFirstname, $vSurname, $vEmail, $vPhone,
 	    else if($vCourierType != 4){//Not collect at Graffiti
 	    	$messageClient .= MysqlQuery::getCmsText($conn, 366, $vClientResult[5])/*Jou bestelling*/." GRAF/".$vOrderId."/".$vSalt." ".MysqlQuery::getCmsText($conn, 367, $vClientResult[5])/*is verwerk en sal binnekort versend word*/."<br><br>";
 	    }
-	    $messageClient .= MysqlQuery::getText($conn, 401)/*Groete*/."<br>";
+	    $messageClient .= "<br>".MysqlQuery::getText($conn, 401)/*Groete*/."<br>";
 	    $messageClient .= "Graffiti Books & Stationery<br>";
 	    $messageClient .= MysqlQuery::getText($conn, 402)/*Winkel 10, Zambezi Junction*/."<br>";
 	    $messageClient .= MysqlQuery::getText($conn, 403)/*522 Breed Street*/."<br>";
@@ -83,13 +83,13 @@ else if($vType == "posted"){
 	    if($vCourierType == 1){//SA Postal services
 	    	$messageClient .= MysqlQuery::getCmsText($conn, 424, $vClientResult[5])/*Die Poskantoor verwysing vir die aflewering is*/.":<b> ".$_POST['tracking']."</b><br><br>";
 	    	$messageClient .= MysqlQuery::getCmsText($conn, 425, $vClientResult[5])/*Indien jy nie binne 1 week 'n skrywe van die poskantoor g...*/.".<br><br>";
-	    	$messageClient .= MysqlQuery::getCmsText($conn, 426, $vClientResult[5])/*Jy kan ook jou pakkie opspoor op die Poskantoor se webwerf www.postoffice.co.za – Klik op “Track my Parcel” en kies “Domestic Parcel”. Tik ....*/.".<br><br>";
-	    	$messageClient .= MysqlQuery::getCmsText($conn, 427, $vClientResult[5])/*Jy kan ook die pakkie opspoor deur die verwysingsnommer te SMS na 35277. Die poskantoor sal dan vir jou ‘n SMS stuur om te sê waar jo....*/.".<br><br>";
+	    	$messageClient .= MysqlQuery::getCmsText($conn, 426, $vClientResult[5])/*Jy kan ook jou pakkie opspoor op die Poskantoor se webwerf www.postoffice.co.za ï¿½ Klik op ï¿½Track my Parcelï¿½ en kies ï¿½Domestic Parcelï¿½. Tik ....*/.".<br><br>";
+	    	$messageClient .= MysqlQuery::getCmsText($conn, 427, $vClientResult[5])/*Jy kan ook die pakkie opspoor deur die verwysingsnommer te SMS na 35277. Die poskantoor sal dan vir jou ï¿½n SMS stuur om te sï¿½ waar jo....*/.".<br><br>";
 	    }
 	    else if($vCourierType == 2 || $vCourierType == 6 || $vCourierType == 7 || $vCourierType == 204 || $vCourierType == 3){//Courier
 	        if($vCourierSelected == 'aramex') {
                 $messageClient .= MysqlQuery::getCmsText($conn, 419, $vClientResult[5])/*Die aflewering word gedoen deur CourierIT. Die verwysingsnommer vir die aflewering is */ . ":<b> " . $_POST['tracking'] . "</b><br><br>";
-                $messageClient .= MysqlQuery::getCmsText($conn, 420, $vClientResult[5])/*Jy kan hulle kontak by 087 985 3051 of http://www.courierit.co.za – klik op TRACK IT */.".<br><br>";
+                $messageClient .= MysqlQuery::getCmsText($conn, 420, $vClientResult[5])/*Jy kan hulle kontak by 087 985 3051 of http://www.courierit.co.za ï¿½ klik op TRACK IT */.".<br><br>";
             }
 	        else if($vCourierSelected == 'courier_guy'){
 	            $messageClient .= MysqlQuery::getCmsText($conn, 483, $vClientResult[5])/*Die aflewering word gedoen deur  */ . ":<b> " . $_POST['tracking'] . "</b><br><br>";
@@ -120,11 +120,11 @@ else if($vType == "posted"){
 //			$messageClient .= MysqlQuery::getCmsText($conn, 460, $vClientResult[5])/*Indien jy nie binne 7 dae jou pakkie...*/."<br><br>";
 //	    }
 
-	    $messageClient .= MysqlQuery::getCmsText($conn, 401, $vClientResult[5])/*Groete*/."<br>";
-	    $messageClient .= "Graffiti Books & Stationery<br>";
-	    $messageClient .= MysqlQuery::getCmsText($conn, 402, $vClientResult[5])/*Winkel 10, Zambezi Junction*/."<br>";
-	    $messageClient .= MysqlQuery::getCmsText($conn, 403, $vClientResult[5])/*522 Breed Street*/."<br>";
-	    $messageClient .= MysqlQuery::getCmsText($conn, 404, $vClientResult[5])/*Montanapark*/."<br>";
+	    $messageClient .= "<br>".MysqlQuery::getCmsText($conn, 401, $vClientResult[5])/*Groete*/."<br><br>";
+	    $messageClient .= "Graffiti Books & Stationery<br><br>";
+	    $messageClient .= MysqlQuery::getCmsText($conn, 402, $vClientResult[5])/*Winkel 10, Zambezi Junction*/."<br><br>";
+	    $messageClient .= MysqlQuery::getCmsText($conn, 403, $vClientResult[5])/*522 Breed Street*/."<br><br>";
+	    $messageClient .= MysqlQuery::getCmsText($conn, 404, $vClientResult[5])/*Montanapark*/."<br><br>";
 	    $messageClient .= MysqlQuery::getCmsText($conn, 405, $vClientResult[5])/*Tel: 012 - 548 2356*/."</p>";
 	    $messageClient  .= "<p style=\"font-family: arial; font-size: 12px; color: #202020; line-height: 20px;\"><a href=\"https://www.graffitiboeke.co.za\">www.graffitiboeke.co.za</a></p><br>";
 	    $messageClient  .= "<img src=\"".$_SESSION['SessionGrafServerUrl']."/images/logo.png\" height=\"120\" width=\"245\">";

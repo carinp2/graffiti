@@ -53,8 +53,9 @@ if($vPage == "Betaling" || $vPage == "Payment"){
                     setcookie('cookie_graf_ui', $vClientId, 0, '/', '', false, true);
 
                     if (isset($_SESSION['SessionGrafUserSessionId']) && isset($_SESSION['SessionGrafUserId'])) {
-                        $vData['client_id'] = $_SESSION['SessionGrafUserId'];
-                        $vQueryCartResult = MysqlQuery::doUpdate($conn, 'cart', $vData, "client_id = '" . $_SESSION['SessionGrafUserSessionId'] . "' AND order_id IS NULL");
+                        $vDataC['client_id'] = $_SESSION['SessionGrafUserId'];
+
+                        $vQueryCartResult = MysqlQuery::doUpdate($conn, 'cart', $vDataC, "client_id = '" . $_SESSION['SessionGrafUserSessionId'] . "' AND order_id IS NULL");
                         if ($vQueryCartResult == 1) {
                             unset($_SESSION['SessionGrafUserSessionId']);
                         }
@@ -63,22 +64,22 @@ if($vPage == "Betaling" || $vPage == "Payment"){
             }
         }
 
-        $vData['receiver_name'] = filter_var($_POST['deliver_name'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-        $vData['receiver_email'] = filter_var($_POST['cart_email'], FILTER_SANITIZE_EMAIL);
-        $vData['address1'] = filter_var($_POST['deliver_address1'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-        $vData['address2'] = filter_var($_POST['deliver_address2'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-        $vData['city'] = filter_var($_POST['deliver_city'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-        $vData['province'] = filter_var($_POST['deliver_province'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-        $vData['country'] = filter_var($_POST['deliver_country'], FILTER_SANITIZE_NUMBER_INT);
-        $vData['code'] = filter_var($_POST['deliver_code'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);//Stop leading 0 to be removed
-        $vData['receiver_phone'] = filter_var($_POST['deliver_phone'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-        $vData['courier_type'] = filter_var($_POST['courier_type'], FILTER_SANITIZE_NUMBER_INT);
-        $vData['courier_detail'] = filter_var($_POST['courier_detail'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-        $vData['courier_cost'] = filter_var($_POST['courier_cost'], FILTER_SANITIZE_NUMBER_INT);
-        $vData['price'] = filter_var($_POST['price'], FILTER_SANITIZE_NUMBER_FLOAT);
-        $vData['total_price'] = filter_var($_POST['total_price'], FILTER_SANITIZE_NUMBER_FLOAT);
-        $vData['message'] = filter_var($_POST['message'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-        $vQueryResult = MysqlQuery::doUpdate($conn, "cart", $vData, " client_id = '".$vClientId."' and order_date is NULL and order_reference is NULL and order_id is NULL and temp_salt is not NULL");
+        $vDataCart['receiver_name'] = filter_var($_POST['deliver_name'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+        $vDataCart['receiver_email'] = filter_var($_POST['cart_email'], FILTER_SANITIZE_EMAIL);
+        $vDataCart['address1'] = filter_var($_POST['deliver_address1'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+        $vDataCart['address2'] = filter_var($_POST['deliver_address2'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+        $vDataCart['city'] = filter_var($_POST['deliver_city'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+        $vDataCart['province'] = filter_var($_POST['deliver_province'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+        $vDataCart['country'] = filter_var($_POST['deliver_country'], FILTER_SANITIZE_NUMBER_INT);
+        $vDataCart['code'] = filter_var($_POST['deliver_code'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);//Stop leading 0 to be removed
+        $vDataCart['receiver_phone'] = filter_var($_POST['deliver_phone'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+        $vDataCart['courier_type'] = filter_var($_POST['courier_type'], FILTER_SANITIZE_NUMBER_INT);
+        $vDataCart['courier_detail'] = filter_var($_POST['courier_detail'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+        $vDataCart['courier_cost'] = filter_var($_POST['courier_cost'], FILTER_SANITIZE_NUMBER_INT);
+        $vDataCart['price'] = filter_var($_POST['price'], FILTER_SANITIZE_NUMBER_FLOAT);
+        $vDataCart['total_price'] = filter_var($_POST['total_price'], FILTER_SANITIZE_NUMBER_FLOAT);
+        $vDataCart['message'] = filter_var($_POST['message'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+        $vQueryResult = MysqlQuery::doUpdate($conn, "cart", $vDataCart, " client_id = '".$vClientId."' and order_date is NULL and order_reference is NULL and order_id is NULL and temp_salt is not NULL");
 
         $vData['client_id'] = $vClientId;
     }
@@ -134,6 +135,10 @@ else if($vPage == "BestelFinaal" || $vPage == "OrderFinal"){
             $vNormalPrice = $vCartResults[29][$od];
             $vPriceDisplayType = 'query';
             $price = $vCartResults[29][$od];
+            $new = $vCartResults[33][$od];
+            $top_seller = $vCartResults[34][$od];
+            $special = $vCartResults[31][$od];
+            $soon_discount = $vCartResults[35][$od];
             include 'include/BookPriceDisplay.php';
             //Final Price end
 
@@ -163,7 +168,7 @@ else if($vPage == "BestelFinaal" || $vPage == "OrderFinal"){
 
                 echo "<Script>";
                 echo "$(document).ready(function(){";
-                 	echo "alert(0);$('#GraffitiForm').submit();";
+                 	echo "$('#GraffitiForm').submit();";
                 echo "});";
                 echo "</Script>";
 		}
@@ -285,7 +290,7 @@ else if($vPage == "BestelFinaal" || $vPage == "OrderFinal"){
 //                error_log($vFormString);
 
                 echo "<Script>";
-                echo "$(document).ready(function(){alert(0);";
+                echo "$(document).ready(function(){";
                  	//echo "$('#MyGateForm').submit();";
                 echo "});";
                 echo "</Script>";

@@ -1559,8 +1559,12 @@ class CmsParts {
 			$vString .= "<tbody>";
 			if(isset($vResults) && count($vResults[0]) > 0){
 				for($x = 0; $x < count($vResults[0]); $x++){
-					$vClientResults = MysqlQuery::getOrderClient($pConn, $vResults[1][$x]);//$vId, $vFirstname, $vSurname, $vEmail, $vPhone
-
+                    if(is_numeric($vResults[1][$x])) {
+                        $vClientResults = MysqlQuery::getOrderClient($pConn, $vResults[1][$x]);//$vId, $vFirstname, $vSurname, $vEmail, $vPhone
+                    }
+                    else {
+                        $vClientResults = array();
+                    }
 					$vCourierResults = MysqlQuery::getCourierSelection($pConn, 9);//$vId, $vCourier_type
                     if(isset($vResults[23][$x]) && !empty($vResults[23][$x]) && $vResults[23][$x] != '') {
                         $vCourierCountry = MysqlQuery::getCmsCourierCountry($pConn, $vResults[23][$x]);
@@ -1588,18 +1592,29 @@ class CmsParts {
 					$vString .= "<tr id=\"tr_".$vResults[0][$x]."\">";
 						$vString .= "<td>".$vResults[0][$x]."</td>";//id
 						$vString .= "<td>";
-							$vString .= $vClientResults[1]." ".$vClientResults[2]."<a href=\"index.php?page=clients&type=edit&id=".$vResults[1][$x]."\"><i class=\"fa fa-user fa-lg green space-left\" aria-hidden=\"true\" ".General::echoTooltip("right", "Besigting kli&#235;nt info")."></i></a> (".$vResults[1][$x].")<br>";
-							$vString .= "<a href=\"mailto:".$vClientResults[3]."\" class=\"email\">".$vClientResults[3]."</a><br>";
-							$vString .= $vClientResults[4]."<br>";
-								(!empty($vResults[27][$x]) ? $vString .= $vResults[27][$x]."<br>" : $vString .= "");
-								(!empty($vResults[4][$x]) ? $vString .= $vResults[4][$x] : $vString .= "");
-								(!empty($vResults[5][$x]) ? $vString .= ", ".$vResults[5][$x] : $vString .= "");
-								(!empty($vResults[6][$x]) ? $vString .= ", ".$vResults[6][$x] : $vString .= "");
-								(!empty($vResults[7][$x]) ? $vString .= ", ".$vResults[7][$x] : $vString .= "");
-								(!empty($vResults[8][$x]) ? $vString .= ", ".$vResults[8][$x] : $vString .= "");
-								(!empty($vResults[9][$x]) ? $vString .= ", ".$vResults[9][$x] : $vString .= "");
-								(!empty($vResults[28][$x]) ? $vString .= "<br>Ontvanger kontak no: ".$vResults[28][$x] : $vString .= "");
-								(!empty($vResults[23][$x]) ? $vString .= "<br>(".$vResults[23][$x].")" : $vString .= "");
+                        if(isset($vClientResults[0]) && !empty($vClientResults[0])) {
+                            $vString .= $vClientResults[1] . " " . $vClientResults[2] . "
+                                <a href='index.php?page=clients&type=edit&id=" . $vResults[1][$x] . "'>
+                                    <i class='fa fa-user fa-lg green space-left' aria-hidden='true' " . General::echoTooltip("right", "Besigting kli&#235;nt info") . "></i>
+                                </a> (" . $vResults[1][$x] . ")<br>";
+                            $vString .= "<a href='mailto:" . $vClientResults[3] . "' class='email'>" . $vClientResults[3] . "</a><br>";//Email
+                            $vString .= $vClientResults[4] . "<br>";
+                        }
+                        else {
+                            $vString .= "<span class='red'>Klient nie ingelog</span><br>";
+                            $vString .= "<a href='mailto:" . $vResults[32][$x] . "' class='email'>" . $vResults[32][$x] . '</a><br>';//Email
+                        }
+                            $vCountryString = (!empty($vResults[8][$x]) && $vResults[8][$x] > 0 && $vResults[10][$x] <> 4 ? MysqlQuery::getCountry($pConn, $vResults[8][$x]) : '');
+
+                            (!empty($vResults[4][$x]) ? $vString .= $vResults[4][$x] : $vString .= "");//Address1
+                            (!empty($vResults[5][$x]) ? $vString .= ", ".$vResults[5][$x] : $vString .= "");//Address2
+                            (!empty($vResults[6][$x]) ? $vString .= ", ".$vResults[6][$x] : $vString .= "");//City
+                            (!empty($vResults[7][$x]) ? $vString .= ", ".$vResults[7][$x] : $vString .= "");//Province
+                            (!empty($vCountryString[1]) ? $vString .= ", ".$vCountryString[1] : '');//Country
+                            (!empty($vResults[9][$x]) ? $vString .= ", ".$vResults[9][$x] : $vString .= "");//Postal code
+                            (!empty($vResults[27][$x]) ? $vString .= "<br>Ontvanger: ". $vResults[27][$x] : $vString .= "");
+                            (!empty($vResults[28][$x]) ? $vString .= "<br>Ontvanger no: ".$vResults[28][$x] : $vString .= "");
+                            (!empty($vResults[23][$x]) ? $vString .= "<br>(".$vResults[23][$x].")" : $vString .= "");//Courier detail
 						$vString .= "</td>";//client & delivery address
 						$vString .= "<td>".$vResults[0][$x]."/".$vResults[3][$x]."</td>";//order ref
 						$vString .= "<td><span class=\"hidden-input\">".$vDefaultClass."</span>";
@@ -1867,7 +1882,7 @@ class CmsParts {
 				$vString .= "</tr>";
 			$vString .= "</tfoot>";
 			$vString .= "<tbody>";
-			if(count($vResults[0]) > 0){
+			if(isset($vResults[0]) && count($vResults[0]) > 0){
 				for($x = 0; $x < count($vResults[0]); $x++){
 					($vResults[18][$x] == 1 ? $vNewsletter = "Ja" : $vNewsletter = "Nee");
 					($vResults[19][$x] == "af" ? $vLanguage = "Afr" : $vLanguage = "Eng");
