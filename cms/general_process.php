@@ -25,14 +25,13 @@ if($vType == "get_sub_cat"){
 	//type: edit, book_id: vBookId, price: vPrice, special: vSpecial, special_price: vSpecial_price, bnew: vNew, topseller: vTopseller, topseller_rank: vTopseller_rank, out_print: vOut_print, in_stock: vInstock, publisher: vPublisher
     $vQueryResult = 0;
     $vCategory =  $vRequest->getParameter('category');
-    $vId = $_POST['book_id'];
-		$vResult = MysqlQuery::getAllSubCategoriesPerCategory($conn, $vCategory, 1);
-		$vString = "<option value=\"\">Kies 'n waarde</option>";
-		for($x = 0; $x < count($vResult[0]); $x++){
-		 	$vString .= "<option value=\"".$vResult[0][$x]."\">".$vResult[1][$x]."</option>";
-		}
-		echo $vString;
-		 exit;
+    $vResult = $vQuery->getAllSubCategoriesPerCategory($conn, $vCategory, 1);
+    $vString = "<option value=\"\">Kies 'n waarde</option>";
+    for($x = 0; $x < count($vResult[0]); $x++){
+        $vString .= "<option value=\"".$vResult[0][$x]."\">".$vResult[1][$x]."</option>";
+    }
+    echo $vString;
+    exit;
 }
 
 include "../include/connect/CloseConnect.php";

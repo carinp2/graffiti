@@ -565,7 +565,7 @@ class MysqlQuery {
 	public static function getAllSubCategoriesPerCategory($pConn, $pCategoryId, $pActive){
 		(!isset($_SESSION['SessionGrafLanguage']) || $_SESSION['SessionGrafLanguage'] == '' || $_SESSION['SessionGrafLanguage'] == 'af' ? $vSessionLanguage = 'af' : $vSessionLanguage = 'en');
 		$vSqlString = "select id, category_id, sub_category_".$vSessionLanguage." AS sub_category, sort_order_".$vSessionLanguage." AS sort_order from sub_categories where category_id = ? and activex = ? order by sort_order_".$vSessionLanguage;
-		//error_log($vSqlString." - ".$vSessionLanguage." - ".$pCategoryId);
+//		error_log($vSqlString." - ".$vSessionLanguage." - ".$pCategoryId, 3, '../errors.log');
 		$stmt = $pConn->prepare($vSqlString);
 		$stmt->bind_param("ii", $pCategoryId, $pActive);
         $id=0;
@@ -580,7 +580,13 @@ class MysqlQuery {
 			}
 		}
 		$stmt->close();
-		return array($vSubCategoryId, $vSubCategory);
+
+        if(isset($id)){
+            return array($vSubCategoryId, $vSubCategory);
+        }
+        else {
+            return array();
+        }
 	}
 
 	public static function getCategorySubCategoryFromSubCat($pConn, $pSubCategoryId){
@@ -783,7 +789,13 @@ class MysqlQuery {
 			}
 		}
 		$stmt->close();
-		return array($vId, $vIsbn, $vCategory, $vSub_category, $vTitle, $vSummary, $vBlob_path, $vSpecial_price, $vPrice, $vDate_publish, $vDate_loaded, $vNew, $vSpecial, $vTop_seller, $vTop_seller_rank, $vOut_of_print, $vIn_stock, $vPublisher, $vLanguage, $vCategoryString, $vSubCategoryString, $vAuthor, $vIllustrator, $vTranslator, $vEdit, $vNormalDate, $vDefault_discount, $vDimensions, $vWeight, $vFormat, $vNoPages, $vNewRank, $vSoonDiscount, $vSoonRank, $vSoon, $vSpecialRank, $vTv, $vTvDate, $vCostPrice, $vRr, $vRrDate, $vSection, $vE_isbn, $vE_url, $vE_price);
+
+        if(isset($vId)){
+            return array($vId, $vIsbn, $vCategory, $vSub_category, $vTitle, $vSummary, $vBlob_path, $vSpecial_price, $vPrice, $vDate_publish, $vDate_loaded, $vNew, $vSpecial, $vTop_seller, $vTop_seller_rank, $vOut_of_print, $vIn_stock, $vPublisher, $vLanguage, $vCategoryString, $vSubCategoryString, $vAuthor, $vIllustrator, $vTranslator, $vEdit, $vNormalDate, $vDefault_discount, $vDimensions, $vWeight, $vFormat, $vNoPages, $vNewRank, $vSoonDiscount, $vSoonRank, $vSoon, $vSpecialRank, $vTv, $vTvDate, $vCostPrice, $vRr, $vRrDate, $vSection, $vE_isbn, $vE_url, $vE_price);
+        }
+        else {
+            return array();
+        }
 	}
 
 	public static function getBooksNonprepared($pConn, $pIdResults, $pOrder, $pLimit){

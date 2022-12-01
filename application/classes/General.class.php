@@ -350,7 +350,7 @@ $text = preg_replace($regex, $highlight, $text);
 	 * @return string
 	 */
 	public static function returnSelect($pConn, $pValue, $pName, $pId, $pValueArray, $pDisplayArray, $pOnChange, $pDefault, $pRequired) {
-		$vSelect = "<select id='".$pId."' name='".$pName."' size='1' onChange='" . $pOnChange . "' ".$pRequired."  class=\"small\">";
+		$vSelect = "<select id='".$pId."' name='".$pName."' size='1' onChange='" . $pOnChange . "' ".$pRequired."  class='small'>";
 		if($pDefault == 1) {
 			$vSelect .= "<option value=''>Kies 'n waarde</option>";
 		}
