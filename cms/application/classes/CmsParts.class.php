@@ -51,13 +51,13 @@ class CmsParts {
 //			}
 //			$vString .= ">Nuusbriewe</a>";
 //		}
-		if(in_array("boek-koek", $_SESSION['SessionGrafCmsUserSections'])){
-			$vString .= "\n     <a href=\"index.php?page=events&type=future\"";
-			if($pPage == "events"){
-				$vString .= " class=\"active\"";
-			}
-			$vString .= ">Funksies</a>";
-		}
+//		if(in_array("boek-koek", $_SESSION['SessionGrafCmsUserSections'])){
+//			$vString .= "\n     <a href=\"index.php?page=events&type=future\"";
+//			if($pPage == "events"){
+//				$vString .= " class=\"active\"";
+//			}
+//			$vString .= ">Funksies</a>";
+//		}
 		if(in_array("uitgewers", $_SESSION['SessionGrafCmsUserSections'])){
 			$vString .= "\n     <a href=\"index.php?page=publishers&type=list&id=0\"";
 			if($pPage == "publishers"){
@@ -1585,7 +1585,7 @@ class CmsParts {
                             ($vOrderDetail['in_stock'][$b] > 0 ? $vClass = "green" : $vClass = "red");
                             ($vOrderDetail['in_stock'][$b] == 0 ? $vDefaultClass = "red" : $vDefaultClass = $vDefaultClass);
                             ($vOrderDetail['in_stock'][$b] == 0 ? $vDefaultText = "Al die boeke is nie in voorraad<br>-Klik vir meer inligting-" : $vDefaultText = $vDefaultText);
-                            $vBooksString .= "<div class='" . $vClass . "'>" . $vOrderDetail['number_books'][$b] . " x " . $vOrderDetail['title'][$b] . " @ " . $vOrderDetail['price'][$b] . " elk</div>";
+                            $vBooksString .= "<div class='" . $vClass . "'>" . $vOrderDetail['number_books'][$b] . " x " . $vOrderDetail['title'][$b] . " @ " . $vOrderDetail['price'][$b] . "</div>";
                         }
                     }
 

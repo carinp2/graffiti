@@ -29,7 +29,7 @@ $vBegin = $vCmsParts->returnBeginHtml();
 echo $vBegin;
 
 if(isset($_SESSION['SessionGrafCmsUserId'])){
-	$vMenu = $vCmsParts->returnTopMenu($conn, $vPage, $vSection, $vCategory);
+	$vMenu = $vCmsParts->returnTopMenu($conn, $vPage);
 	echo $vMenu;
 }
 
@@ -39,32 +39,33 @@ echo $vContent;
 $vSubMenu = $vCmsParts->returnSubMenu($conn, $vPage, $vType);
 echo $vSubMenu;
 
-$vString = "";
+$vStringA = "";
+
 	//############################################################################################  Stock update
 	if($vType == "stock_update"){
-			$vString .= "<h1>Laai voorraadlys op</h1>";
-			$vString .= "<h2>Voorraadlys opgelaai - Resultate:</h2>";
+			$vStringA .= "<h1>Laai voorraadlys op</h1>";
+			$vStringA .= "<h2>Voorraadlys opgelaai - Resultate:</h2>";
 
-			$vString .= "<table id=\"stockTable\" class=\"cell-border dataTable hover\" cellspacing=\"0\">";
-				$vString .= "<thead>";
-					$vString .= "<tr class=\"red\">";
-						$vString .= "<th class=\"dt-head-center\">Ry no</th>";
-						$vString .= "<th class=\"dt-head-center\">ISBN</th>";
-						$vString .= "<th class=\"dt-head-center\">Publikasie datum</th>";
-						$vString .= "<th class=\"dt-head-center\">Voorraad</th>";
-						$vString .= "<th class=\"dt-head-center\">Uitdruk</th>";
-					$vString .= "</tr>";
-			$vString .= "</thead>";
-				$vString .= "<tfoot>";
-					$vString .= "<tr class=\"red\">";
-						$vString .= "<th class=\"dt-head-center\">Ry no</th>";
-						$vString .= "<th class=\"dt-head-center\">ISBN</th>";
-						$vString .= "<th class=\"dt-head-center\">Publikasie datum</th>";
-						$vString .= "<th class=\"dt-head-center\">Voorraad</th>";
-						$vString .= "<th class=\"dt-head-center\">Uitdruk</th>";
-					$vString .= "</tr>";
-			$vString .= "</tfoot>";
-			$vString .= "<tbody>";
+			$vStringA .= "<table id=\"stockTable\" class=\"cell-border dataTable hover\" cellspacing=\"0\">";
+				$vStringA .= "<thead>";
+					$vStringA .= "<tr class=\"red\">";
+						$vStringA .= "<th class=\"dt-head-center\">Ry no</th>";
+						$vStringA .= "<th class=\"dt-head-center\">ISBN</th>";
+						$vStringA .= "<th class=\"dt-head-center\">Publikasie datum</th>";
+						$vStringA .= "<th class=\"dt-head-center\">Voorraad</th>";
+						$vStringA .= "<th class=\"dt-head-center\">Uitdruk</th>";
+					$vStringA .= "</tr>";
+			$vStringA .= "</thead>";
+				$vStringA .= "<tfoot>";
+					$vStringA .= "<tr class=\"red\">";
+						$vStringA .= "<th class=\"dt-head-center\">Ry no</th>";
+						$vStringA .= "<th class=\"dt-head-center\">ISBN</th>";
+						$vStringA .= "<th class=\"dt-head-center\">Publikasie datum</th>";
+						$vStringA .= "<th class=\"dt-head-center\">Voorraad</th>";
+						$vStringA .= "<th class=\"dt-head-center\">Uitdruk</th>";
+					$vStringA .= "</tr>";
+			$vStringA .= "</tfoot>";
+			$vStringA .= "<tbody>";
 			$vFileType = substr($_FILES['stock_file']['name'], strpos($_FILES['stock_file']['name'], "."));
 		    if($vFileType == ".xlsx"){
 		    	include "application/classes/simplexlsx.class.php";
@@ -85,22 +86,22 @@ $vString = "";
 						$vData["out_of_print"] = 0;
 						//$vData['edit_by'] = $_SESSION['SessionGrafCmsUserId'];
 						$vQueryResult = $vQuery->doUpdate($conn, "books", $vData, "isbn = '".trim($r[0])."'");
-							$vString .="<tr>";
-								$vString .= "<td class=\"dt-body-center bg-success\">".$rowNo."</td>";
-								$vString .= "<td class=\"dt-body-center bg-success\">".trim($r[0])."</td>";
-								$vString .= "<td class=\"dt-body-center bg-success\">".$vData["date_publish"]."</td>";
-								$vString .= "<td class=\"dt-body-center bg-success\">".$vData["in_stock"]."</td>";
-								$vString .= "<td class=\"dt-body-center bg-success\">Nee</td>";
-							$vString .="</tr>";
+							$vStringA .="<tr>";
+								$vStringA .= "<td class=\"dt-body-center bg-success\">".$rowNo."</td>";
+								$vStringA .= "<td class=\"dt-body-center bg-success\">".trim($r[0])."</td>";
+								$vStringA .= "<td class=\"dt-body-center bg-success\">".$vData["date_publish"]."</td>";
+								$vStringA .= "<td class=\"dt-body-center bg-success\">".$vData["in_stock"]."</td>";
+								$vStringA .= "<td class=\"dt-body-center bg-success\">Nee</td>";
+							$vStringA .="</tr>";
 					}
 					else if($vIsbnExists == 0){
-							$vString .="<tr>";
-								$vString .= "<td class=\"bg-error dt-body-center\">".$rowNo."</td>";
-								$vString .= "<td class=\"bg-error dt-body-center\">".trim($r[0])."</td>";
-								$vString .= "<td class=\"bg-error dt-body-center\">ISBN nie gevind nie</td>";
-								$vString .= "<td class=\"bg-error dt-body-center\"></td>";
-								$vString .= "<td class=\"bg-error dt-body-center\"></td>";
-							$vString .="</tr>";
+							$vStringA .="<tr>";
+								$vStringA .= "<td class=\"bg-error dt-body-center\">".$rowNo."</td>";
+								$vStringA .= "<td class=\"bg-error dt-body-center\">".trim($r[0])."</td>";
+								$vStringA .= "<td class=\"bg-error dt-body-center\">ISBN nie gevind nie</td>";
+								$vStringA .= "<td class=\"bg-error dt-body-center\"></td>";
+								$vStringA .= "<td class=\"bg-error dt-body-center\"></td>";
+							$vStringA .="</tr>";
 					}
 					$rowNo++;
 				}
@@ -126,49 +127,49 @@ $vString = "";
 						$vData["out_of_print"] = 0;
 						//$vData['edit_by'] = $_SESSION['SessionGrafCmsUserId'];
 						$vQueryResult = $vQuery->doUpdate($conn, "books", $vData, "isbn = '".trim($vIsbn)."'");
-								$vString .="<tr>";
-									$vString .= "<td class=\"dt-body-center bg-success\">".$x."</td>";
-									$vString .= "<td class=\"dt-body-center bg-success\">".trim($vIsbn)."</td>";
-									$vString .= "<td class=\"dt-body-center bg-success\">".$vData["date_publish"]."</td>";
-									$vString .= "<td class=\"dt-body-center bg-success\">".$vData["in_stock"]."</td>";
-									$vString .= "<td class=\"dt-body-center bg-success\">Nee</td>";
-								$vString .="</tr>";
+								$vStringA .="<tr>";
+									$vStringA .= "<td class=\"dt-body-center bg-success\">".$x."</td>";
+									$vStringA .= "<td class=\"dt-body-center bg-success\">".trim($vIsbn)."</td>";
+									$vStringA .= "<td class=\"dt-body-center bg-success\">".$vData["date_publish"]."</td>";
+									$vStringA .= "<td class=\"dt-body-center bg-success\">".$vData["in_stock"]."</td>";
+									$vStringA .= "<td class=\"dt-body-center bg-success\">Nee</td>";
+								$vStringA .="</tr>";
 					}
 					else if($vIsbnExists == 0){
-							$vString .="<tr>";
-								$vString .= "<td class=\"bg-error dt-body-center\">".$x."</td>";
-								$vString .= "<td class=\"bg-error dt-body-center\">".trim($vIsbn)."</td>";
-								$vString .= "<td class=\"bg-error dt-body-center\">ISBN nie gevind nie</td>";
-								$vString .= "<td class=\"bg-error dt-body-center\"></td>";
-								$vString .= "<td class=\"bg-error dt-body-center\"></td>";
-							$vString .="</tr>";
+							$vStringA .="<tr>";
+								$vStringA .= "<td class=\"bg-error dt-body-center\">".$x."</td>";
+								$vStringA .= "<td class=\"bg-error dt-body-center\">".trim($vIsbn)."</td>";
+								$vStringA .= "<td class=\"bg-error dt-body-center\">ISBN nie gevind nie</td>";
+								$vStringA .= "<td class=\"bg-error dt-body-center\"></td>";
+								$vStringA .= "<td class=\"bg-error dt-body-center\"></td>";
+							$vStringA .="</tr>";
 					}
 					$x++;
 				}
 		    }
-			$vString .= "</tbody>";
+			$vStringA .= "</tbody>";
 		}
 		//############################################################################################ Out of print
 		else if($vType == "out_of_print"){
-			$vString .= "<h1>Laai 'UIT DRUK' lys op</h1>";
-			$vString .= "<h2>'Uit druk uit' opgelaai - Resultate:</h2>";
+			$vStringA .= "<h1>Laai 'UIT DRUK' lys op</h1>";
+			$vStringA .= "<h2>'Uit druk uit' opgelaai - Resultate:</h2>";
 
-			$vString .= "<table id=\"outOfPrintTable\" class=\"cell-border dataTable hover\" cellspacing=\"0\">";
-				$vString .= "<thead>";
-					$vString .= "<tr class=\"red\">";
-						$vString .= "<th class=\"dt-head-center\">Ry no</th>";
-						$vString .= "<th class=\"dt-head-center\">ISBN</th>";
-						$vString .= "<th class=\"dt-head-center\">Uitdruk</th>";
-					$vString .= "</tr>";
-			$vString .= "</thead>";
-				$vString .= "<tfoot>";
-					$vString .= "<tr class=\"red\">";
-						$vString .= "<th class=\"dt-head-center\">Ry no</th>";
-						$vString .= "<th class=\"dt-head-center\">ISBN</th>";
-						$vString .= "<th class=\"dt-head-center\">Uitdruk</th>";
-					$vString .= "</tr>";
-			$vString .= "</tfoot>";
-			$vString .= "<tbody>";
+			$vStringA .= "<table id=\"outOfPrintTable\" class=\"cell-border dataTable hover\" cellspacing=\"0\">";
+				$vStringA .= "<thead>";
+					$vStringA .= "<tr class=\"red\">";
+						$vStringA .= "<th class=\"dt-head-center\">Ry no</th>";
+						$vStringA .= "<th class=\"dt-head-center\">ISBN</th>";
+						$vStringA .= "<th class=\"dt-head-center\">Uitdruk</th>";
+					$vStringA .= "</tr>";
+			$vStringA .= "</thead>";
+				$vStringA .= "<tfoot>";
+					$vStringA .= "<tr class=\"red\">";
+						$vStringA .= "<th class=\"dt-head-center\">Ry no</th>";
+						$vStringA .= "<th class=\"dt-head-center\">ISBN</th>";
+						$vStringA .= "<th class=\"dt-head-center\">Uitdruk</th>";
+					$vStringA .= "</tr>";
+			$vStringA .= "</tfoot>";
+			$vStringA .= "<tbody>";
 			$vFileType = substr($_FILES['out_of_print_file']['name'], strpos($_FILES['out_of_print_file']['name'], "."));
 		    if($vFileType == ".xlsx"){
 		    	include "application/classes/simplexlsx.class.php";
@@ -181,18 +182,18 @@ $vString = "";
 						$vData["out_of_print"] =1;
 						//$vData['edit_by'] = $_SESSION['SessionGrafCmsUserId'];
 						$vQueryResult = $vQuery->doUpdate($conn, "books", $vData, "isbn = '".trim($r[0])."'");
-							$vString .="<tr>";
-								$vString .= "<td class=\"dt-body-center bg-success\">".$rowNo."</td>";
-								$vString .= "<td class=\"dt-body-center bg-success\">".trim($r[0])."</td>";
-								$vString .= "<td class=\"dt-body-center bg-success\">Ja</td>";
-							$vString .="</tr>";
+							$vStringA .="<tr>";
+								$vStringA .= "<td class=\"dt-body-center bg-success\">".$rowNo."</td>";
+								$vStringA .= "<td class=\"dt-body-center bg-success\">".trim($r[0])."</td>";
+								$vStringA .= "<td class=\"dt-body-center bg-success\">Ja</td>";
+							$vStringA .="</tr>";
 					}
 					else if($vIsbnExists == 0){
-							$vString .="<tr>";
-								$vString .= "<td class=\"bg-error dt-body-center\">".$rowNo."</td>";
-								$vString .= "<td class=\"bg-error dt-body-center\">".$r[0]."</td>";
-								$vString .= "<td class=\"bg-error dt-body-center\">ISBN nie gevind</td>";
-							$vString .="</tr>";
+							$vStringA .="<tr>";
+								$vStringA .= "<td class=\"bg-error dt-body-center\">".$rowNo."</td>";
+								$vStringA .= "<td class=\"bg-error dt-body-center\">".$r[0]."</td>";
+								$vStringA .= "<td class=\"bg-error dt-body-center\">ISBN nie gevind</td>";
+							$vStringA .="</tr>";
 					}
 					$rowNo++;
 				}
@@ -209,47 +210,47 @@ $vString = "";
 						$vData["out_of_print"] = 1;
 						//$vData['edit_by'] = $_SESSION['SessionGrafCmsUserId'];
 						$vQueryResult = $vQuery->doUpdate($conn, "books", $vData, "isbn = '".trim($vIsbn)."'");
-								$vString .="<tr>";
-									$vString .= "<td class=\"dt-body-center bg-success\">".$x."</td>";
-									$vString .= "<td class=\"dt-body-center bg-success\">".trim($vIsbn)."</td>";
-									$vString .= "<td class=\"dt-body-center bg-success\">Ja</td>";
-								$vString .="</tr>";
+								$vStringA .="<tr>";
+									$vStringA .= "<td class=\"dt-body-center bg-success\">".$x."</td>";
+									$vStringA .= "<td class=\"dt-body-center bg-success\">".trim($vIsbn)."</td>";
+									$vStringA .= "<td class=\"dt-body-center bg-success\">Ja</td>";
+								$vStringA .="</tr>";
 					}
 					else if($vIsbnExists == 0){
-							$vString .="<tr>";
-								$vString .= "<td class=\"bg-error dt-body-center\">".$x."</td>";
-								$vString .= "<td class=\"bg-error dt-body-center\">".trim($vIsbn)."</td>";
-								$vString .= "<td class=\"bg-error dt-body-center\">ISBN nie gevind nie</td>";
-							$vString .="</tr>";
+							$vStringA .="<tr>";
+								$vStringA .= "<td class=\"bg-error dt-body-center\">".$x."</td>";
+								$vStringA .= "<td class=\"bg-error dt-body-center\">".trim($vIsbn)."</td>";
+								$vStringA .= "<td class=\"bg-error dt-body-center\">ISBN nie gevind nie</td>";
+							$vStringA .="</tr>";
 					}
 					$x++;
 				}
 		    }
-			$vString .= "</tbody>";
+			$vStringA .= "</tbody>";
 		}
 		//############################################################################################ Book list upload
 		else if($vType == "load_book_list"){
-			$vString .= "<h1>Laai boekelys</h1>";
-			$vString .= "<h2>Boekelys opgelaai - Resultate:</h2>";
+			$vStringA .= "<h1>Laai boekelys</h1>";
+			$vStringA .= "<h2>Boekelys opgelaai - Resultate:</h2>";
 
-			$vString .= "<table id=\"loadBookListTable\" class=\"cell-border dataTable hover\" cellspacing=\"0\">";
-				$vString .= "<thead>";
-					$vString .= "<tr class=\"red\">";
-						$vString .= "<th class=\"dt-head-center\">Ry no</th>";
-						$vString .= "<th class=\"dt-head-center\">ISBN</th>";
-						$vString .= "<th class=\"dt-head-center\">Aksie geneem</th>";
-						$vString .= "<th class=\"dt-head-center\">Voorraad</th>";
-					$vString .= "</tr>";
-			$vString .= "</thead>";
-				$vString .= "<tfoot>";
-					$vString .= "<tr class=\"red\">";
-						$vString .= "<th class=\"dt-head-center\">Ry no</th>";
-						$vString .= "<th class=\"dt-head-center\">ISBN</th>";
-						$vString .= "<th class=\"dt-head-center\">Aksie geneem</th>";
-						$vString .= "<th class=\"dt-head-center\">Voorraad</th>";
-					$vString .= "</tr>";
-			$vString .= "</tfoot>";
-			$vString .= "<tbody>";
+			$vStringA .= "<table id=\"loadBookListTable\" class=\"cell-border dataTable hover\" cellspacing=\"0\">";
+				$vStringA .= "<thead>";
+					$vStringA .= "<tr class=\"red\">";
+						$vStringA .= "<th class=\"dt-head-center\">Ry no</th>";
+						$vStringA .= "<th class=\"dt-head-center\">ISBN</th>";
+						$vStringA .= "<th class=\"dt-head-center\">Aksie geneem</th>";
+						$vStringA .= "<th class=\"dt-head-center\">Voorraad</th>";
+					$vStringA .= "</tr>";
+			$vStringA .= "</thead>";
+				$vStringA .= "<tfoot>";
+					$vStringA .= "<tr class=\"red\">";
+						$vStringA .= "<th class=\"dt-head-center\">Ry no</th>";
+						$vStringA .= "<th class=\"dt-head-center\">ISBN</th>";
+						$vStringA .= "<th class=\"dt-head-center\">Aksie geneem</th>";
+						$vStringA .= "<th class=\"dt-head-center\">Voorraad</th>";
+					$vStringA .= "</tr>";
+			$vStringA .= "</tfoot>";
+			$vStringA .= "<tbody>";
 			$vFileType = substr($_FILES['load_book_list_file']['name'], strpos($_FILES['load_book_list_file']['name'], "."));
 		    if($vFileType == ".xlsx"){
 		    	include "application/classes/simplexlsx.class.php";
@@ -259,12 +260,12 @@ $vString = "";
 					if ($k == 0) continue; // skip first row
 					$vIsbnExists = $vQuery->checkExists($conn, "books", "id", "isbn = '".trim($r[0])."'");
 					if($vIsbnExists >= 1){
-							$vString .="<tr>";
-								$vString .= "<td class=\"dt-body-center bg-error\">".$rowNo."</td>";
-								$vString .= "<td class=\"dt-body-center bg-error\">".trim($r[0])."</td>";
-								$vString .= "<td class=\"bg-error\">Boek reeds in databasis</td>";
-								$vString .= "<td class=\"dt-body-center bg-error\">0</td>";
-							$vString .="</tr>";
+							$vStringA .="<tr>";
+								$vStringA .= "<td class=\"dt-body-center bg-error\">".$rowNo."</td>";
+								$vStringA .= "<td class=\"dt-body-center bg-error\">".trim($r[0])."</td>";
+								$vStringA .= "<td class=\"bg-error\">Boek reeds in databasis</td>";
+								$vStringA .= "<td class=\"dt-body-center bg-error\">0</td>";
+							$vStringA .="</tr>";
 					}
 					else if($vIsbnExists == 0){
 						$vData['isbn'] = trim($r[0]);
@@ -305,12 +306,12 @@ $vString = "";
 							$vQuery->doUpdate($conn, 'books', $vBookData, 'id = '.$vQueryResult);
 						}
 
-						$vString .="<tr>";
-							$vString .= "<td class=\"bg-success dt-body-center\">".$rowNo."</td>";
-							$vString .= "<td class=\"bg-success dt-body-center\">".trim($r[0])."</td>";
-							$vString .= "<td class=\"bg-success\">Sukses! Boek opgelaai</td>";
-							$vString .= "<td class=\"dt-body-center bg-success\">0</td>";
-						$vString .="</tr>";
+						$vStringA .="<tr>";
+							$vStringA .= "<td class=\"bg-success dt-body-center\">".$rowNo."</td>";
+							$vStringA .= "<td class=\"bg-success dt-body-center\">".trim($r[0])."</td>";
+							$vStringA .= "<td class=\"bg-success\">Sukses! Boek opgelaai</td>";
+							$vStringA .= "<td class=\"dt-body-center bg-success\">0</td>";
+						$vStringA .="</tr>";
 					}
 					$rowNo++;
 				}
@@ -324,12 +325,12 @@ $vString = "";
 					$vIsbn = isset($excel->sheets[0]['cells'][$x][1]) ? $excel->sheets[0]['cells'][$x][1] : '';
 					$vIsbnExists = $vQuery->checkExists($conn, "books", "id", "isbn = '".trim($vIsbn)."'");
 					if($vIsbnExists >= 1){
-								$vString .="<tr>";
-									$vString .= "<td class=\"dt-body-center bg-error\">".$x."</td>";
-									$vString .= "<td class=\"dt-body-center bg-error\">".trim($vIsbn)."</td>";
-									$vString .= "<td class=\"bg-error\">Boek reeds in databasis</td>";
-									$vString .= "<td class=\"dt-body-center bg-error\">0</td>";
-								$vString .="</tr>";
+								$vStringA .="<tr>";
+									$vStringA .= "<td class=\"dt-body-center bg-error\">".$x."</td>";
+									$vStringA .= "<td class=\"dt-body-center bg-error\">".trim($vIsbn)."</td>";
+									$vStringA .= "<td class=\"bg-error\">Boek reeds in databasis</td>";
+									$vStringA .= "<td class=\"dt-body-center bg-error\">0</td>";
+								$vStringA .="</tr>";
 					}
 					else if($vIsbnExists == 0){
 						$vData['isbn'] = isset($excel->sheets[0]['cells'][$x][1]) ? trim($excel->sheets[0]['cells'][$x][1]) : '';
@@ -370,40 +371,40 @@ $vString = "";
 							$vQuery->doUpdate($conn, 'books', $vBookData, 'id = '.$vQueryResult);
 						}
 
-						$vString .="<tr>";
-							$vString .= "<td class=\"bg-success dt-body-center\">".$x."</td>";
-							$vString .= "<td class=\"bg-success dt-body-center\">".trim($vIsbn)."</td>";
-							$vString .= "<td class=\"bg-success\">Sukses! Boek opgelaai</td>";
-							$vString .= "<td class=\"dt-body-center bg-success\">0</td>";
-						$vString .="</tr>";
+						$vStringA .="<tr>";
+							$vStringA .= "<td class=\"bg-success dt-body-center\">".$x."</td>";
+							$vStringA .= "<td class=\"bg-success dt-body-center\">".trim($vIsbn)."</td>";
+							$vStringA .= "<td class=\"bg-success\">Sukses! Boek opgelaai</td>";
+							$vStringA .= "<td class=\"dt-body-center bg-success\">0</td>";
+						$vStringA .="</tr>";
 					}
 					$x++;
 				}
 		    }
-			$vString .= "</tbody>";
+			$vStringA .= "</tbody>";
 		}
 	//############################################################################################  In print per Publisher start
 	else if($vType == "in_print_publisher"){
 			$GLOBALS['date_min_one_month'] = date("Y-m-d", strtotime('-1 month'));
-			$vString .= "<h1>Laai 'In Druk' per Uitgewer</h1>";
-			$vString .= "<h2>'In Druk' lys opgelaai - Resultate:</h2>";
+			$vStringA .= "<h1>Laai 'In Druk' per Uitgewer</h1>";
+			$vStringA .= "<h2>'In Druk' lys opgelaai - Resultate:</h2>";
 
-			$vString .= "<table id=\"stockTable\" class=\"cell-border dataTable hover\" cellspacing=\"0\">";
-				$vString .= "<thead>";
-					$vString .= "<tr class=\"red\">";
-						$vString .= "<th class=\"dt-head-center\">Ry No</th>";
-						$vString .= "<th class=\"dt-head-center\">ISBN</th>";
-						$vString .= "<th class=\"dt-head-center\">Uitdruk</th>";
-					$vString .= "</tr>";
-			$vString .= "</thead>";
-				$vString .= "<tfoot>";
-					$vString .= "<tr class=\"red\">";
-						$vString .= "<th class=\"dt-head-center\">Ry no</th>";
-						$vString .= "<th class=\"dt-head-center\">ISBN</th>";
-						$vString .= "<th class=\"dt-head-center\">Uitdruk</th>";
-					$vString .= "</tr>";
-			$vString .= "</tfoot>";
-			$vString .= "<tbody>";
+			$vStringA .= "<table id=\"stockTable\" class=\"cell-border dataTable hover\" cellspacing=\"0\">";
+				$vStringA .= "<thead>";
+					$vStringA .= "<tr class=\"red\">";
+						$vStringA .= "<th class=\"dt-head-center\">Ry No</th>";
+						$vStringA .= "<th class=\"dt-head-center\">ISBN</th>";
+						$vStringA .= "<th class=\"dt-head-center\">Uitdruk</th>";
+					$vStringA .= "</tr>";
+			$vStringA .= "</thead>";
+				$vStringA .= "<tfoot>";
+					$vStringA .= "<tr class=\"red\">";
+						$vStringA .= "<th class=\"dt-head-center\">Ry no</th>";
+						$vStringA .= "<th class=\"dt-head-center\">ISBN</th>";
+						$vStringA .= "<th class=\"dt-head-center\">Uitdruk</th>";
+					$vStringA .= "</tr>";
+			$vStringA .= "</tfoot>";
+			$vStringA .= "<tbody>";
 			$vPublisherId = RequestUtils::getParameter('publisher-id');
 			$vFileType = substr($_FILES['in_print_file']['name'], strpos($_FILES['in_print_file']['name'], "."));
 
@@ -440,18 +441,18 @@ $vString = "";
 						else {
 							$vQueryResult = $vQuery->doUpdate($conn, "books", $vDataIP, "isbn = '".trim($r[0])."' and publisher = ".$vPublisherId);
 						}
-							$vString .="<tr>";
-								$vString .= "<td class=\"dt-body-center bg-success\">".$rowNo."</td>";
-								$vString .= "<td class=\"dt-body-center bg-success\">".trim($r[0])."</td>";
-								$vString .= "<td class=\"dt-body-center bg-success\">Nee</td>";
-							$vString .="</tr>";
+							$vStringA .="<tr>";
+								$vStringA .= "<td class=\"dt-body-center bg-success\">".$rowNo."</td>";
+								$vStringA .= "<td class=\"dt-body-center bg-success\">".trim($r[0])."</td>";
+								$vStringA .= "<td class=\"dt-body-center bg-success\">Nee</td>";
+							$vStringA .="</tr>";
 					}
 					else if($vIsbnExists == 0){
-							$vString .="<tr>";
-								$vString .= "<td class=\"bg-error dt-body-center\">".$rowNo."</td>";
-								$vString .= "<td class=\"bg-error dt-body-center\">".trim($r[0])."</td>";
-								$vString .= "<td class=\"bg-error dt-body-center\">ISBN nie gevind nie</td>";
-							$vString .="</tr>";
+							$vStringA .="<tr>";
+								$vStringA .= "<td class=\"bg-error dt-body-center\">".$rowNo."</td>";
+								$vStringA .= "<td class=\"bg-error dt-body-center\">".trim($r[0])."</td>";
+								$vStringA .= "<td class=\"bg-error dt-body-center\">ISBN nie gevind nie</td>";
+							$vStringA .="</tr>";
 					}
 					$rowNo++;
 				}
@@ -477,47 +478,47 @@ $vString = "";
 						else {
 							$vQueryResult = $vQuery->doUpdate($conn, "books", $vDataIP, "isbn = '".trim($vIsbn)."' and publisher = ".$vPublisherId);
 						}
-								$vString .="<tr>";
-									$vString .= "<td class=\"dt-body-center bg-success\">".$x."</td>";
-									$vString .= "<td class=\"dt-body-center bg-success\">".trim($vIsbn)."</td>";
-									$vString .= "<td class=\"dt-body-center bg-success\">Nee</td>";
-								$vString .="</tr>";
+								$vStringA .="<tr>";
+									$vStringA .= "<td class=\"dt-body-center bg-success\">".$x."</td>";
+									$vStringA .= "<td class=\"dt-body-center bg-success\">".trim($vIsbn)."</td>";
+									$vStringA .= "<td class=\"dt-body-center bg-success\">Nee</td>";
+								$vStringA .="</tr>";
 					}
 					else if($vIsbnExists == 0){
-							$vString .="<tr>";
-								$vString .= "<td class=\"bg-error dt-body-center\">".$x."</td>";
-								$vString .= "<td class=\"bg-error dt-body-center\">".trim($vIsbn)."</td>";
-								$vString .= "<td class=\"bg-error dt-body-center\">ISBN nie gevind nie</td>";
-							$vString .="</tr>";
+							$vStringA .="<tr>";
+								$vStringA .= "<td class=\"bg-error dt-body-center\">".$x."</td>";
+								$vStringA .= "<td class=\"bg-error dt-body-center\">".trim($vIsbn)."</td>";
+								$vStringA .= "<td class=\"bg-error dt-body-center\">ISBN nie gevind nie</td>";
+							$vStringA .="</tr>";
 					}
 					$x++;
 				}
 		    }
-			$vString .= "</tbody>";
+			$vStringA .= "</tbody>";
 		}
 	//############################################################################################  In print per Publisher start
 	else if($vType == "load_price_list"){
-			$vString .= "<h1>Laai Pryslys</h1>";
-			$vString .= "<h2>Pryslys - Resultate:</h2>";
+			$vStringA .= "<h1>Laai Pryslys</h1>";
+			$vStringA .= "<h2>Pryslys - Resultate:</h2>";
 
-			$vString .= "<table id=\"stockTable\" class=\"cell-border dataTable hover\" cellspacing=\"0\">";
-				$vString .= "<thead>";
-					$vString .= "<tr class=\"red\">";
-						$vString .= "<th class=\"dt-head-center\">Ry No</th>";
-						$vString .= "<th class=\"dt-head-center\">ISBN</th>";
-						$vString .= "<th class=\"dt-head-center\">Ou prys</th>";
-						$vString .= "<th class=\"dt-head-center\">Nuwe prys</th>";
-					$vString .= "</tr>";
-			$vString .= "</thead>";
-				$vString .= "<tfoot>";
-					$vString .= "<tr class=\"red\">";
-						$vString .= "<th class=\"dt-head-center\">Ry no</th>";
-						$vString .= "<th class=\"dt-head-center\">ISBN</th>";
-						$vString .= "<th class=\"dt-head-center\">Ou prys</th>";
-						$vString .= "<th class=\"dt-head-center\">Nuwe prys</th>";
-					$vString .= "</tr>";
-			$vString .= "</tfoot>";
-			$vString .= "<tbody>";
+			$vStringA .= "<table id=\"stockTable\" class=\"cell-border dataTable hover\" cellspacing=\"0\">";
+				$vStringA .= "<thead>";
+					$vStringA .= "<tr class=\"red\">";
+						$vStringA .= "<th class=\"dt-head-center\">Ry No</th>";
+						$vStringA .= "<th class=\"dt-head-center\">ISBN</th>";
+						$vStringA .= "<th class=\"dt-head-center\">Ou prys</th>";
+						$vStringA .= "<th class=\"dt-head-center\">Nuwe prys</th>";
+					$vStringA .= "</tr>";
+			$vStringA .= "</thead>";
+				$vStringA .= "<tfoot>";
+					$vStringA .= "<tr class=\"red\">";
+						$vStringA .= "<th class=\"dt-head-center\">Ry no</th>";
+						$vStringA .= "<th class=\"dt-head-center\">ISBN</th>";
+						$vStringA .= "<th class=\"dt-head-center\">Ou prys</th>";
+						$vStringA .= "<th class=\"dt-head-center\">Nuwe prys</th>";
+					$vStringA .= "</tr>";
+			$vStringA .= "</tfoot>";
+			$vStringA .= "<tbody>";
 			$vFileType = substr($_FILES['load_price_list_file']['name'], strpos($_FILES['load_price_list_file']['name'], "."));
 
 		    if($vFileType == ".xlsx"){
@@ -544,19 +545,19 @@ $vString = "";
 //						}
 						//$vData['edit_by'] = $_SESSION['SessionGrafCmsUserId'];
 						$vQueryResult = $vQuery->doUpdate($conn, "books", $vData, "isbn = '".trim($r[0])."'");
-							$vString .="<tr>";
-								$vString .= "<td class=\"dt-body-center bg-success\">".$rowNo."</td>";
-								$vString .= "<td class=\"dt-body-center bg-success\">".trim($r[0])."</td>";
-								$vString .= "<td class=\"dt-body-center bg-success\">".$vShowStyleStart.$vOldPrice.$vShowStyleEnd."</td>";
-								$vString .= "<td class=\"dt-body-center bg-success\">".$vShowStyleStart.$r[1].$vShowStyleEnd."</td>";
-							$vString .="</tr>";
+							$vStringA .="<tr>";
+								$vStringA .= "<td class=\"dt-body-center bg-success\">".$rowNo."</td>";
+								$vStringA .= "<td class=\"dt-body-center bg-success\">".trim($r[0])."</td>";
+								$vStringA .= "<td class=\"dt-body-center bg-success\">".$vShowStyleStart.$vOldPrice.$vShowStyleEnd."</td>";
+								$vStringA .= "<td class=\"dt-body-center bg-success\">".$vShowStyleStart.$r[1].$vShowStyleEnd."</td>";
+							$vStringA .="</tr>";
 					}
 					else if($vIsbnExists == 0){
-							$vString .="<tr>";
-								$vString .= "<td class=\"bg-error dt-body-center\">".$rowNo."</td>";
-								$vString .= "<td class=\"bg-error dt-body-center\">".trim($r[0])."</td>";
-								$vString .= "<td class=\"bg-error dt-body-center\" colspan=\"2\">ISBN nie gevind</td>";
-							$vString .="</tr>";
+							$vStringA .="<tr>";
+								$vStringA .= "<td class=\"bg-error dt-body-center\">".$rowNo."</td>";
+								$vStringA .= "<td class=\"bg-error dt-body-center\">".trim($r[0])."</td>";
+								$vStringA .= "<td class=\"bg-error dt-body-center\" colspan=\"2\">ISBN nie gevind</td>";
+							$vStringA .="</tr>";
 					}
 					$rowNo++;
 				}
@@ -587,32 +588,32 @@ $vString = "";
 							($vThePrice != $vOldPrice ? $vShowStyleEnd = "</b></u>" : $vShowStyleEnd = "");
 //						}
 						$vQueryResult = $vQuery->doUpdate($conn, "books", $vData, "isbn = '".trim($vIsbn)."'");
-								$vString .="<tr>";
-									$vString .= "<td class=\"dt-body-center bg-success\">".$x."</td>";
-									$vString .= "<td class=\"dt-body-center bg-success\">".trim($vIsbn)."</td>";
-									$vString .= "<td class=\"dt-body-center bg-success\">".$vShowStyleStart.$vOldPrice.$vShowStyleEnd."</td>";
-									$vString .= "<td class=\"dt-body-center bg-success\">".$vShowStyleStart.$vThePrice.$vShowStyleEnd."</td>";
-								$vString .="</tr>";
+								$vStringA .="<tr>";
+									$vStringA .= "<td class=\"dt-body-center bg-success\">".$x."</td>";
+									$vStringA .= "<td class=\"dt-body-center bg-success\">".trim($vIsbn)."</td>";
+									$vStringA .= "<td class=\"dt-body-center bg-success\">".$vShowStyleStart.$vOldPrice.$vShowStyleEnd."</td>";
+									$vStringA .= "<td class=\"dt-body-center bg-success\">".$vShowStyleStart.$vThePrice.$vShowStyleEnd."</td>";
+								$vStringA .="</tr>";
 					}
 					else if($vIsbnExists == 0){
-							$vString .="<tr>";
-								$vString .= "<td class=\"bg-error dt-body-center\">".$x."</td>";
-								$vString .= "<td class=\"bg-error dt-body-center\">".trim($vIsbn)."</td>";
-								$vString .= "<td class=\"bg-error dt-body-center\" colspan=\"2\">ISBN nie gevind nie</td>";
-							$vString .="</tr>";
+							$vStringA .="<tr>";
+								$vStringA .= "<td class=\"bg-error dt-body-center\">".$x."</td>";
+								$vStringA .= "<td class=\"bg-error dt-body-center\">".trim($vIsbn)."</td>";
+								$vStringA .= "<td class=\"bg-error dt-body-center\" colspan=\"2\">ISBN nie gevind nie</td>";
+							$vStringA .="</tr>";
 					}
 					$x++;
 				}
 		    }
-			$vString .= "</tbody>";
+			$vStringA .= "</tbody>";
 		}
 
 		//############################################################################################ Book images
 		else if($vType == "load_images"){
-			$vString .= "<h1>LAAI BOEKE VOORBLAAIE</h1>";
+			$vStringA .= "<h1>LAAI BOEKE VOORBLAAIE</h1>";
 
-			$vString .= "<table id=\"imageTable\" class=\"cell-border dataTable hover\" cellspacing=\"0\">";
-			$vString .= "<tbody><tr><td>";
+			$vStringA .= "<table id=\"imageTable\" class=\"cell-border dataTable hover\" cellspacing=\"0\">";
+			$vStringA .= "<tbody><tr><td>";
 
 			$vNum = 0;
 			if(!empty($_FILES['images']['name'])){
@@ -633,40 +634,40 @@ $vString = "";
 			    }
 
 				if ($vQueryResultImages >= 1){
-					$vString .= "<h4 class=\"success-message\"><i class=\"fa fa-check fa-lg space-right green\" aria-hidden=\"true\"></i>".$vNum." prente is suksesvol gelaai.</h4></td></tr>";
+					$vStringA .= "<h4 class=\"success-message\"><i class=\"fa fa-check fa-lg space-right green\" aria-hidden=\"true\"></i>".$vNum." prente is suksesvol gelaai.</h4></td></tr>";
 				}
 				else if($vQueryResultImages == 0){
-					$vString .= "<h4 class=\"error-message\"><i class=\"fa fa-times fa-lg space-right red\" aria-hidden=\"true\"></i>Geen prente is gelaai nie.</h4></td></tr>";
+					$vStringA .= "<h4 class=\"error-message\"><i class=\"fa fa-times fa-lg space-right red\" aria-hidden=\"true\"></i>Geen prente is gelaai nie.</h4></td></tr>";
 				}
 			}
 			else{
-				$vString .= "<h4 class=\"error-message\"><i class=\"fa fa-times fa-lg space-right red\" aria-hidden=\"true\"></i>Daar is geen prente in die le&#234;r nie.</h4></td></tr>";
+				$vStringA .= "<h4 class=\"error-message\"><i class=\"fa fa-times fa-lg space-right red\" aria-hidden=\"true\"></i>Daar is geen prente in die le&#234;r nie.</h4></td></tr>";
 			}
 		}
 	//############################################################################################  Stock update - Music
 	if($vType == "stock_update_music"){
-			$vString .= "<h1>Laai voorraadlys op - Musiek</h1>";
-			$vString .= "<h2>Voorraadlys opgelaai - Resultate:</h2>";
+			$vStringA .= "<h1>Laai voorraadlys op - Musiek</h1>";
+			$vStringA .= "<h2>Voorraadlys opgelaai - Resultate:</h2>";
 
-			$vString .= "<table id=\"stockTable\" class=\"cell-border dataTable hover\" cellspacing=\"0\">";
-				$vString .= "<thead>";
-					$vString .= "<tr class=\"red\">";
-						$vString .= "<th class=\"dt-head-center\">Ry no</th>";
-						$vString .= "<th class=\"dt-head-center\">ISBN</th>";
-						$vString .= "<th class=\"dt-head-center\">Publikasie datum</th>";
-						$vString .= "<th class=\"dt-head-center\">Voorraad</th>";
-						$vString .= "<th class=\"dt-head-center\">Uitdruk</th>";
-					$vString .= "</tr>";
-			$vString .= "</thead>";
-				$vString .= "<tfoot>";
-					$vString .= "<tr class=\"red\">";
-						$vString .= "<th class=\"dt-head-center\">Ry no</th>";
-						$vString .= "<th class=\"dt-head-center\">ISBN</th>";
-						$vString .= "<th class=\"dt-head-center\">Voorraad</th>";
-						$vString .= "<th class=\"dt-head-center\">Uitdruk</th>";
-					$vString .= "</tr>";
-			$vString .= "</tfoot>";
-			$vString .= "<tbody>";
+			$vStringA .= "<table id=\"stockTable\" class=\"cell-border dataTable hover\" cellspacing=\"0\">";
+				$vStringA .= "<thead>";
+					$vStringA .= "<tr class=\"red\">";
+						$vStringA .= "<th class=\"dt-head-center\">Ry no</th>";
+						$vStringA .= "<th class=\"dt-head-center\">ISBN</th>";
+						$vStringA .= "<th class=\"dt-head-center\">Publikasie datum</th>";
+						$vStringA .= "<th class=\"dt-head-center\">Voorraad</th>";
+						$vStringA .= "<th class=\"dt-head-center\">Uitdruk</th>";
+					$vStringA .= "</tr>";
+			$vStringA .= "</thead>";
+				$vStringA .= "<tfoot>";
+					$vStringA .= "<tr class=\"red\">";
+						$vStringA .= "<th class=\"dt-head-center\">Ry no</th>";
+						$vStringA .= "<th class=\"dt-head-center\">ISBN</th>";
+						$vStringA .= "<th class=\"dt-head-center\">Voorraad</th>";
+						$vStringA .= "<th class=\"dt-head-center\">Uitdruk</th>";
+					$vStringA .= "</tr>";
+			$vStringA .= "</tfoot>";
+			$vStringA .= "<tbody>";
 			$vFileType = substr($_FILES['stock_file']['name'], strpos($_FILES['stock_file']['name'], "."));
 		    if($vFileType == ".xlsx"){
 		    	include "application/classes/simplexlsx.class.php";
@@ -684,20 +685,20 @@ $vString = "";
 						$vData["in_stock"] = $r[3];
 						$vData["out_of_print"] = 0;
 						$vQueryResult = $vQuery->doUpdate($conn, "books", $vData, "isbn = '".trim($r[0])."'");
-							$vString .="<tr>";
-								$vString .= "<td class=\"dt-body-center bg-success\">".$rowNo."</td>";
-								$vString .= "<td class=\"dt-body-center bg-success\">".trim($r[0])."</td>";
-								$vString .= "<td class=\"dt-body-center bg-success\">".$vData["in_stock"]."</td>";
-								$vString .= "<td class=\"dt-body-center bg-success\">Nee</td>";
-							$vString .="</tr>";
+							$vStringA .="<tr>";
+								$vStringA .= "<td class=\"dt-body-center bg-success\">".$rowNo."</td>";
+								$vStringA .= "<td class=\"dt-body-center bg-success\">".trim($r[0])."</td>";
+								$vStringA .= "<td class=\"dt-body-center bg-success\">".$vData["in_stock"]."</td>";
+								$vStringA .= "<td class=\"dt-body-center bg-success\">Nee</td>";
+							$vStringA .="</tr>";
 					}
 					else if($vIsbnExists == 0){
-							$vString .="<tr>";
-								$vString .= "<td class=\"bg-error dt-body-center\">".$rowNo."</td>";
-								$vString .= "<td class=\"bg-error dt-body-center\">".trim($r[0])."</td>";
-								$vString .= "<td class=\"bg-error dt-body-center\">ISBN nie gevind nie</td>";
-								$vString .= "<td class=\"bg-error dt-body-center\"></td>";
-							$vString .="</tr>";
+							$vStringA .="<tr>";
+								$vStringA .= "<td class=\"bg-error dt-body-center\">".$rowNo."</td>";
+								$vStringA .= "<td class=\"bg-error dt-body-center\">".trim($r[0])."</td>";
+								$vStringA .= "<td class=\"bg-error dt-body-center\">ISBN nie gevind nie</td>";
+								$vStringA .= "<td class=\"bg-error dt-body-center\"></td>";
+							$vStringA .="</tr>";
 					}
 					$rowNo++;
 				}
@@ -719,30 +720,30 @@ $vString = "";
 						$vData["in_stock"] = $excel->sheets[0]['cells'][$x][4];
 						$vData["out_of_print"] = 0;
 						$vQueryResult = $vQuery->doUpdate($conn, "books", $vData, "isbn = '".trim($vIsbn)."'");
-								$vString .="<tr>";
-									$vString .= "<td class=\"dt-body-center bg-success\">".$x."</td>";
-									$vString .= "<td class=\"dt-body-center bg-success\">".trim($vIsbn)."</td>";
-									$vString .= "<td class=\"dt-body-center bg-success\">".$vData["in_stock"]."</td>";
-									$vString .= "<td class=\"dt-body-center bg-success\">Nee</td>";
-								$vString .="</tr>";
+								$vStringA .="<tr>";
+									$vStringA .= "<td class=\"dt-body-center bg-success\">".$x."</td>";
+									$vStringA .= "<td class=\"dt-body-center bg-success\">".trim($vIsbn)."</td>";
+									$vStringA .= "<td class=\"dt-body-center bg-success\">".$vData["in_stock"]."</td>";
+									$vStringA .= "<td class=\"dt-body-center bg-success\">Nee</td>";
+								$vStringA .="</tr>";
 					}
 					else if($vIsbnExists == 0){
-							$vString .="<tr>";
-								$vString .= "<td class=\"bg-error dt-body-center\">".$x."</td>";
-								$vString .= "<td class=\"bg-error dt-body-center\">".trim($vIsbn)."</td>";
-								$vString .= "<td class=\"bg-error dt-body-center\">ISBN nie gevind nie</td>";
-								$vString .= "<td class=\"bg-error dt-body-center\"></td>";
-							$vString .="</tr>";
+							$vStringA .="<tr>";
+								$vStringA .= "<td class=\"bg-error dt-body-center\">".$x."</td>";
+								$vStringA .= "<td class=\"bg-error dt-body-center\">".trim($vIsbn)."</td>";
+								$vStringA .= "<td class=\"bg-error dt-body-center\">ISBN nie gevind nie</td>";
+								$vStringA .= "<td class=\"bg-error dt-body-center\"></td>";
+							$vStringA .="</tr>";
 					}
 					$x++;
 				}
 		    }
-			$vString .= "</tbody>";
+			$vStringA .= "</tbody>";
 		}
 
-	$vString .= "</table>";
+	$vStringA .= "</table>";
 
-	echo $vString;
+	echo $vStringA;
 
 $vEnd = $vCmsParts->returnEndHtml($conn);
 echo $vEnd;

@@ -143,7 +143,6 @@ else if($vPage == "BestelFinaal" || $vPage == "OrderFinal"){
             //Final Price end
 
             $vDataDetail['price'] = $vCartResults[3][$od] * $vFinalPrice;
-
 			$vQueryResult = MysqlQuery::doInsert($conn, "orders_detail", $vDataDetail);
 
 			$vCartUData['order_id'] = $vOrderId;
@@ -156,6 +155,7 @@ else if($vPage == "BestelFinaal" || $vPage == "OrderFinal"){
 	}
 
 	if($vQueryResult > 0){
+        //Direct payment
 		if($vData['payment_type'] == 16){
 			$vSuccessUrl = $_SESSION['SessionGrafFullServerUrl'].$_SESSION['SessionGrafLanguage']."/".$vData['payment_type']."/".MysqlQuery::getText($conn, 298)/*BestellingSukses*/;
 			$vFormString = "";
@@ -172,7 +172,8 @@ else if($vPage == "BestelFinaal" || $vPage == "OrderFinal"){
                 echo "});";
                 echo "</Script>";
 		}
-		else if($vData['payment_type'] == 57){//Zapper
+        //Zapper
+		else if($vData['payment_type'] == 57){
 			$vFormString = "";
 			$vFormString .= "<script src=\"//zapper-ecommerce.s3-eu-west-1.amazonaws.com/releases/zapper.ecommerce-2.0.0.min.js\"></script>";
 			$vFormString .= "<form class=\"form-horizontal\" name=\"zapperForm\" id=\"zapperForm\">";
@@ -247,18 +248,22 @@ else if($vPage == "BestelFinaal" || $vPage == "OrderFinal"){
 
 			echo $vFormString;
 		}
+        //15 = CCard | 17 = Instant EFT
 		else {
-			$vSuccessUrl = $_SESSION['SessionGrafFullServerUrl'].$_SESSION['SessionGrafLanguage']."/".$vData['payment_type']."/".MysqlQuery::getText($conn, 298)/*BestellingSukses*/;
-			$vErrorUrl = $_SESSION['SessionGrafFullServerUrl'].$_SESSION['SessionGrafLanguage']."/".$vData['payment_type']."/".MysqlQuery::getText($conn, 299)/*BestellingFout*/;
-			//($vData['payment_type'] == 15 ? $vAppId = "DCD90073-9B52-4C3E-B113-957B84559661" : $vAppId = "3A353F1C-4852-44AE-BBFD-3FA6FE326AE8");
-            //Change on 28/01/2021
+			//$vSuccessUrl = $_SESSION['SessionGrafFullServerUrl'].$_SESSION['SessionGrafLanguage']."/".$vData['payment_type']."/".MysqlQuery::getText($conn, 298)/*BestellingSukses*/;
+			//$vErrorUrl = $_SESSION['SessionGrafFullServerUrl'].$_SESSION['SessionGrafLanguage']."/".$vData['payment_type']."/".MysqlQuery::getText($conn, 299)/*BestellingFout*/;
+			
+            $vSuccessUrl = $_SESSION['SessionGrafFullServerUrl'] . $_SESSION['SessionGrafLanguage'] . '/' . $vData['payment_type'] . '/' . MysqlQuery::getText($conn, 298)/*BestellingSukses*/.'/'.$vOrderId;
+            $vErrorUrl = $_SESSION['SessionGrafFullServerUrl'] . $_SESSION['SessionGrafLanguage'] . '/' . $vData['payment_type'] . '/' . MysqlQuery::getText($conn, 299)/*BestellingFout*/.'/'.$vOrderId;			
+			
 			($vData['payment_type'] == 15 ? $vAppId = "DCD90073-9B52-4C3E-B113-957B84559661" : $vAppId = "3A353F1C-4852-44AE-BBFD-3FA6FE326AE8");
-
-
+            //Change on 28/01/2021
+			//($vData['payment_type'] == 15 ? $vAppId = "DCD90073-9B52-4C3E-B113-957B84559661" : $vAppId = "3A353F1C-4852-44AE-BBFD-3FA6FE326AE8");
+			 
 			$vFormString = "";
-			$vFormString .= "\n\n<form name=\"MyGateForm\" id=\"MyGateForm\" action=\"https://apiv2.adumoonline.com/product/payment/v1/initialisevirtual\" method=\"post\">";
+			$vFormString .= "\n\n<form name=\"MyGateForm\" id=\"MyGateForm\" action=\"https://virtual.mygateglobal.com/PaymentPage.cfm\" method=\"post\">";
                     $vFormString .= "\n<input type=\"hidden\" name=\"Mode\" value=\"1\">";
-                    $vFormString .= "\n<input type=\"hidden\" name=\"MerchantID\" value=\"420EE23E-93E6-4775-88A0-633FB58C2C42\">";
+                    $vFormString .= "\n<input type=\"hidden\" name=\"MerchantID\" value=\"420ee23e-93e6-4775-88a0-633fb58c2c42\">";
                     $vFormString .= "\n<input type=\"hidden\" name=\"ApplicationID\" value=\"".$vAppId."\">";//Non secure
                     $vFormString .= "\n<input type=\"hidden\" name=\"MerchantReference\" value=\"".$vOrderId."\">";
                     $vFormString .= "\n<input type=\"hidden\" name=\"Amount\" value=\"".$vData['total_price'].".00\">";
@@ -271,7 +276,24 @@ else if($vPage == "BestelFinaal" || $vPage == "OrderFinal"){
 	                $vFormString .= "\n<input type=\"hidden\" name=\"ItemDescr1\" value=\"".MysqlQuery::getText($conn, 157)."\">";//Boeke|Books
                     //$vId, $vBookId, $vClientId, $vNumber, $vAddDate, $vTempSalt, $vOrderDate, $vOrderReference, $vOrderId, $vTitle, $vPrice, $vBlobPath, $vInStock
                     for($od = 0; $od < count($vCartResults[0]); $od++){
-                    	$vTotalBookPrice = $vCartResults[3][$od] * $vCartResults[10][$od];
+						//Final Price start
+						$vNewTopDiscountPrice = round($vCartResults[29][$od] - ($vCartResults[29][$od] * $vCartResults[30][$od]));
+						$vSpecialDiscountPrice = (!empty($vCartResults[31][$od]) && $vCartResults[31][$od] > 0 ? $vCartResults[32][$od] : $vCartResults[29][$od]);
+						$vClientDiscountPrice = round($vCartResults[29][$od] - ($vCartResults[29][$od] * $_SESSION['SessionGrafSpecialDiscount']));
+						$vSoonDiscountPrice = round($vCartResults[29][$od] - ($vCartResults[29][$od] * $vCartResults[30][$od]));
+						$vNormalPrice = $vCartResults[29][$od];
+						$vPriceDisplayType = 'query';
+						$price = $vCartResults[29][$od];
+						$new = $vCartResults[33][$od];
+						$top_seller = $vCartResults[34][$od];
+						$special = $vCartResults[31][$od];
+						$soon_discount = $vCartResults[35][$od];
+						include 'include/BookPriceDisplay.php';
+						//Final Price end
+												  
+
+						$vTotalBookPrice = $vCartResults[3][$od] * $vFinalPrice;
+								//$vTotalBookPrice = $vCartResults[3][$od] * $vCartResults[10][$od];
 	                    $vFormString .= "\n<input type=\"hidden\" name=\"Qty".$od."\" value=\"".$vCartResults[3][$od]."\">";//number
 	                    $vFormString .= "\n<input type=\"hidden\" name=\"ItemRef".$od."\" value=\"".$vCartResults[1][$od]."\">";//id
 	                    $vFormString .= "\n<input type=\"hidden\" name=\"ItemAmount".$od."\" value=\"".$vTotalBookPrice.".00\">";//price
@@ -291,7 +313,7 @@ else if($vPage == "BestelFinaal" || $vPage == "OrderFinal"){
 
                 echo "<Script>";
                 echo "$(document).ready(function(){";
-                 	//echo "$('#MyGateForm').submit();";
+                 	echo "$('#MyGateForm').submit();";
                 echo "});";
                 echo "</Script>";
 		}
@@ -305,7 +327,7 @@ else if($vPage == "BestelFinaal" || $vPage == "OrderFinal"){
 else if($vPage == "BestellingSukses" || $vPage == "OrderSuccess"){
 	if($vPaymentType != 16){//Set paid = 1 for all except direct payments
 		$vDataO['paid'] = 1;
-		MysqlQuery::doUpdate($conn, "orders", $vDataO, "id = ".$vData['reference']." AND client_id = ".$vData['client_id']." AND temp_salt = '".$vData['temp_salt']."'");
+		MysqlQuery::doUpdate($conn, "orders", $vDataO, "id = ".$vData['reference']." AND client_id = '".$vData['client_id']."' AND temp_salt = '".$vData['temp_salt']."'");
 	}
 	$vCartData['order_date'] = $_SESSION['now_date'];
 	$vCartData['order_reference'] = "GRAF/".$vData['reference']."/".$vData['temp_salt'];
@@ -313,26 +335,25 @@ else if($vPage == "BestellingSukses" || $vPage == "OrderSuccess"){
 	MysqlQuery::doUpdate($conn, "cart", $vCartData, "order_id = ".$vData['reference']);
 }
 else if($vPage == "BestellingFout" || $vPage == "OrderError"){
-    $threedsecure = $_POST ["_3DSTATUS"];
-    $acquirerDateTime = $_POST ["_ACQUIRERDATETIME"];
-    $price = $_POST ["_AMOUNT"];
-    $cardCountry = $_POST ["_CARDCOUNTRY"];
-    $countryCode = $_POST ["_COUNTRYCODE"];
-    $currencyCode = $_POST ["_CURRENCYCODE"];
-    $merchantReference = $_POST ["_MERCHANTREFERENCE"];
-    $transactionIndex = $_POST ["_TRANSACTIONINDEX"];
-    $payMethod = $_POST ["_PAYMETHOD"];
+    $threedsecure = $_POST["_3DSTATUS"];
+    $acquirerDateTime = $_POST["_ACQUIRERDATETIME"];
+    $price = $_POST["_AMOUNT"];
+    $cardCountry = $_POST["_CARDCOUNTRY"];
+    $countryCode = $_POST["_COUNTRYCODE"];
+    $currencyCode = $_POST["_CURRENCYCODE"];
+    $merchantReference = $_POST["_MERCHANTREFERENCE"];
+    $transactionIndex = $_POST["_TRANSACTIONINDEX"];
+    $payMethod = $_POST["_PAYMETHOD"];
 
-    $errorCode = $_POST ['_ERROR_CODE'];
-    $errorMessage = $_POST ['_ERROR_MESSAGE'];
-    $errorDetail = $_POST ['_ERROR_DETAIL'];
-    $errorSource = $_POST ['_ERROR_SOURCE'];
+    $errorCode = $_POST['_ERROR_CODE'];
+    $errorMessage = $_POST['_ERROR_MESSAGE'];
+    $errorDetail = $_POST['_ERROR_DETAIL'];
+    $errorSource = $_POST['_ERROR_SOURCE'];
 
-    $bankErrorCode = $_POST ["_BANK_ERROR_CODE"];
-    $bankErrorMessage = $_POST ["_BANK_ERROR_MESSAGE"];
+    $bankErrorCode = $_POST["_BANK_ERROR_CODE"];
+    $bankErrorMessage = $_POST["_BANK_ERROR_MESSAGE"];
 
-    $vErrorString = "";
-    $vErrorString .= "Failed Transaction<br />";
+    $vErrorString = "Failed Transaction<br />";
     $vErrorString .= "Result: " . $result."<br />";
     $vErrorString .= "Error Code: " . $errorCode."<br />";
     $vErrorString .= "Error Message: " . $errorMessage."<br />";

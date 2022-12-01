@@ -234,7 +234,21 @@ class Pages {
 //									                    else {
 //									                    	$vString .= "<a class=\"btn btn-primary\" href=\"#login\" role=\"button\" data-toggle=\"modal\" title=\"".MysqlQuery::getText($pConn, 266)/*Teken aan om te koop*/."\">".MysqlQuery::getText($pConn, 266)/*Teken aan om te koop*/."<i class=\"fa fa-shopping-basket top-margin\"></i></a>";
 //									                    }
-
+                                                        //Published
+                                                        if (strtotime($_SESSION['now_date']) >= strtotime($vResults[25][$x])) {
+                                                            //in_stock = 0 && out_of_print = No
+                                                            if ($vResults[16][$x] == 0 && $vResults[15][$x] == 0) {
+                                                                $vString .= "<div class=\"text-small-normal red\">" . MysqlQuery::getText($pConn, 293)/*Nie in voorraad - sal versending vertraag*/ . '</div>';
+                                                            } else if ($vResults[15][$x] == 1) {//out_print = Yes
+                                                                $vString .= "<div class=\"text-small-normal red\">" . MysqlQuery::getText($pConn, 28)/*Uit druk uit. Geen bstellings kan aanvaar word nie.*/ . '</div>';
+                                                            } else {
+                                                                $vString .= "<div class=\"text-small-normal green\">" . MysqlQuery::getText($pConn, 431)/*In voorraad - versending binne 48 uur*/ . '</div>';
+                                                            }
+                                                            //Not published yet
+                                                        } else {
+                                                            $vString .= "<div class=\"text-small-normal red\">" . MysqlQuery::getText($pConn, 25)/*Publikasiedatum*/ . ":<br>" .$vResults[25][$x]. "</div>";
+                                                            $vString .= "<div class=\"text-small-normal red\">" . MysqlQuery::getText($pConn, 505)/*Versending sodra boek gepubliseer is*/ . "</div>";
+                                                        }
 														$vString .="<div id=\"wishlist_double".$vResults[0][$x]."\" class=\"home-error\" style=\"display:none;\">".MysqlQuery::getText($pConn, 313)/*Die boek is reeds in jou Wenslys gelaai*/."</div>";
 														$vString .="<div id=\"wishlist_success".$vResults[0][$x]."\" class=\"home-success\" style=\"display:none;\">".MysqlQuery::getText($pConn, 314)/*Die boek is in jou Wenslys gelaai*/."</div>";
 
@@ -377,7 +391,11 @@ class Pages {
                                 include "include/BookPriceDisplay.php";
 
 								$vTotalBookPrice = $vResults[3][$x] * $vFinalPrice;
-								($vResults[3][$x] <= 2 ? $vNoDisplay = "no-display" : $vNoDisplay = "");
+
+                                ($vResults[12][$x] == 0 && $vResults[13][$x] <= $_SESSION['now_date'] ? $vInStockMesssage = "<span class=\"text-small-normal red\">&nbsp;&nbsp;(" . MysqlQuery::getText($pConn, 293)/*Nie in voorraad - sal versending vertraag*/ . ')</span>' : $vInStockMesssage = '');
+                                ($vResults[13][$x] > $_SESSION['now_date'] ? $vPublicationMesssage = "<span class=\"text-small-normal red\">&nbsp;&nbsp;(" . MysqlQuery::getText($pConn, 412)/*Let asseblief op die publikasie datum. Versending sodra boek gepubliseer is.*/ . ' - ' . $vResults[13][$x] . ')</span>' : $vPublicationMesssage = '');
+
+                                ($vResults[3][$x] <= 2 ? $vNoDisplay = "no-display" : $vNoDisplay = "");
 								//Books
 								$vString .= "<div class=\"row row-grid line\">";
 									$vString .= "<div class=\"form-group\">";
@@ -389,7 +407,7 @@ class Pages {
 											$vString .= "<img src=\"images/no_image.png\" class=\"img-responsive cart-thumb-no-image thumb\" alt=\"Graffiti\">";
 										}
 										$vString .= "</div>";
-										$vString .= "<div class=\"col-xs-4 col-md-6 row-grid\">".$vResults[9][$x];
+										$vString .= "<div class=\"col-xs-4 col-md-6 row-grid\">".$vResults[9][$x] . $vInStockMesssage . ' ' . $vPublicationMesssage;
 
 										$vString .= "<div id=\"big-order-message\" class=\"text-xsmall red ".$vNoDisplay."\">".MysqlQuery::getText($pConn, 445)/*Let asseblief daarop dat Graffiti soms beperkte voorraad van.....*/."</div></div>";
 										$vString .= "<div class=\"col-xs-2 col-md-1 row-grid col-right\"><input type=\"number\" name=\"number\" id=\"cart-number-".$vResults[0][$x]."\" class=\"input-number\" data-src=\"".$vResults[0][$x]."\" data-book=\"".$vResults[1][$x]."\" value=\"".$vResults[3][$x]."\" required size=\"50\"></div>";
@@ -1528,9 +1546,13 @@ class Pages {
 
 		$vBooks = "&nbsp;<b>".MysqlQuery::getText($pConn, 281)/*Jou boeke*/."</b>:<br>";
 		$vBooks .= "<ul>";
-			for($b = 0; $b < count($vOrderDetailResult[0]); $b++){
-				$vBooks .= "<li>".$vOrderDetailResult[4][$b]." x ".$vOrderDetailResult[6][$b]." - ".$vOrderDetailResult[8][$b]." @ R ".$vOrderDetailResult[3][$b]."</li>";
-			}
+
+        if (isset($vOrderDetailResult['id'])) {
+            for ($b = 0; $b < count($vOrderDetailResult['id']); $b++) {
+                $vBooks .= '<li>' . $vOrderDetailResult['number_books'][$b] . ' x ' . $vOrderDetailResult['title'][$b] . ' - ' . $vOrderDetailResult['author'][$b] . ' @ R ' . $vOrderDetailResult['price'][$b] . '</li>';
+            }
+        }
+
 		$vBooks .= "</ul>";
 
 				$vMessageTop = MysqlQuery::getText($pConn, 301);/*Jou bestelling detail is as volg:*/

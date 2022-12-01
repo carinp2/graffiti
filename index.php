@@ -29,12 +29,11 @@ require_once ("application/classes/Client.class.php");
 $vClient= new Client();
 require_once ("application/resources/PasswordHashClass.php");
 
-echo "SessionGrafUserId = ".(isset($_SESSION['SessionGrafUserId']) ?  $_SESSION['SessionGrafUserId'] : 0)."/////";
-echo "<br>/////SessionGrafUserSessionId: ".($_SESSION['SessionGrafUserSessionId'] ?? 0)."////";
+
 
 $vString = "";
 //$vPage = $vRequest->getParameter('page');
-$vPage = ($_REQUEST['page'] ?? "Tuisblad");
+$vPage = (isset($_REQUEST['page']) ? $_REQUEST['page'] : "Tuisblad");
 //(empty($vPage) ? $vPage = "Tuisblad" : $vPage = $vPage);
 
 //Change Language start
@@ -191,6 +190,7 @@ else {
 			}
 			else if($vPage == "BestellingSukses" || $vPage == "OrderSuccess"){
 				$vPaymentType = $vRequest->getParameter('id');
+                $vOrderId = $vRequest->getParameter('temp');
 				if($vPaymentType == 16 || $vPaymentType == 57){//16 = EFT | 57 = Zapper
 					$vData['client_id'] = $vRequest->getParameter('client_id');
 					$vData['temp_salt'] = $vRequest->getParameter('temp_salt');
@@ -200,14 +200,19 @@ else {
 					$vPaymentResult = 0;
 				}
 				if($vPaymentType != 16 && $vPaymentType != 57){//15 = Credit card| 17 = Instant EFT
-					$vPaymentType = $_POST ['VARIABLE3'];//15 = Credit card| 17 = Instant EFT
-					$vData['client_id'] = $_POST ['VARIABLE2'];
-					$vData['temp_salt'] = $_POST ['VARIABLE1'];
-					$vPaymentResult = $_POST ['_RESULT'];
+					$vPaymentType = $_POST['VARIABLE3'];//15 = Credit card| 17 = Instant EFT
+					$vData['client_id'] = $_POST['VARIABLE2'];
+					$vData['temp_salt'] = $_POST['VARIABLE1'];
+					$vPaymentResult = $_POST['_RESULT'];
+//                    $vOrderInfo = $vQuery->getOrdersInfo($conn, $vOrderId);
 
 					if ($vPaymentResult == 0) {//Success
-						$vData['reference'] = $_POST ["_MERCHANTREFERENCE"];
-						$vData['price'] = $_POST ["_AMOUNT"];
+						$vData['reference'] = $vOrderId;
+						$vData['price'] = $_POST['_AMOUNT'];
+//                        $vData['client_id'] = $vOrderInfo[0];
+//                        $vData['temp_salt'] = $vOrderInfo[1];
+//                        $vPaymentResult = 0;
+//                        $vData['price'] = $vOrderInfo[2];
 						$vData['payment_type'] = $vPaymentType;
 
 						include_once 'include/OrderQueries.php';
@@ -218,18 +223,19 @@ else {
 			}
 			else if($vPage == "BestellingFout" || $vPage == "OrderError"){
 				$vPaymentType = $vRequest->getParameter('id');
-				$vPaymentResult = $_POST ['_RESULT'];
-				$vData['error_code'] = $_POST ['_ERROR_CODE'];
-				$vData['error_message'] = $_POST ['_ERROR_MESSAGE'];
-				$vData['error_detail'] = $_POST ['_ERROR_DETAIL'];
-				$vData['error_source'] = $_POST ['_ERROR_SOURCE'];
-				$vData['bank_error_code'] = $_POST ["_BANK_ERROR_CODE"];
-				$vData['bank_error_message'] = $_POST ["_BANK_ERROR_MESSAGE"];
-				$vData['reference'] = $_POST ["_MERCHANTREFERENCE"];
-				$vData['price'] = $_POST ["_AMOUNT"];
+                $vOrderId = $vRequest->getParameter('temp');
+				$vPaymentResult = $_POST['_RESULT'];
+				$vData['error_code'] = $_POST['_ERROR_CODE'];
+				$vData['error_message'] = $_POST['_ERROR_MESSAGE'];
+				$vData['error_detail'] = $_POST['_ERROR_DETAIL'];
+				$vData['error_source'] = $_POST['_ERROR_SOURCE'];
+				$vData['bank_error_code'] = $_POST['_BANK_ERROR_CODE'];
+				$vData['bank_error_message'] = $_POST['_BANK_ERROR_MESSAGE'];
+				$vData['reference'] = $vOrderId;
+				$vData['price'] = $_POST['_AMOUNT'];
 				$vData['payment_type'] = $vPaymentType;
-				$vData['client_id'] = $_POST ['VARIABLE2'];
-				$vData['temp_salt'] = $vRequest->getParameter('VARIABLE1');
+				$vData['client_id'] = $_POST['VARIABLE2'];
+				$vData['temp_salt'] = $_POST['VARIABLE1'];
 				$vData['lang'] = $vRequest->getParameter('lang');
 				$vOrderErrorPage = $vPages->returnOrderError($conn, $vPaymentType, $vPaymentResult, $vData);
 				echo $vOrderErrorPage;

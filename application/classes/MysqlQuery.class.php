@@ -1438,6 +1438,33 @@ class MysqlQuery {
 		return $row_set;
 	}
 
+    public static function getOrdersInfo($pConn, $vOrderId)
+    {
+        $vSqlString = "select client_id, temp_salt, total_price  from orders WHERE id = ?";
+        //error_log("SQL: ".$vSqlString." ".$vRef, 0, "C:/Temp/php_errors.log");
+        $stmt = $pConn->prepare($vSqlString);
+        $stmt->bind_param('i', $vOrderId);
+        $temp_salt=$client_id = '';
+        $total_price = 0;
+        if ($stmt->execute() == true) {
+            $stmt->bind_result($client_id, $temp_salt, $total_price);
+            while ($stmt->fetch()) {
+                if (!empty($client_id)) {
+                    $vClientId = $client_id;
+                    $vTempSalt = $temp_salt;
+                    $vTotalPrice = $total_price;
+                }
+            }
+        }
+        $stmt->close();
+        if(!empty($client_id)){
+            return array($vClientId, $vTempSalt, $vTotalPrice);
+        }
+        else {
+            return array();
+        }
+    }
+
 	public static function getOrdersIsbnMin($pConn, $pWhere, $pIsbn){
 		$vSqlString = "select od.order_id as order_id, b.isbn as isbn from orders_detail od ";
 		$vSqlString .= "LEFT JOIN books AS b ON b.id = od.book_id ";

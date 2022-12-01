@@ -23,9 +23,9 @@ include "../application/config/session_config.php";
 include "../include/connect/Connect.php";
 include "application/config/session_cms_config.php";
 
-$vPage = ($_REQUEST['page'] ?? "home");
-$vType = ($_REQUEST['type'] ?? "");
-$vId = ($_REQUEST['id'] ?? 0);
+$vPage = ($_REQUEST['page'] ? $_REQUEST['page'] : "home");
+$vType = ($_REQUEST['type'] ? $_REQUEST['type'] : "");
+$vId = ($_REQUEST['id'] ? $_REQUEST['id'] : 0);
 
 if($vPage != "export"){
 	$vBegin = $vCmsParts->returnBeginHtml();
