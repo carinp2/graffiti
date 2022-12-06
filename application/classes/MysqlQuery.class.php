@@ -99,7 +99,7 @@ class MysqlQuery {
 				$v .= "'" . $val . "', ";
 		}
 		$q .= "(" . rtrim($n, ', ') . ") VALUES (" . rtrim($v, ', ') . ");";
-//        error_log('Insert: ' . $q, 3, 'C:/a_Server/wamp64/logs/php_error.log');
+//        error_log('Insert: ' . $q, 3, '../error.log');
 		if(mysqli_query($pConn, $q)){
 			$vResult = mysqli_insert_id($pConn);
 		}
@@ -732,8 +732,8 @@ class MysqlQuery {
 		$stmt = $pConn->prepare($vSqlString);
 		array_unshift($pBindParams, $pBindLetters);
 		call_user_func_array(array($stmt, 'bind_param'), $pBindParams);
-        $id=0;
-        $isbn=$category=$sub_category=$title=$summary=$blob_path=$special_price=$price=$date_publish=$date_loaded=$new=$special=$top_seller=$top_seller_rank=$out_of_print=$in_stock=$publisher=$language=$category_string=$sub_category_string=$author=$illustrator=$translator=$edit_by=$default_discount=$dimensions=$weight=$format=$pages=$new_rank=$soon_discount=$soon_rank=$soon=$special_rank=$tv=$tv_date=$cost_price=$rr=$rr_date=$section=$e_isbn=$e_url=$e_price=$SortPrice = '';
+        $id=$in_stock=0;
+        $isbn=$category=$sub_category=$title=$summary=$blob_path=$special_price=$price=$date_publish=$date_loaded=$new=$special=$top_seller=$top_seller_rank=$out_of_print=$publisher=$language=$category_string=$sub_category_string=$author=$illustrator=$translator=$edit_by=$default_discount=$dimensions=$weight=$format=$pages=$new_rank=$soon_discount=$soon_rank=$soon=$special_rank=$tv=$tv_date=$cost_price=$rr=$rr_date=$section=$e_isbn=$e_url=$e_price=$SortPrice = '';
 		if($stmt->execute() == true) {
 			$stmt->bind_result($id, $isbn, $category, $sub_category, $title, $summary, $blob_path, $special_price, $price, $date_publish, $date_loaded, $new, $special, $top_seller, $top_seller_rank, $out_of_print, $in_stock, $publisher, $language, $category_string, $sub_category_string, $author, $illustrator, $translator, $edit_by, $default_discount, $dimensions, $weight, $format, $pages, $new_rank, $soon_discount, $soon_rank, $soon, $special_rank, $tv, $tv_date, $cost_price, $rr, $rr_date, $section, $e_isbn, $e_url, $e_price, $SortPrice);
 			while ($stmt->fetch()) {

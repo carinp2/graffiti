@@ -120,14 +120,14 @@
                 //Server settings
                 //$mail->SMTPDebug = SMTP::DEBUG_SERVER;                      //Enable verbose debug output
                 $mail->isSMTP();                                            //Send using SMTP
-                $mail->Host = 'smtp.graffitidev.co.za';                     //Set the SMTP server to send through
+                $mail->Host = 'smtp.graffitibooks.co.za';                     //Set the SMTP server to send through
                 $mail->SMTPAuth   = true;                                   //Enable SMTP authentication
-                $mail->Username = 'orders@graffitidev.co.za';                     //SMTP username
-                $mail->Password = '123QWEasdzxc';                               //SMTP password
+                $mail->Username = 'orders@graffitibooks.co.za';                     //SMTP username
+                $mail->Password = 'Lizette@136792';                               //SMTP password
                 //$mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;            //Enable implicit TLS encryption
                 $mail->Port = 587;
 
-                $mail->setFrom('orders@graffitidev.co.za', $fromClient);
+                $mail->setFrom('orders@graffitibooks.co.za', $fromClient);
                 $mail->addAddress($toClient, $clientName);     //Add a recipient
                 $mail->AddStringAttachment($pdfdoc, $filename);    //Optional name
 

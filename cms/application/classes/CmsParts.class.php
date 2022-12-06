@@ -558,7 +558,7 @@ class CmsParts {
 							$vString .= "</select>";
 						$vString .= "</td>";//out of print
 						$vString .= "<td><span class='hidden-input'>".$vResults[16][$x]."</span>";
-							$vString .= "<input type='text' name='instock_".$vResults[0][$x]."' id='instock_".$vResults[0][$x]."' value='".$vResults[16][$x]."' class='small' size='4'>";
+							$vString .= "<input type='text' name='instock_".$vResults[0][$x]."' id='instock_".$vResults[0][$x]."' value='".(empty($vResults[16][$x]) ? 0 :$vResults[16][$x])."' class='small' size='4'>";
 						$vString .= "</td>";//in_stock
 						$vString .= "<td>";
 //						if($pData['type'] != "searchBookPublisher"){
@@ -833,20 +833,21 @@ class CmsParts {
 				}
 				$vString .= "<div class='border'>";
 					$vString .= "<label for='in_stock'>".($vSectionId == 1 ? "Voorraad:" : "In stock:")."</label>";
-					$vString .= General::returnInput($pConn, "text", "in_stock", "in_stock", $vResults[16][0], 5, 5, "", "", "required", "", "");
+//					$vString .= General::returnInput($pConn, "number", "in_stock", "in_stock", $vResults[16][0], 5, 5, "", "", "required", "", "");
+                    $vString .= "<input type='number' id='in_stock' name='in_stock' value='".(empty($vResults[16][0]) ? 0 : $vResults[16][0])."' class='small'>";
 				$vString .= "</div>";
 				$vString .= "<div class='border'>";
-					$vString .= "<label for='in_stock'>".($vSectionId == 1 ? "Dimensies (H x W):" : "Code:")."</label>";
+					$vString .= "<label for='dimensions'>".($vSectionId == 1 ? "Dimensies (H x W):" : "Code:")."</label>";
 					$vString .= General::returnInput($pConn, "text", "dimensions", "dimensions", $vResults[27][0], 25, 25, "", "", "required", "", "");
 				$vString .= "</div>";
 				if($vSectionId == 1){
 					$vString .= "<div class='border'>";
-						$vString .= "<label for='in_stock'>Gewig:</label>";
+						$vString .= "<label for='weight'>Gewig:</label>";
 						$vString .= General::returnInput($pConn, "text", "weight", "weight", $vResults[28][0], 10, 10, "", "", "required", "", "")."&nbsp;gram";
 					$vString .= "</div>";
 					$vString .= "<div class='border'>";
 						$vFormat = MysqlQuery::getCmsLookup($pConn, "book_format");
-						$vString .= "<label for='in_stock'>Formaat:</label>";
+						$vString .= "<label for='format'>Formaat:</label>";
 							$vString .= "<select class='small' id='format' name='format'>";
 								$vString .= "<option value='0'>Kies</option>";
 								for($f = 0; $f < count($vFormat[0]); $f++){
@@ -1577,6 +1578,18 @@ class CmsParts {
 					$vOrderDetail = MysqlQuery::getOrderDetail($pConn, "order_id = ?", $vResults[0][$x]);//$vId, $vOrder_id, $vBook_id, $vPrice, $vNumber_books, $vTemp_salt, $vTitle, $vInStock
 					//(empty($vResults[20][$x]) ? $vTracking = "None" : $vTracking = $vResults[20][$x]);
 
+                    $vBooksString = '';
+                    $vDefaultClass = 'green';
+                    $vDefaultText = 'Al die boeke is in voorraad<br>-Klik vir meer inligting-';
+                    if (isset($vOrderDetail['id'])) {
+                        for ($b = 0; $b < count($vOrderDetail['id']); $b++) {
+                            ($vOrderDetail['in_stock'][$b] > 0 ? $vClass = 'green' : $vClass = 'red');
+                            ($vOrderDetail['in_stock'][$b] == 0 ? $vDefaultClass = 'red' : $vDefaultClass = $vDefaultClass);
+                            ($vOrderDetail['in_stock'][$b] == 0 ? $vDefaultText = 'Al die boeke is nie in voorraad<br>-Klik vir meer inligting-' : $vDefaultText = $vDefaultText);
+                            $vBooksString .= "<div class='" . $vClass . "'>" . $vOrderDetail['number_books'][$b] . ' x ' . $vOrderDetail['title'][$b] . ' @ R' . $vOrderDetail['price'][$b] . '</div>';
+                        }
+                    }
+
 					$vString .= "<tr id='tr_".$vResults[0][$x]."'>";
 						$vString .= "<td>".$vResults[0][$x]."</td>";//id
 						$vString .= "<td>";
@@ -1605,52 +1618,51 @@ class CmsParts {
                             (!empty($vResults[23][$x]) ? $vString .= "<br>(".$vResults[23][$x].")" : $vString .= "");//Courier detail
 						$vString .= "</td>";//client & delivery address
 						$vString .= "<td>".$vResults[0][$x]."/".$vResults[3][$x]."</td>";//order ref
-						$vString .= "<td>";
-                            if(isset($vOrderDetail['id'])) {
-                                $vDefaultClass = '';
-                                $vBookString = '';
-                                $vBooks = '';
-                                $vIconClass = '';
-                                if(isset($vOrderDetail['number_books'])){
-                                    $vTotalNumberBooks = array_sum($vOrderDetail['number_books']);
-                                    $vString .= 'Totaal: ' . $vTotalNumberBooks;
-                                }
-                                for ($b = 0; $b < count($vOrderDetail['id']); $b++) {
-                                    $vClass = ($vOrderDetail['in_stock'][$b] > 0 ? 'green' : 'red');
-                                    if($vIconClass == 'green' && $vClass == 'red'){
-                                        $vIconClass = 'red';
-                                    }
-                                    else if($vIconClass == 'red' || $vClass == 'red'){
-                                        $vIconClass = 'red';
-                                    }
-                                    else {
-                                        $vIconClass = 'green';
-                                    }
-                                    if($vTotalNumberBooks > 5) {
-                                        $vBooks .= $vOrderDetail['number_books'][$b] . " x " . $vOrderDetail['title'][$b].($vOrderDetail['in_stock'][$b] == 0 ? "<span class='".$vClass."'>&nbsp;(Nie in voorraad)</span><br>" : '<br>');
-                                    }
-                                    else {
-                                        $vBookString .= "<br>".$vOrderDetail['number_books'][$b]." x ".$vOrderDetail['title'][$b]. ($vOrderDetail['in_stock'][$b] == 0 ? "&nbsp;<span class='".$vClass."'>(Nie in voorraad)</span>" : "");
-                                    }
-                                }
-                                if(!empty($vBooks)) {
-                                    $vString .= "<a href=\"#orderbooks\" id=\"orderbooks_" . $vResults[0][$x] . "\" data-toggle=\"modal\" data-id=\"" . $vResults[0][$x] . "\" data-books=\"".$vBooks."\"><i class=\"fa fa-book fa-lg space-left ".$vIconClass."\" aria-hidden=\"true\"  data-toggle=\"tooltip\" data-html=\"true\" title=\"Wys boeke\"></i></a>";
-                                }
-                                else {
-                                    $vString .= $vBookString;
-                                }
-                            }
-
-//                            if(isset($vOrderDetail['number_books'])) {
-//                                $vString .= "Totaal: ".array_sum($vOrderDetail['number_books']);
-//                                if(array_sum($vOrderDetail['number_books']) > 2) {
-//                                    $vString .= "&nbsp;&nbsp;<a href=\"#orderbooks\" id=\"orderbooks_".$vResults[0][$x]."\" data-toggle=\"modal\" data-id=\"" . $vResults[0][$x] . "\" data-books=\"" . $vBooksString . "\"><i class=\"fa fa-book fa-lg " . $vDefaultClass . " space-left\" aria-hidden=\"true\"  data-toggle=\"tooltip\" data-html=\"true\" title=\"" . $vDefaultText . "\"></i></a>";
+//						$vString .= "<td>";
+//                            if(isset($vOrderDetail['id'])) {
+//                                $vDefaultClass = '';
+//                                $vBookString = '';
+//                                $vBooks = '';
+//                                $vIconClass = '';
+//                                if(isset($vOrderDetail['number_books'])){
+//                                    $vTotalNumberBooks = array_sum($vOrderDetail['number_books']);
+//                                    $vString .= 'Totaal: ' . $vTotalNumberBooks;
 //                                }
-//                                else{
-//                                    $vString .= "<br>".$vBooksString . ' ' . $vDefaultText;
+//                                for ($b = 0; $b < count($vOrderDetail['id']); $b++) {
+//                                    $vClass = ($vOrderDetail['in_stock'][$b] > 0 ? 'green' : 'red');
+//                                    if($vIconClass == 'green' && $vClass == 'red'){
+//                                        $vIconClass = 'red';
+//                                    }
+//                                    else if($vIconClass == 'red' || $vClass == 'red'){
+//                                        $vIconClass = 'red';
+//                                    }
+//                                    else {
+//                                        $vIconClass = 'green';
+//                                    }
+//                                    if($vTotalNumberBooks > 5) {
+//                                        $vBooks .= $vOrderDetail['number_books'][$b] . " x " . $vOrderDetail['title'][$b].($vOrderDetail['in_stock'][$b] == 0 ? "<span class='".$vClass."'>&nbsp;(Nie in voorraad)</span><br>" : '<br>');
+//                                    }
+//                                    else {
+//                                        $vBookString .= "<br>".$vOrderDetail['number_books'][$b]." x ".$vOrderDetail['title'][$b]. ($vOrderDetail['in_stock'][$b] == 0 ? "&nbsp;<span class='".$vClass."'>(Nie in voorraad)</span>" : "");
+//                                    }
+//                                }
+//                                if(!empty($vBooks)) {
+//                                    $vString .= "<a href=\"#orderbooks\" id=\"orderbooks_" . $vResults[0][$x] . "\" data-toggle=\"modal\" data-id=\"" . $vResults[0][$x] . "\" data-books=\"".$vBooks."\"><i class=\"fa fa-book fa-lg space-left ".$vIconClass."\" aria-hidden=\"true\"  data-toggle=\"tooltip\" data-html=\"true\" title=\"Wys boeke\"></i></a>";
+//                                }
+//                                else {
+//                                    $vString .= $vBookString;
 //                                }
 //                            }
-						$vString .= "</td>";//Book no & books
+//						$vString .= "</td>";//Book no & books
+
+                    $vString .= "<td><span class=\"hidden-input\">" . $vDefaultClass . '</span>';
+                    if(isset($vOrderDetail['number_books'])) {
+                        $vString .= array_sum($vOrderDetail['number_books']);
+                        $vString .= "<a href=\"#orderbooks\" id=\"orderbooks_" . $vResults[0][$x] . "\" data-toggle=\"modal\" data-id=\"" . $vResults[0][$x] . "\" data-books=\"" . $vBooksString . "\"><i class=\"fa fa-book fa-lg " . $vDefaultClass . " space-left\" aria-hidden=\"true\"  data-toggle=\"tooltip\" data-html=\"true\" title=\"" . $vDefaultText . "\"></i></a>";
+                    }
+                    $vString .= '</td>';//Book no & books
+
+
 						$vString .= "<td>".$vResults[2][$x]."</td>";//order date
 						$vString .= "<td>";
 							if($vResults[10][$x] != 5){

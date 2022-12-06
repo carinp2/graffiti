@@ -27,6 +27,7 @@ if($vType == "edit"){
 	//tv: vTv, tv_date: vTvDate
     $vQueryResult = 0;
     $vId = $_POST['book_id'];
+//    filter_var($_POST['phone'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 	$vData['price'] = $vGeneral->prepareStringForQuery($_POST['price']);
 	$vData['special'] = General::prepareStringForQuery($_POST['special']);
 	$vData['special_price'] = General::prepareStringForQuery($_POST['special_price']);
@@ -71,14 +72,15 @@ if($vType == "edit"){
 	}
 }
 else if($vType == "edit-sql" || $vType == "add-sql" || $vType == "add_stat-sql"){
+    //    filter_var($_POST['phone'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 	$vData['isbn'] = $vGeneral->prepareStringForQuery(str_replace(" ", "", str_replace("-", "", $vRequest->getParameter('isbn'))));
 	$vData['category'] = $vRequest->getParameter('category');
 	$vData['sub_category'] = $vRequest->getParameter('sub_category');
-	$vData['title'] = $vGeneral->prepareStringForQuery(ltrim($vRequest->getParameter('title')));
-	$vData['summary'] = $vGeneral->prepareStringForQuery(ltrim($vRequest->getParameter('summary')));
-	$vData['author'] = str_replace(", ", ",", $vGeneral->prepareStringForQuery(ltrim($vRequest->getParameter('author'))));
-	$vData['illustrator'] = str_replace(", ", ",", $vGeneral->prepareStringForQuery(ltrim($vRequest->getParameter('illustrator'))));
-	$vData['translator'] = str_replace(", ", ",", $vGeneral->prepareStringForQuery(ltrim($vRequest->getParameter('translator'))));
+	$vData['title'] = ltrim(filter_var($_POST['title'], FILTER_SANITIZE_FULL_SPECIAL_CHARS));
+	$vData['summary'] = ltrim(filter_var($_POST['summary'], FILTER_SANITIZE_FULL_SPECIAL_CHARS));
+	$vData['author'] = str_replace(", ", ",", ltrim(filter_var($_POST['author'], FILTER_SANITIZE_FULL_SPECIAL_CHARS)));
+	$vData['illustrator'] = str_replace(', ', ',', ltrim(filter_var($_POST['illustrator'], FILTER_SANITIZE_FULL_SPECIAL_CHARS)));
+	$vData['translator'] = str_replace(', ', ',', ltrim(filter_var($_POST['translator'], FILTER_SANITIZE_FULL_SPECIAL_CHARS)));
 	$vData['price'] = $vGeneral->prepareStringForQuery($vRequest->getParameter('price'));
 	(!empty($vRequest->getParameter('special_price')) ? $vData['special_price'] = $vGeneral->prepareStringForQuery($vRequest->getParameter('special_price')) : $vData['special_price'] = 0);
 	(!empty($vRequest->getParameter('special')) ? $vData['special'] = $vGeneral->prepareStringForQuery($vRequest->getParameter('special')) : $vData['special'] = 0);
@@ -89,17 +91,17 @@ else if($vType == "edit-sql" || $vType == "add-sql" || $vType == "add_stat-sql")
 	(!empty($vRequest->getParameter('top_seller')) ? $vData['top_seller'] = $vGeneral->prepareStringForQuery($vRequest->getParameter('top_seller')) : $vData['top_seller'] = 0);
 	($vData['top_seller'] == 0 ? $vData['top_seller_rank'] =  0 : $vData['top_seller_rank'] = $vGeneral->prepareStringForQuery($vRequest->getParameter('top_seller_rank')));
 	(!empty($vRequest->getParameter('out_of_print')) ? $vData['out_of_print'] = $vGeneral->prepareStringForQuery($vRequest->getParameter('out_of_print')) : $vData['out_of_print'] = 0);
-	$vData['in_stock'] = $vGeneral->prepareStringForQuery($vRequest->getParameter('in_stock'));
+	$vData['in_stock'] = filter_var($_POST['in_stock'], FILTER_SANITIZE_NUMBER_INT);
 	$vData['publisher'] = $vGeneral->prepareStringForQuery($vRequest->getParameter('publisher'));
 	$vData['language'] = $vRequest->getParameter('language');
 	if($vType == "add-sql"){
 		$vData['edit_by'] = $vRequest->getParameter('edit_by');
 	}
 	//(!empty($vRequest->getParameter('default_discount')) ? $vData['default_discount'] = $vGeneral->prepareStringForQuery($vRequest->getParameter('default_discount')) : $vData['default_discount'] = 0.1);
-	(!empty($vRequest->getParameter('dimensions')) ? $vData['dimensions'] = $vGeneral->prepareStringForQuery($vRequest->getParameter('dimensions')) : $vData['dimensions'] = 0);
-	(!empty($vRequest->getParameter('weight')) ? $vData['weight'] = $vGeneral->prepareStringForQuery($vRequest->getParameter('weight')) : $vData['weight'] = 0);
-	(!empty($vRequest->getParameter('format')) ? $vData['format'] = $vGeneral->prepareStringForQuery($vRequest->getParameter('format')) : $vData['format'] = 0);
-	(!empty($vRequest->getParameter('pages')) ? $vData['pages'] = $vGeneral->prepareStringForQuery($vRequest->getParameter('pages')) : $vData['pages'] = 0);
+	(!empty($_POST['dimensions']) ? $vData['dimensions'] = filter_var($_POST['dimensions'], FILTER_SANITIZE_FULL_SPECIAL_CHARS) : $vData['dimensions'] = 0);
+	(!empty($_POST['weight']) ? $vData['weight'] = filter_var($_POST['weight'], FILTER_SANITIZE_FULL_SPECIAL_CHARS) : $vData['weight'] = 0);
+	(!empty($_POST['format']) ? $vData['format'] = filter_var($_POST['format'], FILTER_SANITIZE_FULL_SPECIAL_CHARS) : $vData['format'] = 0);
+	(!empty($_POST['pages']) ? $vData['pages'] = filter_var($_POST['pages'], FILTER_SANITIZE_FULL_SPECIAL_CHARS) : $vData['pages'] = 0);
 	(!empty($vRequest->getParameter('soon_discount')) ? $vData['soon_discount'] = $vGeneral->prepareStringForQuery($vRequest->getParameter('soon_discount')) : $vData['soon_discount'] = 0);
 	//(!empty($vRequest->getParameter('soon_rank')) ? $vData['soon_rank'] = $vGeneral->prepareStringForQuery($vRequest->getParameter('soon_rank')) : $vData['soon_rank'] = 0);
 	(!empty($vRequest->getParameter('soon')) ? $vData['soon'] = $vGeneral->prepareStringForQuery($vRequest->getParameter('soon')) : $vData['soon'] = 0);
@@ -198,19 +200,11 @@ else if($vType == "edit-sql" || $vType == "add-sql" || $vType == "add_stat-sql")
 
 		//Set New Rank if book is New Start
 		if($vData['new'] == 1){
-// 			$vCurrentNewRank = MysqlQuery::getBookCurrentRank($conn, 'new_rank', $vId);
-// 			if($vCurrentNewRank == 0){
-// 				$vHighRank = MysqlQuery::getMax($conn, 'books', 'new_rank');
-// 				$vBookData['new_rank'] = $vHighRank + 1;
-// 			}
-// 			else {
-// 				$vBookData['new_rank'] = $vCurrentNewRank;
-// 			}
-			if(empty($vRequest->getParameter('new_rank'))){
-				$vBookData['new_rank'] =1;
+			if(empty($_POST['new_rank'])){
+				$vBookData['new_rank'] = 1;
 			}
 			else {
-				$vBookData['new_rank'] = $vRequest->getParameter('new_rank');
+				$vBookData['new_rank'] = $_POST['new_rank'];
 			}
 		}
 		else if($vData['new'] == 0){
@@ -220,25 +214,18 @@ else if($vType == "edit-sql" || $vType == "add-sql" || $vType == "add_stat-sql")
 
 		//Set Soon Rank if book is Soon Start
 		if($vData['soon'] == 1){
-// 			$vCurrentSoonRank = MysqlQuery::getBookCurrentRank($conn, 'soon_rank', $vId);
-// 			if($vCurrentSoonRank == 0){
-// 				$vHighRank = MysqlQuery::getMax($conn, 'books', 'soon_rank');
-// 				$vBookData['soon_rank'] = $vHighRank + 1;
-// 			}
-// 			else {
-// 				$vBookData['soon_rank'] = $vCurrentSoonRank;
-// 			}
-			if(empty($vRequest->getParameter('soon_rank'))){
+			if(empty($_POST['new_rank'])){
 				$vBookData['soon_rank'] = 1;
 			}
 			else {
-				$vBookData['soon_rank'] = $vRequest->getParameter('soon_rank');
+				$vBookData['soon_rank'] = $_POST['new_rank'];
 			}
 		}
 		else if($vData['soon'] == 0){
 			$vBookData['soon_rank'] = 0;
 		}
 		//Set Soon Rank if book is Soon End
+        $vData['in_stock'] = (empty($vData['in_stock']) ? 0 : $vData['in_stock']);
 
 		$vQueryResult = MysqlQuery::doUpdate($conn, 'books', $vData, "id = ".	$vId);
 		if ($vQueryResult == 1){//success
@@ -253,12 +240,12 @@ else if($vType == "edit-sql" || $vType == "add-sql" || $vType == "add_stat-sql")
 		}
 		//Do search index
 		if($vQueryResult == 1){
-			$vDataS['title'] = General::prepareBooksSearchStringData($vData['title']);
-			$vDataS['summary'] = General::prepareBooksSearchStringData($vData['summary']);
-			$vDataS['author'] = General::prepareBooksSearchStringData($vData['author']);
-			$vDataS['illustrator'] = General::prepareBooksSearchStringData($vData['illustrator']);
-			$vDataS['translator'] = General::prepareBooksSearchStringData($vData['translator']);
-			$vDataS['language'] = General::prepareBooksSearchStringData($vData['language']);
+			$vDataS['title'] = filter_var($_POST['title'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+			$vDataS['summary'] = filter_var($_POST['summary'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+			$vDataS['author'] = filter_var($_POST['author'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+			$vDataS['illustrator'] = filter_var($_POST['illustrator'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+			$vDataS['translator'] = filter_var($_POST['translator'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+			$vDataS['language'] = filter_var($_POST['language'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 			$vDataS['isbn'] = $vData['isbn'];
 			$vQueryS = $vQuery::doUpdate($conn, "books_search", $vDataS, "id = ".$vId);
 			if($vQueryS == 1){

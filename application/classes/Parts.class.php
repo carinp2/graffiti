@@ -8,7 +8,7 @@ class Parts {
 
 	public function getHtmlBegin($pConn, $pType, $pValue, $pParam, $pSubCatId){
 		$vString = "";
-		if(is_string($pValue) && $pValue == "a"){
+		if(is_string($pValue) && $pValue == "a" || is_numeric($pValue) && $pValue > 10000){
 			$vMetaResults = MysqlQuery::getBooksMetaInfo($pConn, $pValue, str_replace("~", ".", $pParam));//$vId, $vTitle, $vAuthor, $vSummary, $vCategory, $vSubCategory, $vBlobPath
 			if($_SESSION['SessionGrafLanguage'] == 'af'){
 				 $vTitle = $vMetaResults[1].": ".$vMetaResults[2]." Graffiti Boeke";
@@ -533,7 +533,7 @@ class Parts {
                             }
 							else {
 								($vLink2[0][$y] == 30 ? $vTitle = $vLink2[1][$y]." - ".MysqlQuery::getText($pConn, 473) : $vTitle = $vLink2[1][$y]);
-								$vString .= "<a href=\"".$_SESSION['SessionGrafLanguage']."/".$vLink2[0][$y]."/Info/".$vLink2Url."\" title=\"".$vTitle."\">".$vLink2[1][$y]."</a>";
+								$vString .= "<a href=\"".$_SESSION['SessionGrafLanguage']."/".$vLink2[0][$y]."/Info/".$vLink2Url."\" title=\"".$vTitle."\" target='_blank'>".$vLink2[1][$y]."</a>";
 							}
 						}
 					$vString .= "</div>";

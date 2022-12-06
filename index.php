@@ -51,6 +51,7 @@ else {
 	$vValue = (isset($_REQUEST['id']) ? $_REQUEST['id'] : "");
 	$vParam = (isset($_REQUEST['cat']) ? $_REQUEST['cat'] : "");
 	$vSubCatId = (isset($_REQUEST['c_id']) ? $_REQUEST['c_id'] : "");
+
 	$vHtmlBegin = $vParts->getHtmlBegin($conn, $vPage, $vValue, $vParam, $vSubCatId);
 	echo $vHtmlBegin;
 

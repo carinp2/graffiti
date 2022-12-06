@@ -41,6 +41,13 @@ echo $vSubMenu;
 
 $vStringA = "";
 
+use Shuchkin\SimpleXLSX;
+
+ini_set('error_reporting', E_ALL);
+ini_set('display_errors', true);
+
+require_once '../vendor/shuchkin/simplexlsx/src/SimpleXLSX.php';
+
 	//############################################################################################  Stock update
 	if($vType == "stock_update"){
 			$vStringA .= "<h1>Laai voorraadlys op</h1>";
@@ -253,7 +260,7 @@ $vStringA = "";
 			$vStringA .= "<tbody>";
 			$vFileType = substr($_FILES['load_book_list_file']['name'], strpos($_FILES['load_book_list_file']['name'], "."));
 		    if($vFileType == ".xlsx"){
-		    	include "application/classes/simplexlsx.class.php";
+//		    	include "application/classes/simplexlsx.class.php";
 				$xlsx = new SimpleXLSX( $_FILES['load_book_list_file']['tmp_name'] );
 				$rowNo = 2;
 				foreach( $xlsx->rows() as $k => $r) {
@@ -271,11 +278,11 @@ $vStringA = "";
 						$vData['isbn'] = trim($r[0]);
 						$vData['category'] = $r[1];
 						$vData['sub_category'] =$r[2];
-						$vData['title'] = General::prepareStringForQuery($r[3]);
-						$vData['summary'] = General::prepareStringForQuery($r[4]);
-						$vData['author'] = General::prepareStringForQuery($r[5]);
-						$vData['illustrator'] = General::prepareStringForQuery($r[6]);
-						$vData['translator'] = General::prepareStringForQuery($r[7]);
+						$vData['title'] = filter_var($r[3], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+						$vData['summary'] = filter_var($r[4], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+						$vData['author'] = filter_var($r[5], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+						$vData['illustrator'] = filter_var($r[6], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+						$vData['translator'] = filter_var($r[7], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 						$vData['price'] = round(General::prepareStringForQuery($r[8]),0, PHP_ROUND_HALF_EVEN);
 						$vData['date_publish'] = General::prepareStringForQuery($r[9]);
 						($r[10] == "" ? $vData['dimensions'] = 0 : $vData['dimensions'] = General::prepareStringForQuery(trim($r[10])));
