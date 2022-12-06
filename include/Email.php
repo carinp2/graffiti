@@ -120,10 +120,10 @@
                 //Server settings
                 //$mail->SMTPDebug = SMTP::DEBUG_SERVER;                      //Enable verbose debug output
                 $mail->isSMTP();                                            //Send using SMTP
-                $mail->Host = 'smtp.graffitibooks.co.za';                     //Set the SMTP server to send through
+                $mail->Host = 'xxxxx';                     //Set the SMTP server to send through
                 $mail->SMTPAuth   = true;                                   //Enable SMTP authentication
-                $mail->Username = 'orders@graffitibooks.co.za';                     //SMTP username
-                $mail->Password = 'Lizette@136792';                               //SMTP password
+                $mail->Username = 'xxxxxx';                     //SMTP username
+                $mail->Password = 'xxxxx';                               //SMTP password
                 //$mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;            //Enable implicit TLS encryption
                 $mail->Port = 587;
 
